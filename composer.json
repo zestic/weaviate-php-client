@@ -59,7 +59,6 @@
         "sort-packages": true
     },
     "scripts": {
-        "security-audit": "composer audit --format=table",
         "cs-check": "phpcs src tests --standard=PSR12",
         "cs-fix": "phpcbf src tests --standard=PSR12",
         "docker-reset": "./scripts/test-setup.sh reset",
@@ -68,6 +67,7 @@
         "normalize": "@composer normalize",
         "normalize-check": "@composer normalize --dry-run",
         "phpstan": "phpstan analyse src tests --level=8",
+        "security-audit": "composer audit --format=table",
         "test": "phpunit",
         "test-coverage": "phpunit --coverage-html coverage",
         "test-docker": "./scripts/test-setup.sh test",
