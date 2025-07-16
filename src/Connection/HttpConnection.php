@@ -23,6 +23,7 @@ namespace Weaviate\Connection;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Weaviate\Auth\AuthInterface;
 use Weaviate\Exceptions\NotFoundException;
 
 /**
@@ -34,8 +35,17 @@ class HttpConnection implements ConnectionInterface
         private readonly string $baseUrl,
         private readonly ClientInterface $httpClient,
         private readonly RequestFactoryInterface $requestFactory,
-        private readonly StreamFactoryInterface $streamFactory
+        private readonly StreamFactoryInterface $streamFactory,
+        private readonly ?AuthInterface $auth = null
     ) {
+    }
+
+    /**
+     * Apply authentication to a request if auth is configured
+     */
+    private function applyAuth(\Psr\Http\Message\RequestInterface $request): \Psr\Http\Message\RequestInterface
+    {
+        return $this->auth !== null ? $this->auth->apply($request) : $request;
     }
 
     public function get(string $path, array $params = []): array
@@ -46,6 +56,7 @@ class HttpConnection implements ConnectionInterface
         }
 
         $request = $this->requestFactory->createRequest('GET', $url);
+        $request = $this->applyAuth($request);
         $response = $this->httpClient->sendRequest($request);
 
         if ($response->getStatusCode() === 404) {
@@ -71,6 +82,7 @@ class HttpConnection implements ConnectionInterface
                 ->withHeader('Content-Type', 'application/json');
         }
 
+        $request = $this->applyAuth($request);
         $response = $this->httpClient->sendRequest($request);
         $body = (string) $response->getBody();
         return json_decode($body, true) ?? [];
@@ -91,6 +103,7 @@ class HttpConnection implements ConnectionInterface
                 ->withHeader('Content-Type', 'application/json');
         }
 
+        $request = $this->applyAuth($request);
         $response = $this->httpClient->sendRequest($request);
         $body = (string) $response->getBody();
         return json_decode($body, true) ?? [];
@@ -111,6 +124,7 @@ class HttpConnection implements ConnectionInterface
                 ->withHeader('Content-Type', 'application/json');
         }
 
+        $request = $this->applyAuth($request);
         $response = $this->httpClient->sendRequest($request);
         $body = (string) $response->getBody();
         return json_decode($body, true) ?? [];
@@ -120,6 +134,7 @@ class HttpConnection implements ConnectionInterface
     {
         $url = $this->baseUrl . $path;
         $request = $this->requestFactory->createRequest('DELETE', $url);
+        $request = $this->applyAuth($request);
         $response = $this->httpClient->sendRequest($request);
 
         return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;

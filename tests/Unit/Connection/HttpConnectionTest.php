@@ -141,4 +141,53 @@ class HttpConnectionTest extends TestCase
 
         $this->assertEquals(['id' => '123'], $result);
     }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::__construct
+     * @covers \Weaviate\Connection\HttpConnection::get
+     * @covers \Weaviate\Connection\HttpConnection::applyAuth
+     */
+    public function testCanMakeGetRequestWithAuthentication(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $auth = $this->createMock(AuthInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $authenticatedRequest = $this->createMock(RequestInterface::class);
+        $stream = $this->createMock(StreamInterface::class);
+
+        $response->method('getStatusCode')->willReturn(200);
+        $response->method('getBody')->willReturn($stream);
+        $stream->method('__toString')->willReturn('{"result": "success"}');
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->with('GET', 'http://localhost:8080/v1/schema')
+            ->willReturn($request);
+
+        // Verify that auth is applied to the request
+        $auth->expects($this->once())
+            ->method('apply')
+            ->with($request)
+            ->willReturn($authenticatedRequest);
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->with($authenticatedRequest)
+            ->willReturn($response);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            $auth
+        );
+
+        $result = $connection->get('/v1/schema');
+
+        $this->assertEquals(['result' => 'success'], $result);
+    }
 }
