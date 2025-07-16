@@ -1,0 +1,155 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: ['8.3', '8.4']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: json, curl
+        coverage: xdebug
+    
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
+    
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-${{ matrix.php-version }}-
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+    
+    - name: Run unit tests
+      run: composer test-unit
+    
+    - name: Run PHPStan
+      run: composer phpstan
+    
+    - name: Check coding standards
+      run: composer cs-check
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: ['8.3', '8.4']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: json, curl
+    
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-${{ matrix.php-version }}-
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+    
+    - name: Start Weaviate
+      run: |
+        docker compose up -d weaviate
+        # Wait for Weaviate to be ready
+        timeout=60
+        counter=0
+        while [ $counter -lt $timeout ]; do
+          if curl -f http://localhost:8080/v1/.well-known/ready > /dev/null 2>&1; then
+            echo "Weaviate is ready!"
+            break
+          fi
+          sleep 2
+          counter=$((counter + 2))
+          echo "Waiting for Weaviate... ($counter/${timeout}s)"
+        done
+        if [ $counter -ge $timeout ]; then
+          echo "Weaviate failed to start within ${timeout} seconds"
+          docker compose logs weaviate
+          exit 1
+        fi
+    
+    - name: Run integration tests
+      run: composer test-integration
+      env:
+        WEAVIATE_URL: http://localhost:8080
+    
+    - name: Stop Weaviate
+      if: always()
+      run: docker compose down
+
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: json, curl
+        coverage: xdebug
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+    
+    - name: Start Weaviate
+      run: |
+        docker compose up -d weaviate
+        timeout=60
+        counter=0
+        while [ $counter -lt $timeout ]; do
+          if curl -f http://localhost:8080/v1/.well-known/ready > /dev/null 2>&1; then
+            echo "Weaviate is ready!"
+            break
+          fi
+          sleep 2
+          counter=$((counter + 2))
+        done
+    
+    - name: Run tests with coverage
+      run: composer test-coverage
+      env:
+        WEAVIATE_URL: http://localhost:8080
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/clover.xml
+        fail_ci_if_error: true
+    
+    - name: Stop Weaviate
+      if: always()
+      run: docker compose down
