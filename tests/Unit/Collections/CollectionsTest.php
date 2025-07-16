@@ -27,6 +27,9 @@ use Weaviate\Connection\ConnectionInterface;
 
 class CollectionsTest extends TestCase
 {
+    /**
+     * @covers \Weaviate\Collections\Collections::exists
+     */
     public function testCanCheckIfCollectionExists(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
@@ -42,6 +45,9 @@ class CollectionsTest extends TestCase
         $this->assertTrue($exists);
     }
 
+    /**
+     * @covers \Weaviate\Collections\Collections::exists
+     */
     public function testReturnsFalseWhenCollectionDoesNotExist(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
@@ -57,6 +63,9 @@ class CollectionsTest extends TestCase
         $this->assertFalse($exists);
     }
 
+    /**
+     * @covers \Weaviate\Collections\Collections::create
+     */
     public function testCanCreateCollection(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
@@ -83,6 +92,9 @@ class CollectionsTest extends TestCase
         $this->assertEquals(['class' => 'Organization'], $result);
     }
 
+    /**
+     * @covers \Weaviate\Collections\Collections::get
+     */
     public function testCanGetCollection(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);

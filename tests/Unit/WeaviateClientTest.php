@@ -27,6 +27,9 @@ use Weaviate\Auth\AuthInterface;
 
 class WeaviateClientTest extends TestCase
 {
+    /**
+     * @covers \Weaviate\WeaviateClient::__construct
+     */
     public function testCanCreateClientWithConnection(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
@@ -35,6 +38,10 @@ class WeaviateClientTest extends TestCase
         $this->assertInstanceOf(WeaviateClient::class, $client);
     }
 
+    /**
+     * @covers \Weaviate\WeaviateClient::__construct
+     * @covers \Weaviate\WeaviateClient::getAuth
+     */
     public function testCanCreateClientWithConnectionAndAuth(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
@@ -44,6 +51,9 @@ class WeaviateClientTest extends TestCase
         $this->assertInstanceOf(WeaviateClient::class, $client);
     }
 
+    /**
+     * @covers \Weaviate\WeaviateClient::collections
+     */
     public function testCollectionsReturnsCollectionsInstance(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
@@ -54,6 +64,9 @@ class WeaviateClientTest extends TestCase
         $this->assertInstanceOf(\Weaviate\Collections\Collections::class, $collections);
     }
 
+    /**
+     * @covers \Weaviate\WeaviateClient::schema
+     */
     public function testSchemaReturnsSchemaInstance(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);

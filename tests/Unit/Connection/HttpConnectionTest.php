@@ -32,6 +32,9 @@ use Psr\Http\Message\StreamInterface;
 
 class HttpConnectionTest extends TestCase
 {
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::__construct
+     */
     public function testCanCreateConnection(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -48,6 +51,9 @@ class HttpConnectionTest extends TestCase
         $this->assertInstanceOf(HttpConnection::class, $connection);
     }
 
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::get
+     */
     public function testCanMakeGetRequest(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -83,6 +89,9 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['result' => 'success'], $result);
     }
 
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::post
+     */
     public function testCanMakePostRequest(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
