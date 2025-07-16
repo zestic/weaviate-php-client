@@ -59,14 +59,14 @@
         "sort-packages": true
     },
     "scripts": {
-        "audit": "composer audit --format=table",
+        "security-audit": "composer audit --format=table",
         "cs-check": "phpcs src tests --standard=PSR12",
         "cs-fix": "phpcbf src tests --standard=PSR12",
         "docker-reset": "./scripts/test-setup.sh reset",
         "docker-start": "./scripts/test-setup.sh start",
         "docker-stop": "./scripts/test-setup.sh stop",
-        "normalize": "composer normalize",
-        "normalize-check": "composer normalize --dry-run",
+        "normalize": "@composer normalize",
+        "normalize-check": "@composer normalize --dry-run",
         "phpstan": "phpstan analyse src tests --level=8",
         "test": "phpunit",
         "test-coverage": "phpunit --coverage-html coverage",
