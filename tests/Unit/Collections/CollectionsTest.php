@@ -47,6 +47,7 @@ class CollectionsTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Collections\Collections::__construct
      * @covers \Weaviate\Collections\Collections::exists
      */
     public function testReturnsFalseWhenCollectionDoesNotExist(): void
@@ -95,7 +96,9 @@ class CollectionsTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Collections\Collections::__construct
      * @covers \Weaviate\Collections\Collections::get
+     * @covers \Weaviate\Collections\Collection::__construct
      */
     public function testCanGetCollection(): void
     {
