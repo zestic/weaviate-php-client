@@ -28,6 +28,7 @@ use Weaviate\Connection\ConnectionInterface;
 class CollectionTest extends TestCase
 {
     /**
+     * @covers \Weaviate\Collections\Collection::__construct
      * @covers \Weaviate\Collections\Collection::withTenant
      * @covers \Weaviate\Collections\Collection::getTenant
      */
@@ -58,6 +59,7 @@ class CollectionTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Collections\Collection::__construct
      * @covers \Weaviate\Collections\Collection::data
      * @covers \Weaviate\Collections\Collection::withTenant
      */
