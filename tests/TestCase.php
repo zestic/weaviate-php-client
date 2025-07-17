@@ -32,7 +32,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getWeaviateUrl(): string
     {
-        return $_ENV['WEAVIATE_URL'] ?? 'http://localhost:8080';
+        return $_ENV['WEAVIATE_URL'] ?? 'http://localhost:18080';
     }
 
     /**

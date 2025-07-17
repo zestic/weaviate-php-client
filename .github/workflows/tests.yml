@@ -81,11 +81,12 @@ jobs:
     - name: Start Weaviate
       run: |
         docker compose up -d weaviate
-        # Wait for Weaviate to be ready
-        timeout=60
+        # Wait for Weaviate to be ready (increased timeout for cluster initialization)
+        timeout=120
         counter=0
+        echo "Starting Weaviate and waiting for cluster initialization..."
         while [ $counter -lt $timeout ]; do
-          if curl -f http://localhost:8080/v1/.well-known/ready > /dev/null 2>&1; then
+          if curl -f http://localhost:18080/v1/.well-known/ready > /dev/null 2>&1; then
             echo "Weaviate is ready!"
             break
           fi
@@ -95,14 +96,17 @@ jobs:
         done
         if [ $counter -ge $timeout ]; then
           echo "Weaviate failed to start within ${timeout} seconds"
+          echo "Showing Weaviate logs for debugging:"
           docker compose logs weaviate
+          echo "Checking container status:"
+          docker compose ps
           exit 1
         fi
     
     - name: Run integration tests
       run: composer test-integration
       env:
-        WEAVIATE_URL: http://localhost:8080
+        WEAVIATE_URL: http://localhost:18080
     
     - name: Stop Weaviate
       if: always()
@@ -128,21 +132,32 @@ jobs:
     - name: Start Weaviate
       run: |
         docker compose up -d weaviate
-        timeout=60
+        # Wait for Weaviate to be ready (increased timeout for cluster initialization)
+        timeout=120
         counter=0
+        echo "Starting Weaviate and waiting for cluster initialization..."
         while [ $counter -lt $timeout ]; do
-          if curl -f http://localhost:8080/v1/.well-known/ready > /dev/null 2>&1; then
+          if curl -f http://localhost:18080/v1/.well-known/ready > /dev/null 2>&1; then
             echo "Weaviate is ready!"
             break
           fi
           sleep 2
           counter=$((counter + 2))
+          echo "Waiting for Weaviate... ($counter/${timeout}s)"
         done
+        if [ $counter -ge $timeout ]; then
+          echo "Weaviate failed to start within ${timeout} seconds"
+          echo "Showing Weaviate logs for debugging:"
+          docker compose logs weaviate
+          echo "Checking container status:"
+          docker compose ps
+          exit 1
+        fi
     
     - name: Run tests with coverage
       run: composer test-coverage
       env:
-        WEAVIATE_URL: http://localhost:8080
+        WEAVIATE_URL: http://localhost:18080
     
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
