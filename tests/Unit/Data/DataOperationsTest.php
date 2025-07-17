@@ -83,18 +83,28 @@ class DataOperationsTest extends TestCase
 
     /**
      * @covers \Weaviate\Data\DataOperations::update
+     * @covers \Weaviate\Data\DataOperations::get
      */
     public function testCanUpdateObject(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
+
+        // Expect patch call first
         $connection->expects($this->once())
             ->method('patch')
             ->with('/v1/objects/Organization/123e4567-e89b-12d3-a456-426614174000?tenant=tenant1', [
                 'properties' => ['name' => 'Updated Corp'],
                 'tenant' => 'tenant1'
             ])
+            ->willReturn([]);
+
+        // Then expect get call to fetch updated object
+        $connection->expects($this->once())
+            ->method('get')
+            ->with('/v1/objects/Organization/123e4567-e89b-12d3-a456-426614174000?tenant=tenant1')
             ->willReturn([
                 'id' => '123e4567-e89b-12d3-a456-426614174000',
+                'class' => 'Organization',
                 'properties' => ['name' => 'Updated Corp']
             ]);
 

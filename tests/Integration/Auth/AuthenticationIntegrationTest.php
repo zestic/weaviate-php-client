@@ -120,4 +120,39 @@ class AuthenticationIntegrationTest extends TestCase
         $this->assertArrayHasKey('hostname', $result);
         $this->assertArrayHasKey('version', $result);
     }
+
+    /**
+     * @covers \Weaviate\WeaviateClient::__construct
+     * @covers \Weaviate\WeaviateClient::collections
+     * @covers \Weaviate\Collections\Collections::exists
+     */
+    public function testWeaviateClientWorksEndToEndWithAuth(): void
+    {
+        $this->skipIfWeaviateNotAvailable();
+
+        // Create HTTP client and factories
+        $httpClient = new Client();
+        $httpFactory = new HttpFactory();
+
+        // Create auth
+        $auth = new ApiKey($this->getWeaviateApiKey());
+
+        // Create connection with auth
+        $connection = new HttpConnection(
+            $this->getWeaviateUrl(),
+            $httpClient,
+            $httpFactory,
+            $httpFactory,
+            $auth
+        );
+
+        // Create client
+        $client = new WeaviateClient($connection);
+
+        // Test that we can use the client to check if a collection exists
+        // This tests the full stack: WeaviateClient -> Collections -> HttpConnection -> Auth
+        $exists = $client->collections()->exists('NonExistentCollection');
+
+        $this->assertFalse($exists);
+    }
 }

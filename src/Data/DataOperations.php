@@ -107,7 +107,10 @@ class DataOperations
             $data['tenant'] = $this->tenant;
         }
 
-        return $this->connection->patch($path, $data);
+        $this->connection->patch($path, $data);
+
+        // PATCH may return empty response, so fetch the updated object
+        return $this->get($id);
     }
 
     /**
