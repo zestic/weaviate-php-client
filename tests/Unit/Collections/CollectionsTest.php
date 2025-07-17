@@ -28,6 +28,7 @@ use Weaviate\Connection\ConnectionInterface;
 class CollectionsTest extends TestCase
 {
     /**
+     * @covers \Weaviate\Collections\Collections::__construct
      * @covers \Weaviate\Collections\Collections::exists
      */
     public function testCanCheckIfCollectionExists(): void
@@ -64,6 +65,7 @@ class CollectionsTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Collections\Collections::__construct
      * @covers \Weaviate\Collections\Collections::create
      */
     public function testCanCreateCollection(): void

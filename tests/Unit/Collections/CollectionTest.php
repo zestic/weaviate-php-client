@@ -43,7 +43,9 @@ class CollectionTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Collections\Collection::__construct
      * @covers \Weaviate\Collections\Collection::data
+     * @covers \Weaviate\Data\DataOperations::__construct
      */
     public function testDataReturnsDataOperations(): void
     {

@@ -52,7 +52,9 @@ class WeaviateClientTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\WeaviateClient::__construct
      * @covers \Weaviate\WeaviateClient::collections
+     * @covers \Weaviate\Collections\Collections::__construct
      */
     public function testCollectionsReturnsCollectionsInstance(): void
     {

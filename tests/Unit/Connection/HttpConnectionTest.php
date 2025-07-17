@@ -52,6 +52,7 @@ class HttpConnectionTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Connection\HttpConnection::__construct
      * @covers \Weaviate\Connection\HttpConnection::get
      */
     public function testCanMakeGetRequest(): void

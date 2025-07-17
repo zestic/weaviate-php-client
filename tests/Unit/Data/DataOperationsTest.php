@@ -27,6 +27,7 @@ use Weaviate\Connection\ConnectionInterface;
 class DataOperationsTest extends TestCase
 {
     /**
+     * @covers \Weaviate\Data\DataOperations::__construct
      * @covers \Weaviate\Data\DataOperations::create
      */
     public function testCanCreateObject(): void
@@ -82,6 +83,7 @@ class DataOperationsTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Data\DataOperations::__construct
      * @covers \Weaviate\Data\DataOperations::update
      * @covers \Weaviate\Data\DataOperations::get
      */

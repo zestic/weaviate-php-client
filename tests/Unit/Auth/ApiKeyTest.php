@@ -37,6 +37,7 @@ class ApiKeyTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Auth\ApiKey::__construct
      * @covers \Weaviate\Auth\ApiKey::apply
      */
     public function testAppliesAuthorizationHeader(): void
