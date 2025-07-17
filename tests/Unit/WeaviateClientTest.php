@@ -67,7 +67,9 @@ class WeaviateClientTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\WeaviateClient::__construct
      * @covers \Weaviate\WeaviateClient::schema
+     * @covers \Weaviate\Schema\Schema::__construct
      */
     public function testSchemaReturnsSchemaInstance(): void
     {
