@@ -29,6 +29,7 @@ class DataOperationsTest extends TestCase
     /**
      * @covers \Weaviate\Data\DataOperations::__construct
      * @covers \Weaviate\Data\DataOperations::create
+     * @covers \Weaviate\Data\DataOperations::extractProperties
      */
     public function testCanCreateObject(): void
     {
@@ -61,6 +62,7 @@ class DataOperationsTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Data\DataOperations::__construct
      * @covers \Weaviate\Data\DataOperations::get
      */
     public function testCanGetObject(): void
@@ -120,6 +122,7 @@ class DataOperationsTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Data\DataOperations::__construct
      * @covers \Weaviate\Data\DataOperations::delete
      */
     public function testCanDeleteObject(): void
