@@ -190,8 +190,8 @@ class RetryHandlerTest extends TestCase
 
         try {
             $handler->execute('test operation', $operation);
-            // @phpstan-ignore-next-line - This line is reachable if no exception is thrown,
-            // which would be a test failure
+            // This line is reachable if no exception is thrown, which would be a test failure
+            // @phpstan-ignore-next-line
             $this->fail('Expected WeaviateRetryException');
         } catch (WeaviateRetryException $e) {
             $this->assertSame(2, $e->getRetryCount());
