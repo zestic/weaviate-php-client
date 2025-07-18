@@ -225,6 +225,160 @@ class HttpConnectionIntegrationTest extends TestCase
         $this->connection->get("/v1/objects/{$collectionName}/{$objectId}");
     }
 
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::put
+     * @covers \Weaviate\Connection\HttpConnection::get
+     * @covers \Weaviate\Connection\HttpConnection::delete
+     */
+    public function testCanUpdateObjectWithPut(): void
+    {
+        $collectionName = 'TestHttpConnectionPut';
+        $objectId = '456e7890-e89b-12d3-a456-426614174001';
+
+        // Clean up any existing collection first
+        try {
+            $this->connection->delete("/v1/schema/{$collectionName}");
+        } catch (NotFoundException) {
+            // Collection doesn't exist, which is fine
+        }
+
+        // Create collection first
+        $createCollectionData = [
+            'class' => $collectionName,
+            'properties' => [
+                [
+                    'name' => 'title',
+                    'dataType' => ['text']
+                ],
+                [
+                    'name' => 'description',
+                    'dataType' => ['text']
+                ]
+            ]
+        ];
+
+        $this->connection->post('/v1/schema', $createCollectionData);
+
+        // Create object using POST
+        $createObjectData = [
+            'class' => $collectionName,
+            'id' => $objectId,
+            'properties' => [
+                'title' => 'Original Title',
+                'description' => 'Original Description'
+            ]
+        ];
+
+        $this->connection->post('/v1/objects', $createObjectData);
+
+        // Update object using PUT (full replacement)
+        $updateData = [
+            'class' => $collectionName,
+            'properties' => [
+                'title' => 'Updated Title via PUT',
+                'description' => 'Updated Description via PUT'
+            ]
+        ];
+
+        $result = $this->connection->put("/v1/objects/{$collectionName}/{$objectId}", $updateData);
+
+        // PUT should return the updated object
+        $this->assertIsArray($result);
+        $this->assertEquals($objectId, $result['id']);
+
+        // Verify the update by fetching the object
+        $updatedObject = $this->connection->get("/v1/objects/{$collectionName}/{$objectId}");
+        $this->assertEquals('Updated Title via PUT', $updatedObject['properties']['title']);
+        $this->assertEquals('Updated Description via PUT', $updatedObject['properties']['description']);
+
+        // Clean up
+        $this->connection->delete("/v1/schema/{$collectionName}");
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::head
+     */
+    public function testCanMakeHeadRequest(): void
+    {
+        // Test HEAD request to meta endpoint (should exist)
+        $result = $this->connection->head('/v1/meta');
+        $this->assertTrue($result);
+
+        // Test HEAD request to non-existent endpoint
+        $result = $this->connection->head('/v1/non-existent-endpoint');
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::deleteWithData
+     */
+    public function testCanDeleteWithData(): void
+    {
+        $collectionName = 'TestHttpConnectionDeleteWithData';
+
+        // Clean up any existing collection first
+        try {
+            $this->connection->delete("/v1/schema/{$collectionName}");
+        } catch (NotFoundException) {
+            // Collection doesn't exist, which is fine
+        }
+
+        // Create collection first
+        $createCollectionData = [
+            'class' => $collectionName,
+            'properties' => [
+                [
+                    'name' => 'category',
+                    'dataType' => ['text']
+                ],
+                [
+                    'name' => 'value',
+                    'dataType' => ['int']
+                ]
+            ]
+        ];
+
+        $this->connection->post('/v1/schema', $createCollectionData);
+
+        // Create multiple objects
+        $objects = [
+            [
+                'class' => $collectionName,
+                'properties' => ['category' => 'test', 'value' => 1]
+            ],
+            [
+                'class' => $collectionName,
+                'properties' => ['category' => 'test', 'value' => 2]
+            ],
+            [
+                'class' => $collectionName,
+                'properties' => ['category' => 'keep', 'value' => 3]
+            ]
+        ];
+
+        foreach ($objects as $object) {
+            $this->connection->post('/v1/objects', $object);
+        }
+
+        // Delete objects with specific criteria using deleteWithData
+        $deleteData = [
+            'match' => [
+                'class' => $collectionName,
+                'where' => [
+                    'path' => ['category'],
+                    'operator' => 'Equal',
+                    'valueText' => 'test'
+                ]
+            ]
+        ];
+
+        $result = $this->connection->deleteWithData('/v1/batch/objects', $deleteData);
+        $this->assertTrue($result);
+
+        // Clean up
+        $this->connection->delete("/v1/schema/{$collectionName}");
+    }
+
     protected function tearDown(): void
     {
         // Clean up any test collections that might have been left behind

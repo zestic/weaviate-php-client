@@ -1013,7 +1013,7 @@ class HttpConnectionTest extends TestCase
             ->method('createRequest')
             ->willReturn($request);
 
-        $networkException = new class('Network error') extends \Exception implements NetworkExceptionInterface {
+        $networkException = new class ('Network error') extends \Exception implements NetworkExceptionInterface {
             public function getRequest(): \Psr\Http\Message\RequestInterface
             {
                 throw new \RuntimeException('Not implemented');
@@ -1047,7 +1047,7 @@ class HttpConnectionTest extends TestCase
         $streamFactory = $this->createMock(StreamFactoryInterface::class);
         $request = $this->createMock(RequestInterface::class);
 
-        $requestException = new class('Request error') extends \Exception implements RequestExceptionInterface {
+        $requestException = new class ('Request error') extends \Exception implements RequestExceptionInterface {
             public function getRequest(): \Psr\Http\Message\RequestInterface
             {
                 throw new \RuntimeException('Not implemented');
@@ -1106,7 +1106,9 @@ class HttpConnectionTest extends TestCase
         $this->expectExceptionMessage('Failed to encode JSON data');
         $connection->post('/v1/objects', $invalidData);
 
-        fclose($resource);
+        if (is_resource($resource)) {
+            fclose($resource);
+        }
     }
 
     /**
@@ -1140,7 +1142,9 @@ class HttpConnectionTest extends TestCase
         $this->expectExceptionMessage('Failed to encode JSON data');
         $connection->put('/v1/objects/123', $invalidData);
 
-        fclose($resource);
+        if (is_resource($resource)) {
+            fclose($resource);
+        }
     }
 
     /**
@@ -1174,7 +1178,9 @@ class HttpConnectionTest extends TestCase
         $this->expectExceptionMessage('Failed to encode JSON data');
         $connection->patch('/v1/objects/123', $invalidData);
 
-        fclose($resource);
+        if (is_resource($resource)) {
+            fclose($resource);
+        }
     }
 
     /**
@@ -1208,7 +1214,9 @@ class HttpConnectionTest extends TestCase
         $this->expectExceptionMessage('Failed to encode JSON data');
         $connection->deleteWithData('/v1/objects', $invalidData);
 
-        fclose($resource);
+        if (is_resource($resource)) {
+            fclose($resource);
+        }
     }
 
     /**
@@ -1340,7 +1348,7 @@ class HttpConnectionTest extends TestCase
         $request->method('withBody')->willReturnSelf();
         $request->method('withHeader')->willReturnSelf();
 
-        $networkException = new class('Network error') extends \Exception implements NetworkExceptionInterface {
+        $networkException = new class ('Network error') extends \Exception implements NetworkExceptionInterface {
             public function getRequest(): \Psr\Http\Message\RequestInterface
             {
                 throw new \RuntimeException('Not implemented');
