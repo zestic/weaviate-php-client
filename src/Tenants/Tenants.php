@@ -236,7 +236,9 @@ class Tenants
             $updates[] = (new TenantUpdate($name, $status))->toArray();
         }
 
-        /** @phpstan-ignore-next-line */
+        // ConnectionInterface expects array<string, mixed> but we need to send indexed array for tenant updates
+        // This is correct for the Weaviate API which expects an array of tenant objects
+        /** @var array<string, mixed> $updates */
         $this->connection->put(
             "/v1/schema/{$this->collectionName}/tenants",
             $updates

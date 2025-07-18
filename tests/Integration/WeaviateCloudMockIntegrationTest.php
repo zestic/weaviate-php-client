@@ -55,11 +55,11 @@ class WeaviateCloudMockIntegrationTest extends TestCase
                 'properties' => [
                     ['name' => 'name', 'dataType' => ['text']]
                 ]
-            ])),
+            ]) ?: '{}'),
             // Mock response for collection existence check after creation (200 = exists)
             new Response(200, ['Content-Type' => 'application/json'], json_encode([
                 'class' => 'TestCollection'
-            ])),
+            ]) ?: '{}'),
         ]);
 
         $handlerStack = HandlerStack::create($mockHandler);
@@ -136,6 +136,7 @@ class WeaviateCloudMockIntegrationTest extends TestCase
         $handlerStack = HandlerStack::create($mockHandler);
 
         // Create a client that will capture the actual request URL
+        /** @var string|null $requestUrl */
         $requestUrl = null;
         $handlerStack->push(function (callable $handler) use (&$requestUrl) {
             return function ($request, array $options) use ($handler, &$requestUrl) {
@@ -161,11 +162,13 @@ class WeaviateCloudMockIntegrationTest extends TestCase
         // Make a request to trigger the URL capture
         try {
             $client->collections()->exists('TestCollection');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Ignore any errors, we just want to capture the URL
         }
 
         // Verify that the request was made to HTTPS URL
+        $this->assertNotNull($requestUrl, 'Request URL should have been captured');
+        $this->assertIsString($requestUrl);
         $this->assertStringStartsWith('https://', $requestUrl);
     }
 
@@ -209,7 +212,7 @@ class WeaviateCloudMockIntegrationTest extends TestCase
         // Make a request to trigger header capture
         try {
             $client->collections()->exists('TestCollection');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Ignore errors, we just want to capture headers
         }
 

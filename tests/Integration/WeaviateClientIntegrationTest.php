@@ -37,6 +37,9 @@ class WeaviateClientIntegrationTest extends TestCase
 
         // Extract host and port from the Weaviate URL
         $url = parse_url($this->getWeaviateUrl());
+        if ($url === false || !isset($url['host'], $url['port'])) {
+            $this->fail('Invalid Weaviate URL');
+        }
         $host = $url['host'] . ':' . $url['port'];
 
         $client = WeaviateClient::connectToLocal($host);
@@ -60,6 +63,9 @@ class WeaviateClientIntegrationTest extends TestCase
 
         // Extract host and port from the Weaviate URL
         $url = parse_url($this->getWeaviateUrl());
+        if ($url === false || !isset($url['host'], $url['port'])) {
+            $this->fail('Invalid Weaviate URL');
+        }
         $host = $url['host'] . ':' . $url['port'];
 
         $client = WeaviateClient::connectToLocal($host);
@@ -80,6 +86,9 @@ class WeaviateClientIntegrationTest extends TestCase
 
         // Extract host and port from the Weaviate URL
         $url = parse_url($this->getWeaviateUrl());
+        if ($url === false || !isset($url['host'], $url['port'])) {
+            $this->fail('Invalid Weaviate URL');
+        }
         $host = $url['host'] . ':' . $url['port'];
 
         $apiKey = $this->getWeaviateApiKey();
@@ -142,6 +151,9 @@ class WeaviateClientIntegrationTest extends TestCase
 
         // Extract host and port from the Weaviate URL
         $url = parse_url($this->getWeaviateUrl());
+        if ($url === false || !isset($url['host'], $url['port'])) {
+            $this->fail('Invalid Weaviate URL');
+        }
         $host = $url['host'] . ':' . $url['port'];
 
         $client = WeaviateClient::connectToLocal($host);

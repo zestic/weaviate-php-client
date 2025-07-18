@@ -39,6 +39,9 @@ class WeaviateCustomIntegrationTest extends TestCase
 
         // Extract host and port from the Weaviate URL
         $url = parse_url($this->getWeaviateUrl());
+        if ($url === false || !isset($url['host'], $url['port'], $url['scheme'])) {
+            $this->fail('Invalid Weaviate URL');
+        }
         $host = $url['host'];
         $port = $url['port'];
         $secure = $url['scheme'] === 'https';
@@ -65,6 +68,9 @@ class WeaviateCustomIntegrationTest extends TestCase
         $this->skipIfWeaviateNotAvailable();
 
         $url = parse_url($this->getWeaviateUrl());
+        if ($url === false || !isset($url['host'], $url['port'], $url['scheme'])) {
+            $this->fail('Invalid Weaviate URL');
+        }
         $host = $url['host'];
         $port = $url['port'];
         $secure = $url['scheme'] === 'https';
@@ -96,6 +102,9 @@ class WeaviateCustomIntegrationTest extends TestCase
         $this->skipIfWeaviateNotAvailable();
 
         $url = parse_url($this->getWeaviateUrl());
+        if ($url === false || !isset($url['host'], $url['port'], $url['scheme'])) {
+            $this->fail('Invalid Weaviate URL');
+        }
         $host = $url['host'];
         $port = $url['port'];
         $secure = $url['scheme'] === 'https';
@@ -127,6 +136,9 @@ class WeaviateCustomIntegrationTest extends TestCase
         $this->skipIfWeaviateNotAvailable();
 
         $url = parse_url($this->getWeaviateUrl());
+        if ($url === false || !isset($url['host'], $url['port'], $url['scheme'])) {
+            $this->fail('Invalid Weaviate URL');
+        }
         $host = $url['host'];
         $port = $url['port'];
         $secure = $url['scheme'] === 'https';
@@ -169,6 +181,9 @@ class WeaviateCustomIntegrationTest extends TestCase
         $this->skipIfWeaviateNotAvailable();
 
         $url = parse_url($this->getWeaviateUrl());
+        if ($url === false || !isset($url['host'], $url['port'], $url['scheme'])) {
+            $this->fail('Invalid Weaviate URL');
+        }
         $host = $url['host'];
         $port = $url['port'];
         $secure = $url['scheme'] === 'https';
@@ -210,6 +225,9 @@ class WeaviateCustomIntegrationTest extends TestCase
         $this->skipIfWeaviateNotAvailable();
 
         $url = parse_url($this->getWeaviateUrl());
+        if ($url === false || !isset($url['host'], $url['port'], $url['scheme'])) {
+            $this->fail('Invalid Weaviate URL');
+        }
         $host = $url['host'];
         $port = $url['port'];
         $isHttps = $url['scheme'] === 'https';

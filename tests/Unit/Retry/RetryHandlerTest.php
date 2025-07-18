@@ -67,6 +67,7 @@ class RetryHandlerTest extends TestCase
         $handler->execute('test operation', $operation);
 
         // Should not retry non-retriable errors
+        // @phpstan-ignore-next-line - This line is unreachable due to expectException, but it's here for clarity
         $this->assertSame(1, $callCount);
     }
 
@@ -86,6 +87,7 @@ class RetryHandlerTest extends TestCase
         $handler->execute('test operation', $operation);
 
         // Should try initial + 2 retries = 3 total attempts
+        // @phpstan-ignore-next-line - This line is unreachable due to expectException, but it's here for clarity
         $this->assertSame(3, $callCount);
     }
 
@@ -161,6 +163,7 @@ class RetryHandlerTest extends TestCase
         $handler->execute('test', $operation);
 
         // Should not retry 400 errors
+        // @phpstan-ignore-next-line - This line is unreachable due to expectException, but it's here for clarity
         $this->assertSame(1, $callCount);
     }
 
@@ -187,6 +190,8 @@ class RetryHandlerTest extends TestCase
 
         try {
             $handler->execute('test operation', $operation);
+            // @phpstan-ignore-next-line - This line is reachable if no exception is thrown,
+            // which would be a test failure
             $this->fail('Expected WeaviateRetryException');
         } catch (WeaviateRetryException $e) {
             $this->assertSame(2, $e->getRetryCount());

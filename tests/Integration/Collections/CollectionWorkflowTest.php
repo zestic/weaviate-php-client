@@ -94,7 +94,7 @@ class CollectionWorkflowTest extends TestCase
         // Create tenant
         $this->client->collections()->get($collectionName)
             ->tenants()
-            ->create([['name' => 'test-tenant']]);
+            ->create(['test-tenant']);
 
         // Create object with tenant
         $orgId = '123e4567-e89b-12d3-a456-426614174000';
@@ -174,10 +174,7 @@ class CollectionWorkflowTest extends TestCase
         // Create tenants
         $this->client->collections()->get($collectionName)
             ->tenants()
-            ->create([
-                ['name' => 'tenant1'],
-                ['name' => 'tenant2']
-            ]);
+            ->create(['tenant1', 'tenant2']);
 
         // Create objects in different tenants
         $tenant1Id = '111e4567-e89b-12d3-a456-426614174000';
