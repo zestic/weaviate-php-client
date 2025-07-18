@@ -27,7 +27,6 @@ use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
 use Weaviate\Auth\AuthInterface;
 use Weaviate\Exceptions\WeaviateConnectionException;
-use Weaviate\Exceptions\WeaviateTimeoutException;
 use Weaviate\Exceptions\UnexpectedStatusCodeException;
 use Weaviate\Exceptions\InsufficientPermissionsException;
 use Weaviate\Exceptions\NotFoundException;
@@ -82,23 +81,37 @@ class HttpConnection implements ConnectionInterface
     ) {
     }
 
-    /**
-     * Apply authentication to a request if auth is configured
-     */
-    private function applyAuth(\Psr\Http\Message\RequestInterface $request): \Psr\Http\Message\RequestInterface
+    public function delete(string $path): bool
     {
-        return $this->auth !== null ? $this->auth->apply($request) : $request;
+        $url = $this->baseUrl . $path;
+        $request = $this->requestFactory->createRequest('DELETE', $url);
+        $request = $this->applyHeaders($request);
+        $request = $this->applyAuth($request);
+        $response = $this->httpClient->sendRequest($request);
+
+        return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
     }
 
-    /**
-     * Apply additional headers to a request
-     */
-    private function applyHeaders(\Psr\Http\Message\RequestInterface $request): \Psr\Http\Message\RequestInterface
+    public function deleteWithData(string $path, array $data = []): bool
     {
-        foreach ($this->additionalHeaders as $name => $value) {
-            $request = $request->withHeader($name, $value);
+        $url = $this->baseUrl . $path;
+        $request = $this->requestFactory->createRequest('DELETE', $url);
+
+        if (!empty($data)) {
+            $json = json_encode($data);
+            if ($json === false) {
+                throw new \RuntimeException('Failed to encode JSON data');
+            }
+            $stream = $this->streamFactory->createStream($json);
+            $request = $request->withBody($stream)
+                ->withHeader('Content-Type', 'application/json');
         }
-        return $request;
+
+        $request = $this->applyHeaders($request);
+        $request = $this->applyAuth($request);
+        $response = $this->httpClient->sendRequest($request);
+
+        return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
     }
 
     public function get(string $path, array $params = []): array
@@ -141,40 +154,42 @@ class HttpConnection implements ConnectionInterface
         return $executeRequest();
     }
 
-    /**
-     * Handle HTTP error responses by throwing appropriate exceptions
-     *
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param string $operation
-     * @throws UnexpectedStatusCodeException
-     * @throws InsufficientPermissionsException
-     * @throws NotFoundException
-     */
-    private function handleErrorResponse(\Psr\Http\Message\ResponseInterface $response, string $operation): void
+    public function head(string $path): bool
     {
-        $statusCode = $response->getStatusCode();
+        $url = $this->baseUrl . $path;
+        $request = $this->requestFactory->createRequest('HEAD', $url);
+        $request = $this->applyHeaders($request);
+        $request = $this->applyAuth($request);
 
-        // Create context for the error
-        $context = [
-            'operation' => $operation,
-            'url' => (string) $response->getHeaderLine('X-Request-URL') ?: $this->baseUrl,
-        ];
-
-        // Handle specific status codes with specialized exceptions
-        switch ($statusCode) {
-            case 403:
-                $message = "Insufficient permissions to perform this operation";
-                throw InsufficientPermissionsException::fromResponse($message, $response, $context);
-
-            case 404:
-                $message = "Resource not found";
-                throw NotFoundException::fromResponse($message, $response, $context);
-
-            default:
-                // For all other error status codes, use the general exception
-                $message = "HTTP request failed with status {$statusCode}";
-                throw UnexpectedStatusCodeException::fromResponse($message, $response, $context);
+        try {
+            $response = $this->httpClient->sendRequest($request);
+            return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
+        } catch (\Exception) {
+            // HEAD requests should return false for any error (including 404)
+            return false;
         }
+    }
+
+    public function patch(string $path, array $data = []): array
+    {
+        $url = $this->baseUrl . $path;
+        $request = $this->requestFactory->createRequest('PATCH', $url);
+
+        if (!empty($data)) {
+            $json = json_encode($data);
+            if ($json === false) {
+                throw new \RuntimeException('Failed to encode JSON data');
+            }
+            $stream = $this->streamFactory->createStream($json);
+            $request = $request->withBody($stream)
+                ->withHeader('Content-Type', 'application/json');
+        }
+
+        $request = $this->applyHeaders($request);
+        $request = $this->applyAuth($request);
+        $response = $this->httpClient->sendRequest($request);
+        $body = (string) $response->getBody();
+        return json_decode($body, true) ?? [];
     }
 
     public function post(string $path, array $data = []): array
@@ -246,74 +261,58 @@ class HttpConnection implements ConnectionInterface
         return json_decode($body, true) ?? [];
     }
 
-    public function patch(string $path, array $data = []): array
+    /**
+     * Apply authentication to a request if auth is configured
+     */
+    private function applyAuth(\Psr\Http\Message\RequestInterface $request): \Psr\Http\Message\RequestInterface
     {
-        $url = $this->baseUrl . $path;
-        $request = $this->requestFactory->createRequest('PATCH', $url);
+        return $this->auth !== null ? $this->auth->apply($request) : $request;
+    }
 
-        if (!empty($data)) {
-            $json = json_encode($data);
-            if ($json === false) {
-                throw new \RuntimeException('Failed to encode JSON data');
-            }
-            $stream = $this->streamFactory->createStream($json);
-            $request = $request->withBody($stream)
-                ->withHeader('Content-Type', 'application/json');
+    /**
+     * Apply additional headers to a request
+     */
+    private function applyHeaders(\Psr\Http\Message\RequestInterface $request): \Psr\Http\Message\RequestInterface
+    {
+        foreach ($this->additionalHeaders as $name => $value) {
+            $request = $request->withHeader($name, $value);
         }
-
-        $request = $this->applyHeaders($request);
-        $request = $this->applyAuth($request);
-        $response = $this->httpClient->sendRequest($request);
-        $body = (string) $response->getBody();
-        return json_decode($body, true) ?? [];
+        return $request;
     }
 
-    public function delete(string $path): bool
+    /**
+     * Handle HTTP error responses by throwing appropriate exceptions
+     *
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param string $operation
+     * @throws UnexpectedStatusCodeException
+     * @throws InsufficientPermissionsException
+     * @throws NotFoundException
+     */
+    private function handleErrorResponse(\Psr\Http\Message\ResponseInterface $response, string $operation): void
     {
-        $url = $this->baseUrl . $path;
-        $request = $this->requestFactory->createRequest('DELETE', $url);
-        $request = $this->applyHeaders($request);
-        $request = $this->applyAuth($request);
-        $response = $this->httpClient->sendRequest($request);
+        $statusCode = $response->getStatusCode();
 
-        return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
-    }
+        // Create context for the error
+        $context = [
+            'operation' => $operation,
+            'url' => (string) $response->getHeaderLine('X-Request-URL') ?: $this->baseUrl,
+        ];
 
-    public function deleteWithData(string $path, array $data = []): bool
-    {
-        $url = $this->baseUrl . $path;
-        $request = $this->requestFactory->createRequest('DELETE', $url);
+        // Handle specific status codes with specialized exceptions
+        switch ($statusCode) {
+            case 403:
+                $message = "Insufficient permissions to perform this operation";
+                throw InsufficientPermissionsException::fromResponse($message, $response, $context);
 
-        if (!empty($data)) {
-            $json = json_encode($data);
-            if ($json === false) {
-                throw new \RuntimeException('Failed to encode JSON data');
-            }
-            $stream = $this->streamFactory->createStream($json);
-            $request = $request->withBody($stream)
-                ->withHeader('Content-Type', 'application/json');
-        }
+            case 404:
+                $message = "Resource not found";
+                throw NotFoundException::fromResponse($message, $response, $context);
 
-        $request = $this->applyHeaders($request);
-        $request = $this->applyAuth($request);
-        $response = $this->httpClient->sendRequest($request);
-
-        return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
-    }
-
-    public function head(string $path): bool
-    {
-        $url = $this->baseUrl . $path;
-        $request = $this->requestFactory->createRequest('HEAD', $url);
-        $request = $this->applyHeaders($request);
-        $request = $this->applyAuth($request);
-
-        try {
-            $response = $this->httpClient->sendRequest($request);
-            return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
-        } catch (\Exception $e) {
-            // HEAD requests should return false for any error (including 404)
-            return false;
+            default:
+                // For all other error status codes, use the general exception
+                $message = "HTTP request failed with status {$statusCode}";
+                throw UnexpectedStatusCodeException::fromResponse($message, $response, $context);
         }
     }
 }
