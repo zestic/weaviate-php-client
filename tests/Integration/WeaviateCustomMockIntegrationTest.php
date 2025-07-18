@@ -140,7 +140,7 @@ class WeaviateCustomMockIntegrationTest extends TestCase
         // Make a request to trigger header capture
         try {
             $client->collections()->exists('TestCollection');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Ignore errors, we just want to capture headers
         }
 
@@ -178,7 +178,7 @@ class WeaviateCustomMockIntegrationTest extends TestCase
         // Test invalid ports
         $invalidPorts = [0, -1, 65536, 100000];
         foreach ($invalidPorts as $port) {
-            $this->expectException(\InvalidArgumentException::class);
+            $this->expectException(\Weaviate\Exceptions\WeaviateInvalidInputException::class);
             $this->expectExceptionMessage('Port must be between 1 and 65535');
             WeaviateClient::connectToCustom('localhost', $port, false, $auth);
         }
@@ -236,7 +236,7 @@ class WeaviateCustomMockIntegrationTest extends TestCase
         try {
             $httpClient1->collections()->exists('TestCollection');
             $httpsClient->collections()->exists('TestCollection');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Ignore errors, we just want to capture URLs
         }
 
