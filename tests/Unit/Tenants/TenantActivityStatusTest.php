@@ -52,6 +52,36 @@ class TenantActivityStatusTest extends TestCase
     /**
      * @covers \Weaviate\Tenants\TenantActivityStatus::fromString
      */
+    public function testCanCreateFromLegacyNames(): void
+    {
+        // Test legacy HOT -> ACTIVE mapping
+        $this->assertEquals(TenantActivityStatus::ACTIVE, TenantActivityStatus::fromString('HOT'));
+
+        // Test legacy COLD -> INACTIVE mapping
+        $this->assertEquals(TenantActivityStatus::INACTIVE, TenantActivityStatus::fromString('COLD'));
+
+        // Test legacy FROZEN -> OFFLOADED mapping
+        $this->assertEquals(TenantActivityStatus::OFFLOADED, TenantActivityStatus::fromString('FROZEN'));
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\TenantActivityStatus::fromString
+     */
+    public function testFromStringIsCaseInsensitive(): void
+    {
+        $this->assertEquals(TenantActivityStatus::ACTIVE, TenantActivityStatus::fromString('active'));
+        $this->assertEquals(TenantActivityStatus::ACTIVE, TenantActivityStatus::fromString('hot'));
+        $this->assertEquals(TenantActivityStatus::INACTIVE, TenantActivityStatus::fromString('inactive'));
+        $this->assertEquals(TenantActivityStatus::INACTIVE, TenantActivityStatus::fromString('cold'));
+        $this->assertEquals(TenantActivityStatus::OFFLOADED, TenantActivityStatus::fromString('offloaded'));
+        $this->assertEquals(TenantActivityStatus::OFFLOADED, TenantActivityStatus::fromString('frozen'));
+        $this->assertEquals(TenantActivityStatus::OFFLOADING, TenantActivityStatus::fromString('offloading'));
+        $this->assertEquals(TenantActivityStatus::ONLOADING, TenantActivityStatus::fromString('onloading'));
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\TenantActivityStatus::fromString
+     */
     public function testFromStringThrowsExceptionForInvalidStatus(): void
     {
         $this->expectException(\InvalidArgumentException::class);

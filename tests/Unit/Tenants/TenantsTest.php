@@ -279,4 +279,120 @@ class TenantsTest extends TestCase
 
         $this->tenants->offload('tenant1');
     }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::getByNames
+     */
+    public function testCanGetTenantsByNames(): void
+    {
+        $this->connection
+            ->expects($this->once())
+            ->method('get')
+            ->with('/v1/schema/TestCollection/tenants')
+            ->willReturn([
+                ['name' => 'tenant1', 'activityStatus' => 'HOT'],
+                ['name' => 'tenant2', 'activityStatus' => 'COLD'],
+                ['name' => 'tenant3', 'activityStatus' => 'FROZEN']
+            ]);
+
+        $result = $this->tenants->getByNames(['tenant1', 'tenant3']);
+
+        $this->assertCount(2, $result);
+        $this->assertArrayHasKey('tenant1', $result);
+        $this->assertArrayHasKey('tenant3', $result);
+        $this->assertArrayNotHasKey('tenant2', $result);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::update
+     */
+    public function testCanUpdateSingleTenant(): void
+    {
+        $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
+
+        $this->connection
+            ->expects($this->once())
+            ->method('put')
+            ->with(
+                '/v1/schema/TestCollection/tenants',
+                [['name' => 'tenant1', 'activityStatus' => 'COLD']]
+            );
+
+        $this->tenants->update($tenant);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::update
+     */
+    public function testCanUpdateWithTenantUpdateObject(): void
+    {
+        $tenantUpdate = new TenantUpdate('tenant1', TenantActivityStatus::OFFLOADED);
+
+        $this->connection
+            ->expects($this->once())
+            ->method('put')
+            ->with(
+                '/v1/schema/TestCollection/tenants',
+                [['name' => 'tenant1', 'activityStatus' => 'FROZEN']]
+            );
+
+        $this->tenants->update($tenantUpdate);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::activate
+     */
+    public function testCanActivateMultipleTenants(): void
+    {
+        $this->connection
+            ->expects($this->once())
+            ->method('put')
+            ->with(
+                '/v1/schema/TestCollection/tenants',
+                [
+                    ['name' => 'tenant1', 'activityStatus' => 'HOT'],
+                    ['name' => 'tenant2', 'activityStatus' => 'HOT']
+                ]
+            );
+
+        $this->tenants->activate(['tenant1', 'tenant2']);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::deactivate
+     */
+    public function testCanDeactivateMultipleTenants(): void
+    {
+        $this->connection
+            ->expects($this->once())
+            ->method('put')
+            ->with(
+                '/v1/schema/TestCollection/tenants',
+                [
+                    ['name' => 'tenant1', 'activityStatus' => 'COLD'],
+                    ['name' => 'tenant2', 'activityStatus' => 'COLD']
+                ]
+            );
+
+        $this->tenants->deactivate(['tenant1', 'tenant2']);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::offload
+     */
+    public function testCanOffloadMultipleTenants(): void
+    {
+        $this->connection
+            ->expects($this->once())
+            ->method('put')
+            ->with(
+                '/v1/schema/TestCollection/tenants',
+                [
+                    ['name' => 'tenant1', 'activityStatus' => 'FROZEN'],
+                    ['name' => 'tenant2', 'activityStatus' => 'FROZEN']
+                ]
+            );
+
+        $this->tenants->offload(['tenant1', 'tenant2']);
+    }
 }
