@@ -50,6 +50,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::create
+     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
      */
     public function testCanCreateSingleTenantFromString(): void
     {
@@ -66,6 +67,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::create
+     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
      */
     public function testCanCreateSingleTenantFromTenantObject(): void
     {
@@ -84,6 +86,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::create
+     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
      */
     public function testCanCreateSingleTenantFromTenantCreateObject(): void
     {
@@ -102,6 +105,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::create
+     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
      */
     public function testCanCreateMultipleTenantsFromArray(): void
     {
@@ -128,6 +132,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::remove
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanRemoveSingleTenantFromString(): void
     {
@@ -141,6 +146,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::remove
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanRemoveMultipleTenantsFromArray(): void
     {
@@ -288,6 +294,8 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::activate
+     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanActivateTenant(): void
     {
@@ -304,6 +312,8 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::deactivate
+     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanDeactivateTenant(): void
     {
@@ -320,6 +330,8 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::offload
+     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanOffloadTenant(): void
     {
@@ -336,6 +348,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::getByNames
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanGetTenantsByNames(): void
     {
@@ -359,6 +372,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::update
+     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
      */
     public function testCanUpdateSingleTenant(): void
     {
@@ -377,6 +391,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::update
+     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
      */
     public function testCanUpdateWithTenantUpdateObject(): void
     {
@@ -395,6 +410,8 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::activate
+     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanActivateMultipleTenants(): void
     {
@@ -414,6 +431,8 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::deactivate
+     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanDeactivateMultipleTenants(): void
     {
@@ -433,6 +452,8 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::offload
+     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanOffloadMultipleTenants(): void
     {
@@ -454,6 +475,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::create
+     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
      */
     public function testCanCreateMixedTenantTypes(): void
     {
@@ -477,6 +499,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::update
+     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
      */
     public function testCanUpdateMixedTenantTypes(): void
     {
@@ -499,6 +522,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::remove
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanRemoveSingleTenantObject(): void
     {
@@ -514,6 +538,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::remove
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanRemoveMixedTenantTypes(): void
     {
@@ -529,6 +554,8 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::activate
+     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanActivateSingleTenantObject(): void
     {
@@ -547,6 +574,8 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::deactivate
+     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanDeactivateSingleTenantObject(): void
     {
@@ -565,6 +594,8 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::offload
+     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanOffloadSingleTenantObject(): void
     {
@@ -583,6 +614,8 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::activate
+     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanActivateMixedTenantTypes(): void
     {
@@ -605,6 +638,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::getByNames
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanGetTenantsByNamesWithMixedTypes(): void
     {
@@ -632,6 +666,7 @@ class TenantsTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\Tenants::getByNames
+     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
      */
     public function testCanGetTenantsByNamesWithSingleTenant(): void
     {

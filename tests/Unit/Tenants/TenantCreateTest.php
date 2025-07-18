@@ -126,6 +126,7 @@ class TenantCreateTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\TenantCreate::toArray
+     * @covers \Weaviate\Tenants\TenantCreate::getApiStatusValue
      */
     public function testCanConvertToArrayWithActiveStatus(): void
     {
@@ -140,6 +141,7 @@ class TenantCreateTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\TenantCreate::toArray
+     * @covers \Weaviate\Tenants\TenantCreate::getApiStatusValue
      */
     public function testCanConvertToArrayWithInactiveStatus(): void
     {

@@ -115,6 +115,7 @@ class TenantUpdateTest extends TestCase
 
     /**
      * @covers \Weaviate\Tenants\TenantUpdate::toArray
+     * @covers \Weaviate\Tenants\TenantUpdate::getApiStatusValue
      */
     public function testCanConvertToArrayWithActiveStatus(): void
     {

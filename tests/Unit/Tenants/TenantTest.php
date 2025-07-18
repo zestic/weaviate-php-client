@@ -86,8 +86,10 @@ class TenantTest extends TestCase
      * @covers \Weaviate\Tenants\Tenant::getApiStatusValue
      * @dataProvider statusMappingProvider
      */
-    public function testToArrayMapsAllStatusValuesCorrectly(TenantActivityStatus $status, string $expectedApiValue): void
-    {
+    public function testToArrayMapsAllStatusValuesCorrectly(
+        TenantActivityStatus $status,
+        string $expectedApiValue
+    ): void {
         $tenant = new Tenant('test-tenant', $status);
         $array = $tenant->toArray();
 
