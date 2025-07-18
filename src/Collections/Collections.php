@@ -25,6 +25,29 @@ use Weaviate\Exceptions\NotFoundException;
 
 /**
  * Collections management API
+ *
+ * Provides methods to create, read, update, and delete Weaviate collections (schemas).
+ * Collections define the structure of your data objects and their properties.
+ *
+ * @example
+ * ```php
+ * $client = WeaviateClient::connectToLocal();
+ * $collections = $client->collections();
+ *
+ * // Check if collection exists
+ * if (!$collections->exists('Article')) {
+ *     // Create collection
+ *     $collections->create('Article', [
+ *         'properties' => [
+ *             ['name' => 'title', 'dataType' => ['text']],
+ *             ['name' => 'content', 'dataType' => ['text']],
+ *         ]
+ *     ]);
+ * }
+ *
+ * // Get collection instance for data operations
+ * $collection = $collections->get('Article');
+ * ```
  */
 class Collections
 {

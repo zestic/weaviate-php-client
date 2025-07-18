@@ -24,6 +24,31 @@ use Psr\Http\Message\RequestInterface;
 
 /**
  * Interface for authentication mechanisms
+ *
+ * Defines the contract for authentication implementations in the Weaviate PHP client.
+ * Authentication implementations modify HTTP requests to include the necessary
+ * credentials for accessing Weaviate instances.
+ *
+ * Current implementations:
+ * - ApiKey: Bearer token authentication for API keys
+ *
+ * Future implementations may include:
+ * - OAuth2: OAuth 2.0 authentication
+ * - OIDC: OpenID Connect authentication
+ * - Custom: Custom authentication schemes
+ *
+ * @example Implementing custom authentication
+ * ```php
+ * class CustomAuth implements AuthInterface
+ * {
+ *     public function __construct(private string $token) {}
+ *
+ *     public function apply(RequestInterface $request): RequestInterface
+ *     {
+ *         return $request->withHeader('X-Custom-Auth', $this->token);
+ *     }
+ * }
+ * ```
  */
 interface AuthInterface
 {

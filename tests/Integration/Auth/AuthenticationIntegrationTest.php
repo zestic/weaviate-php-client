@@ -48,7 +48,9 @@ class AuthenticationIntegrationTest extends TestCase
             $this->getWeaviateUrl(),
             $httpClient,
             $httpFactory,
-            $httpFactory
+            $httpFactory,
+            null,
+            []
         );
 
         // Create auth

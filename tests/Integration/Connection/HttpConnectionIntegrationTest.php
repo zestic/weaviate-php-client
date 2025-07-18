@@ -43,7 +43,9 @@ class HttpConnectionIntegrationTest extends TestCase
             $this->getWeaviateUrl(),
             $httpClient,
             $httpFactory,
-            $httpFactory
+            $httpFactory,
+            null,
+            []
         );
     }
 

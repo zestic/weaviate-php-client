@@ -45,7 +45,9 @@ class HttpConnectionTest extends TestCase
             'http://localhost:8080',
             $httpClient,
             $requestFactory,
-            $streamFactory
+            $streamFactory,
+            null,
+            []
         );
 
         $this->assertInstanceOf(HttpConnection::class, $connection);
@@ -82,7 +84,9 @@ class HttpConnectionTest extends TestCase
             'http://localhost:8080',
             $httpClient,
             $requestFactory,
-            $streamFactory
+            $streamFactory,
+            null,
+            []
         );
 
         $result = $connection->get('/v1/schema');
@@ -135,7 +139,9 @@ class HttpConnectionTest extends TestCase
             'http://localhost:8080',
             $httpClient,
             $requestFactory,
-            $streamFactory
+            $streamFactory,
+            null,
+            []
         );
 
         $result = $connection->post('/v1/objects', ['name' => 'test']);
@@ -184,7 +190,8 @@ class HttpConnectionTest extends TestCase
             $httpClient,
             $requestFactory,
             $streamFactory,
-            $auth
+            $auth,
+            []
         );
 
         $result = $connection->get('/v1/schema');

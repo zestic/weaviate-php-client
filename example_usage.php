@@ -3,26 +3,42 @@
 require_once 'vendor/autoload.php';
 
 use Weaviate\WeaviateClient;
-use Weaviate\Connection\HttpConnection;
 use Weaviate\Auth\ApiKey;
+
+// Easy way: Connect to local Weaviate instance
+$client = WeaviateClient::connectToLocal();
+
+// Connect to Docker container on custom port
+// $client = WeaviateClient::connectToLocal('localhost:18080');
+
+// Connect with authentication
+// $client = WeaviateClient::connectToLocal('localhost:8080', new ApiKey('your-api-key'));
+
+// Connect to Weaviate Cloud
+// $client = WeaviateClient::connectToWeaviateCloud('my-cluster.weaviate.network', new ApiKey('your-wcd-api-key'));
+
+// Connect to custom Weaviate instance
+// $client = WeaviateClient::connectToCustom('my-server.com', 9200, true, new ApiKey('api-key'), ['X-Custom-Header' => 'value']);
+
+// Advanced way: Manual connection setup
+/*
+use Weaviate\Connection\HttpConnection;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 
-// Create HTTP client and factories
 $httpClient = new Client();
 $httpFactory = new HttpFactory();
 
-// Create connection (with optional authentication)
 $connection = new HttpConnection(
-    'http://localhost:8080',  // Weaviate URL
+    'http://localhost:8080',
     $httpClient,
     $httpFactory,
     $httpFactory,
-    // new ApiKey('your-api-key')  // Uncomment if authentication is needed
+    new ApiKey('your-api-key')  // Optional authentication
 );
 
-// Create Weaviate client
 $client = new WeaviateClient($connection);
+*/
 
 try {
     // Example 1: Check if a collection exists

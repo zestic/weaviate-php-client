@@ -20,6 +20,44 @@ composer require zestic/weaviate-php-client
 
 ## Basic Usage
 
+### Quick Start with connectToLocal
+
+```php
+<?php
+
+use Weaviate\WeaviateClient;
+use Weaviate\Auth\ApiKey;
+
+// Connect to local Weaviate instance (default: localhost:8080)
+$client = WeaviateClient::connectToLocal();
+
+// Connect to Docker container on custom port
+$client = WeaviateClient::connectToLocal('localhost:18080');
+
+// Connect with authentication
+$client = WeaviateClient::connectToLocal('localhost:8080', new ApiKey('your-api-key'));
+
+// Connect to Weaviate Cloud
+$client = WeaviateClient::connectToWeaviateCloud(
+    'my-cluster.weaviate.network',
+    new ApiKey('your-wcd-api-key')
+);
+
+// Connect to custom Weaviate instance
+$client = WeaviateClient::connectToCustom(
+    'my-server.com',        // host
+    9200,                   // port
+    true,                   // use HTTPS
+    new ApiKey('api-key'),  // authentication
+    [                       // custom headers
+        'X-OpenAI-Api-Key' => 'your-openai-key',
+        'X-Custom-Header' => 'custom-value'
+    ]
+);
+```
+
+### Advanced Usage with Manual Connection
+
 ```php
 <?php
 
@@ -179,6 +217,22 @@ This project follows Test-Driven Development (TDD):
 - Tests drive the implementation
 - High test coverage is maintained
 - Both unit and integration tests are included
+
+## Documentation
+
+### API Reference
+- [Complete API Documentation](docs/API.md) - Detailed API reference with examples
+- [Error Handling Guide](docs/ERROR_HANDLING.md) - Comprehensive error handling and retry strategies
+- [Python Client Migration Guide](docs/PYTHON_MIGRATION.md) - For developers familiar with the Python client
+
+### Key Features
+- **Three Connection Methods**: `connectToLocal()`, `connectToWeaviateCloud()`, `connectToCustom()`
+- **Full Python Client Parity**: Same functionality and patterns as the Python client
+- **Multi-Tenancy Support**: Built-in support for tenant-specific operations
+- **Type Safety**: Full PHPStan level 8 compliance with comprehensive type annotations
+- **Comprehensive Testing**: Unit, integration, and mock tests with 200+ assertions
+- **Advanced Error Handling**: Complete exception hierarchy with retry mechanisms
+- **Automatic Retries**: Exponential backoff for transient failures
 
 ## Support
 

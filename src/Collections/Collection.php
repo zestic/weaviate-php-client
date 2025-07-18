@@ -25,6 +25,41 @@ use Weaviate\Data\DataOperations;
 
 /**
  * Individual collection operations
+ *
+ * Represents a specific Weaviate collection and provides access to data operations
+ * and tenant-specific functionality. This class is obtained through the Collections
+ * API and provides a fluent interface for working with collection data.
+ *
+ * @example Basic data operations
+ * ```php
+ * $client = WeaviateClient::connectToLocal();
+ * $collection = $client->collections()->get('Article');
+ *
+ * // Create an object
+ * $result = $collection->data()->create([
+ *     'title' => 'My Article',
+ *     'content' => 'Article content...'
+ * ]);
+ *
+ * // Get an object
+ * $article = $collection->data()->get($result['id']);
+ *
+ * // Update an object
+ * $collection->data()->update($result['id'], [
+ *     'title' => 'Updated Title'
+ * ]);
+ * ```
+ *
+ * @example Multi-tenant operations
+ * ```php
+ * $collection = $client->collections()->get('Article');
+ *
+ * // Work with specific tenant
+ * $tenantCollection = $collection->withTenant('tenant-123');
+ * $result = $tenantCollection->data()->create([
+ *     'title' => 'Tenant-specific article'
+ * ]);
+ * ```
  */
 class Collection
 {

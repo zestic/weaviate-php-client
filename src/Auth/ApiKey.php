@@ -24,6 +24,31 @@ use Psr\Http\Message\RequestInterface;
 
 /**
  * API Key authentication implementation
+ *
+ * Provides Bearer token authentication for Weaviate using API keys.
+ * This is the most common authentication method for Weaviate Cloud
+ * and self-hosted instances with authentication enabled.
+ *
+ * The API key is sent as a Bearer token in the Authorization header
+ * of all HTTP requests.
+ *
+ * @example Basic usage
+ * ```php
+ * use Weaviate\Auth\ApiKey;
+ * use Weaviate\WeaviateClient;
+ *
+ * $auth = new ApiKey('your-api-key-here');
+ * $client = WeaviateClient::connectToWeaviateCloud(
+ *     'my-cluster.weaviate.network',
+ *     $auth
+ * );
+ * ```
+ *
+ * @example With local instance
+ * ```php
+ * $auth = new ApiKey('your-local-api-key');
+ * $client = WeaviateClient::connectToLocal('localhost:8080', $auth);
+ * ```
  */
 class ApiKey implements AuthInterface
 {
