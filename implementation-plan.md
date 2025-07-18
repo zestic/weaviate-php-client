@@ -196,7 +196,93 @@ $client->collections()->get('Workspace')
     ]);
 ```
 
-### Phase 3: Enhanced Data Operations
+### Phase 3: Schema Management Enhancement
+**Status: PHASE 1 COMPLETED** ✅
+**Priority: HIGH** - Critical missing functionality for production use
+
+#### ✅ Phase 1 Complete: Basic Schema CRUD & Property Management
+**Status: COMPLETED** ✅
+**Completion Date**: Current
+**Test Coverage**: 29 tests, 135 assertions, 100% pass rate
+
+**Implemented Components:**
+- ✅ **Basic Schema CRUD**: Complete collection lifecycle management (create, read, update, delete, exists)
+- ✅ **Property Management**: Full property CRUD operations with validation
+- ✅ **Data Type Validation**: Comprehensive validation for all Weaviate data types
+- ✅ **Error Handling**: Proper validation and exception handling
+- ✅ **Integration Tests**: Real Weaviate instance testing
+- ✅ **Documentation**: Updated README and API docs with examples
+
+**Implemented Methods:**
+```php
+class Schema
+{
+    public function get(?string $className = null): array;
+    public function exists(string $className): bool;
+    public function create(array $classDefinition): array;
+    public function update(string $className, array $updates): array;
+    public function delete(string $className): bool;
+    public function addProperty(string $className, array $property): array;
+    public function updateProperty(string $className, string $propertyName, array $updates): array;
+    public function deleteProperty(string $className, string $propertyName): bool;
+    public function getProperty(string $className, string $propertyName): array;
+}
+```
+
+#### Phase 2: Configuration Builders (PLANNED)
+**Estimated Effort**: 6-8 hours
+**Impact**: Type-safe schema configuration, matches Python client patterns
+
+**Components to Implement:**
+- Configuration builder classes for type-safe schema definition
+- Vectorizer configuration support
+- Vector index configuration (HNSW, Flat, Dynamic)
+- Multi-tenancy and replication configuration
+- Inverted index configuration
+
+```php
+class Configure
+{
+    public static function vectorizer(): VectorizerConfig;
+    public static function vectorIndex(): VectorIndexConfig;
+    public static function property(): PropertyConfig;
+    public static function multiTenancy(): MultiTenancyConfig;
+    public static function invertedIndex(): InvertedIndexConfig;
+    public static function replication(): ReplicationConfig;
+}
+
+// Usage example
+$collection = $client->collections()->create('Article', [
+    'properties' => [
+        Configure::property()
+            ->name('title')
+            ->dataType('text')
+            ->vectorizePropertyName(true)
+            ->tokenization('lowercase')
+            ->build(),
+        Configure::property()
+            ->name('content')
+            ->dataType('text')
+            ->indexFilterable(true)
+            ->build()
+    ],
+    'vectorizer' => Configure::vectorizer()
+        ->text2vecOpenAI()
+        ->model('text-embedding-ada-002')
+        ->build(),
+    'vectorIndex' => Configure::vectorIndex()
+        ->hnsw()
+        ->distanceMetric('cosine')
+        ->efConstruction(128)
+        ->maxConnections(64)
+        ->build(),
+    'multiTenancy' => Configure::multiTenancy()
+        ->enabled(true)
+        ->build()
+]);
+```
+
+### Phase 4: Enhanced Data Operations
 **Status: PLANNED** 🎯
 **Priority: MEDIUM** - Expand capabilities for more complex data operations
 
@@ -213,7 +299,7 @@ $client->collections()->get('Workspace')
    - Detailed error messages
    - Retry mechanisms
 
-#### Example Usage for Phase 2:
+#### Example Usage for Phase 4:
 ```php
 // Batch create workspaces
 $batch = $client->batch();
@@ -244,7 +330,7 @@ $client->collections()->get('Organization')
     );
 ```
 
-### Phase 4: Query Capabilities
+### Phase 5: Query Capabilities
 **Status: PLANNED** 🎯
 **Priority: MEDIUM** - Add basic query capabilities for retrieving data
 
@@ -258,7 +344,7 @@ $client->collections()->get('Organization')
    - Basic GraphQL queries
    - Field selection
 
-#### Example Usage for Phase 3:
+#### Example Usage for Phase 5:
 ```php
 // Get all workspaces for an organization
 $workspaces = $client->collections()->get('Workspace')
@@ -286,7 +372,7 @@ $result = $client->graphql()->get()
     ->do();
 ```
 
-### Phase 5: Advanced Features
+### Phase 6: Advanced Features
 **Status: PLANNED** 🎯
 **Priority: LOW** - Add more advanced features as needed
 
@@ -295,9 +381,10 @@ $result = $client->graphql()->get()
    - Basic vector search
    - Near text/vector queries
 
-2. **Schema Management**
-   - Advanced schema configuration
-   - Property validation
+2. **Advanced Schema Features**
+   - Vector quantization configuration
+   - Sharding configuration
+   - Consistency level settings
 
 3. **Authentication Options**
    - OIDC support
@@ -350,13 +437,19 @@ $result = $client->graphql()->get()
 - Response metadata access (1-2 hours)
 - Request configuration options (2-3 hours)
 
-#### v0.3.0: Enhanced Data Operations
+#### ✅ v0.3.0: Schema Management Enhancement (COMPLETED)
+**Target: COMPLETED** ✅
+- ✅ Basic schema CRUD operations (create, update, delete collections)
+- ✅ Property management (add, update, delete properties)
+- 🎯 Configuration builders for type-safe schema definition (Phase 2)
+
+#### v0.4.0: Enhanced Data Operations
 **Target: 2-4 weeks**
 - References API
 - Batch operations
 - Advanced error handling
 
-#### v0.4.0: Query Capabilities
+#### v0.5.0: Query Capabilities
 **Target: 4-6 weeks**
 - Query builder
 - GraphQL support

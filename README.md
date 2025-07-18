@@ -56,6 +56,69 @@ $client = WeaviateClient::connectToCustom(
 );
 ```
 
+### Schema Management
+
+The PHP client provides comprehensive schema management capabilities:
+
+```php
+<?php
+
+use Weaviate\WeaviateClient;
+
+$client = WeaviateClient::connectToLocal();
+$schema = $client->schema();
+
+// Check if collection exists
+if (!$schema->exists('Article')) {
+    // Create collection with properties
+    $schema->create([
+        'class' => 'Article',
+        'description' => 'A collection for storing articles',
+        'properties' => [
+            [
+                'name' => 'title',
+                'dataType' => ['text'],
+                'description' => 'Article title'
+            ],
+            [
+                'name' => 'content',
+                'dataType' => ['text'],
+                'description' => 'Article content'
+            ],
+            [
+                'name' => 'publishedAt',
+                'dataType' => ['date'],
+                'description' => 'Publication date'
+            ],
+            [
+                'name' => 'viewCount',
+                'dataType' => ['int'],
+                'description' => 'Number of views'
+            ]
+        ]
+    ]);
+}
+
+// Get complete schema
+$completeSchema = $schema->get();
+
+// Get specific collection schema
+$articleSchema = $schema->get('Article');
+
+// Add property to existing collection
+$schema->addProperty('Article', [
+    'name' => 'author',
+    'dataType' => ['text'],
+    'description' => 'Article author'
+]);
+
+// Get specific property
+$authorProperty = $schema->getProperty('Article', 'author');
+
+// Delete collection
+$schema->delete('Article');
+```
+
 ### Advanced Usage with Manual Connection
 
 ```php
