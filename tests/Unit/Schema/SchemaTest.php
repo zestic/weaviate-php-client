@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace Weaviate\Tests\Unit\Schema;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Weaviate\Connection\ConnectionInterface;
 use Weaviate\Exceptions\NotFoundException;
@@ -27,7 +28,7 @@ use Weaviate\Schema\Schema;
 
 class SchemaTest extends TestCase
 {
-    private ConnectionInterface $connection;
+    private ConnectionInterface&MockObject $connection;
     private Schema $schema;
 
     protected function setUp(): void

@@ -23,11 +23,19 @@ namespace Weaviate\Tests\Integration\Schema;
 use Weaviate\Tests\TestCase;
 use Weaviate\WeaviateClient;
 
+/**
+ * Integration tests for Schema management functionality.
+ *
+ * Tests schema operations against a real Weaviate instance.
+ */
 class SchemaIntegrationTest extends TestCase
 {
     private const TEST_CLASS_NAME = 'SchemaTestArticle';
     private WeaviateClient $client;
 
+    /**
+     * Set up test environment.
+     */
     protected function setUp(): void
     {
         $this->skipIfWeaviateNotAvailable();
@@ -47,6 +55,9 @@ class SchemaIntegrationTest extends TestCase
         }
     }
 
+    /**
+     * Clean up test environment.
+     */
     protected function tearDown(): void
     {
         // Clean up test collection
@@ -55,15 +66,21 @@ class SchemaIntegrationTest extends TestCase
         }
     }
 
+    /**
+     * Test getting complete schema.
+     */
     public function testGetCompleteSchema(): void
     {
         $schema = $this->client->schema()->get();
-        
+
         $this->assertIsArray($schema);
         $this->assertArrayHasKey('classes', $schema);
         $this->assertIsArray($schema['classes']);
     }
 
+    /**
+     * Test complete collection lifecycle (create, read, update, delete).
+     */
     public function testCollectionLifecycle(): void
     {
         // Test collection doesn't exist initially
@@ -88,7 +105,7 @@ class SchemaIntegrationTest extends TestCase
         ];
 
         $createdSchema = $this->client->schema()->create($classDefinition);
-        
+
         $this->assertIsArray($createdSchema);
         $this->assertEquals(self::TEST_CLASS_NAME, $createdSchema['class']);
         $this->assertEquals('Test collection for schema integration tests', $createdSchema['description']);
@@ -99,7 +116,7 @@ class SchemaIntegrationTest extends TestCase
 
         // Get specific collection schema
         $retrievedSchema = $this->client->schema()->get(self::TEST_CLASS_NAME);
-        
+
         $this->assertIsArray($retrievedSchema);
         $this->assertEquals(self::TEST_CLASS_NAME, $retrievedSchema['class']);
         $this->assertEquals('Test collection for schema integration tests', $retrievedSchema['description']);
@@ -112,11 +129,14 @@ class SchemaIntegrationTest extends TestCase
 
         // Delete collection
         $deleteResult = $this->client->schema()->delete(self::TEST_CLASS_NAME);
-        
+
         $this->assertTrue($deleteResult);
         $this->assertFalse($this->client->schema()->exists(self::TEST_CLASS_NAME));
     }
 
+    /**
+     * Test property management operations (add, get, update, delete).
+     */
     public function testPropertyManagement(): void
     {
         // Create base collection
@@ -141,9 +161,9 @@ class SchemaIntegrationTest extends TestCase
         ];
 
         $updatedSchema = $this->client->schema()->addProperty(self::TEST_CLASS_NAME, $newProperty);
-        
+
         $this->assertCount(2, $updatedSchema['properties']);
-        
+
         // Find the author property
         $authorProperty = null;
         foreach ($updatedSchema['properties'] as $property) {
@@ -152,7 +172,7 @@ class SchemaIntegrationTest extends TestCase
                 break;
             }
         }
-        
+
         $this->assertNotNull($authorProperty);
         $this->assertEquals('author', $authorProperty['name']);
         $this->assertEquals(['text'], $authorProperty['dataType']);
@@ -160,7 +180,7 @@ class SchemaIntegrationTest extends TestCase
 
         // Get specific property
         $retrievedProperty = $this->client->schema()->getProperty(self::TEST_CLASS_NAME, 'author');
-        
+
         $this->assertEquals('author', $retrievedProperty['name']);
         $this->assertEquals(['text'], $retrievedProperty['dataType']);
 
@@ -178,6 +198,9 @@ class SchemaIntegrationTest extends TestCase
         $this->assertCount(2, $finalSchema['properties']); // Both title and author should still exist
     }
 
+    /**
+     * Test creating collection with multi-tenancy configuration.
+     */
     public function testCreateCollectionWithMultiTenancy(): void
     {
         $classDefinition = [
@@ -194,12 +217,15 @@ class SchemaIntegrationTest extends TestCase
         ];
 
         $createdSchema = $this->client->schema()->create($classDefinition);
-        
+
         $this->assertIsArray($createdSchema);
         $this->assertEquals(self::TEST_CLASS_NAME, $createdSchema['class']);
         $this->assertTrue($createdSchema['multiTenancyConfig']['enabled']);
     }
 
+    /**
+     * Test creating collection with vectorizer configuration.
+     */
     public function testCreateCollectionWithVectorizer(): void
     {
         $classDefinition = [
@@ -214,12 +240,15 @@ class SchemaIntegrationTest extends TestCase
         ];
 
         $createdSchema = $this->client->schema()->create($classDefinition);
-        
+
         $this->assertIsArray($createdSchema);
         $this->assertEquals(self::TEST_CLASS_NAME, $createdSchema['class']);
         $this->assertEquals('none', $createdSchema['vectorizer']);
     }
 
+    /**
+     * Test creating collection with complex property configurations.
+     */
     public function testCreateCollectionWithComplexProperties(): void
     {
         $classDefinition = [
@@ -260,7 +289,7 @@ class SchemaIntegrationTest extends TestCase
         ];
 
         $createdSchema = $this->client->schema()->create($classDefinition);
-        
+
         $this->assertIsArray($createdSchema);
         $this->assertEquals(self::TEST_CLASS_NAME, $createdSchema['class']);
         $this->assertCount(6, $createdSchema['properties']);
@@ -279,6 +308,9 @@ class SchemaIntegrationTest extends TestCase
         $this->assertEquals(['text[]'], $propertyTypes['tags']);
     }
 
+    /**
+     * Test that getting non-existent property throws exception.
+     */
     public function testGetPropertyThrowsExceptionForNonExistentProperty(): void
     {
         // Create collection with one property
@@ -300,6 +332,9 @@ class SchemaIntegrationTest extends TestCase
         $this->client->schema()->getProperty(self::TEST_CLASS_NAME, 'nonexistent');
     }
 
+    /**
+     * Test creating collection with inverted index configuration.
+     */
     public function testCreateCollectionWithInvertedIndexConfig(): void
     {
         $classDefinition = [
@@ -322,7 +357,7 @@ class SchemaIntegrationTest extends TestCase
         ];
 
         $createdSchema = $this->client->schema()->create($classDefinition);
-        
+
         $this->assertIsArray($createdSchema);
         $this->assertEquals(self::TEST_CLASS_NAME, $createdSchema['class']);
         $this->assertArrayHasKey('invertedIndexConfig', $createdSchema);
