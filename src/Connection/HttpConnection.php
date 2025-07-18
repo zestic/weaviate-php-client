@@ -300,4 +300,20 @@ class HttpConnection implements ConnectionInterface
 
         return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
     }
+
+    public function head(string $path): bool
+    {
+        $url = $this->baseUrl . $path;
+        $request = $this->requestFactory->createRequest('HEAD', $url);
+        $request = $this->applyHeaders($request);
+        $request = $this->applyAuth($request);
+
+        try {
+            $response = $this->httpClient->sendRequest($request);
+            return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
+        } catch (\Exception $e) {
+            // HEAD requests should return false for any error (including 404)
+            return false;
+        }
+    }
 }

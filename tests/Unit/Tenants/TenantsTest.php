@@ -207,13 +207,29 @@ class TenantsTest extends TestCase
     {
         $this->connection
             ->expects($this->once())
-            ->method('get')
+            ->method('head')
             ->with('/v1/schema/TestCollection/tenants/tenant1')
-            ->willReturn(['name' => 'tenant1', 'activityStatus' => 'ACTIVE']);
+            ->willReturn(true);
 
         $result = $this->tenants->exists('tenant1');
 
         $this->assertTrue($result);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::exists
+     */
+    public function testReturnsFalseWhenTenantDoesNotExist(): void
+    {
+        $this->connection
+            ->expects($this->once())
+            ->method('head')
+            ->with('/v1/schema/TestCollection/tenants/nonexistent')
+            ->willReturn(false);
+
+        $result = $this->tenants->exists('nonexistent');
+
+        $this->assertFalse($result);
     }
 
     /**

@@ -77,4 +77,12 @@ interface ConnectionInterface
      * @return bool Success status
      */
     public function deleteWithData(string $path, array $data = []): bool;
+
+    /**
+     * Make a HEAD request for existence checks
+     *
+     * @param string $path The API path
+     * @return bool True if resource exists (2xx status), false otherwise
+     */
+    public function head(string $path): bool;
 }

@@ -198,4 +198,118 @@ class HttpConnectionTest extends TestCase
 
         $this->assertEquals(['result' => 'success'], $result);
     }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::head
+     */
+    public function testCanMakeHeadRequest(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+
+        $response->method('getStatusCode')->willReturn(200);
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->with('HEAD', 'http://localhost:8080/v1/objects/Organization/123')
+            ->willReturn($request);
+
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->with($request)
+            ->willReturn($response);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $result = $connection->head('/v1/objects/Organization/123');
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::head
+     */
+    public function testHeadRequestReturnsFalseForNotFound(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+
+        $response->method('getStatusCode')->willReturn(404);
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->with('HEAD', 'http://localhost:8080/v1/objects/Organization/nonexistent')
+            ->willReturn($request);
+
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->with($request)
+            ->willReturn($response);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $result = $connection->head('/v1/objects/Organization/nonexistent');
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::head
+     */
+    public function testHeadRequestReturnsFalseOnException(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->with('HEAD', 'http://localhost:8080/v1/objects/Organization/123')
+            ->willReturn($request);
+
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->with($request)
+            ->willThrowException(new \Exception('Network error'));
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $result = $connection->head('/v1/objects/Organization/123');
+
+        $this->assertFalse($result);
+    }
 }

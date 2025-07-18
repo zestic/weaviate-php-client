@@ -168,12 +168,7 @@ class Tenants
     {
         $tenantName = $tenant instanceof Tenant ? $tenant->getName() : $tenant;
 
-        try {
-            $this->connection->get("/v1/schema/{$this->collectionName}/tenants/{$tenantName}");
-            return true;
-        } catch (NotFoundException) {
-            return false;
-        }
+        return $this->connection->head("/v1/schema/{$this->collectionName}/tenants/{$tenantName}");
     }
 
     /**
