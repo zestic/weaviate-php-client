@@ -131,4 +131,34 @@ class TenantTest extends TestCase
 
         Tenant::fromArray([]);
     }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenant::withActivityStatus
+     */
+    public function testCanCreateNewTenantWithDifferentStatus(): void
+    {
+        $originalTenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
+        $newTenant = $originalTenant->withActivityStatus(TenantActivityStatus::INACTIVE);
+
+        // Original tenant should be unchanged (immutable)
+        $this->assertEquals(TenantActivityStatus::ACTIVE, $originalTenant->getActivityStatus());
+
+        // New tenant should have the new status
+        $this->assertEquals(TenantActivityStatus::INACTIVE, $newTenant->getActivityStatus());
+        $this->assertEquals('tenant1', $newTenant->getName());
+
+        // Should be different instances
+        $this->assertNotSame($originalTenant, $newTenant);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenant::fromArray
+     */
+    public function testFromArrayThrowsExceptionForNonStringName(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Tenant name is required');
+
+        Tenant::fromArray(['name' => 123, 'activityStatus' => 'HOT']);
+    }
 }

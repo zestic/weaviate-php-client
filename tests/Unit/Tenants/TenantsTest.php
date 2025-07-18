@@ -201,6 +201,42 @@ class TenantsTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Tenants\Tenants::getByName
+     */
+    public function testGetTenantByNameReturnsNullWhenNotFound(): void
+    {
+        $this->connection
+            ->expects($this->once())
+            ->method('get')
+            ->with('/v1/schema/TestCollection/tenants/nonexistent')
+            ->willThrowException(new \Weaviate\Exceptions\NotFoundException('Tenant not found'));
+
+        $result = $this->tenants->getByName('nonexistent');
+
+        $this->assertNull($result);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::getByName
+     */
+    public function testCanGetTenantByNameWithTenantObject(): void
+    {
+        $tenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
+        $responseData = ['name' => 'tenant1', 'activityStatus' => 'ACTIVE'];
+
+        $this->connection
+            ->expects($this->once())
+            ->method('get')
+            ->with('/v1/schema/TestCollection/tenants/tenant1')
+            ->willReturn($responseData);
+
+        $result = $this->tenants->getByName($tenant);
+
+        $this->assertInstanceOf(Tenant::class, $result);
+        $this->assertEquals('tenant1', $result->getName());
+    }
+
+    /**
      * @covers \Weaviate\Tenants\Tenants::exists
      */
     public function testCanCheckIfTenantExists(): void
@@ -230,6 +266,24 @@ class TenantsTest extends TestCase
         $result = $this->tenants->exists('nonexistent');
 
         $this->assertFalse($result);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::exists
+     */
+    public function testCanCheckIfTenantExistsWithTenantObject(): void
+    {
+        $tenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
+
+        $this->connection
+            ->expects($this->once())
+            ->method('head')
+            ->with('/v1/schema/TestCollection/tenants/tenant1')
+            ->willReturn(true);
+
+        $result = $this->tenants->exists($tenant);
+
+        $this->assertTrue($result);
     }
 
     /**
@@ -394,5 +448,52 @@ class TenantsTest extends TestCase
             );
 
         $this->tenants->offload(['tenant1', 'tenant2']);
+    }
+
+
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::create
+     */
+    public function testCanCreateMixedTenantTypes(): void
+    {
+        $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
+        $tenantCreate = new TenantCreate('tenant2', TenantActivityStatus::ACTIVE);
+
+        $this->connection
+            ->expects($this->once())
+            ->method('post')
+            ->with(
+                '/v1/schema/TestCollection/tenants',
+                [
+                    ['name' => 'tenant0', 'activityStatus' => 'HOT'], // string
+                    ['name' => 'tenant1', 'activityStatus' => 'COLD'], // Tenant object
+                    ['name' => 'tenant2', 'activityStatus' => 'HOT']   // TenantCreate object
+                ]
+            );
+
+        $this->tenants->create(['tenant0', $tenant, $tenantCreate]);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::update
+     */
+    public function testCanUpdateMixedTenantTypes(): void
+    {
+        $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
+        $tenantUpdate = new TenantUpdate('tenant2', TenantActivityStatus::OFFLOADED);
+
+        $this->connection
+            ->expects($this->once())
+            ->method('put')
+            ->with(
+                '/v1/schema/TestCollection/tenants',
+                [
+                    ['name' => 'tenant1', 'activityStatus' => 'COLD'],   // Tenant object
+                    ['name' => 'tenant2', 'activityStatus' => 'FROZEN']  // TenantUpdate object
+                ]
+            );
+
+        $this->tenants->update([$tenant, $tenantUpdate]);
     }
 }
