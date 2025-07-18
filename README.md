@@ -1,5 +1,11 @@
 # Weaviate PHP Client
 
+[![Tests](https://github.com/zestic/weaviate-php-client/actions/workflows/tests.yml/badge.svg)](https://github.com/zestic/weaviate-php-client/actions/workflows/tests.yml)
+[![Lint](https://github.com/zestic/weaviate-php-client/actions/workflows/lint.yml/badge.svg)](https://github.com/zestic/weaviate-php-client/actions/workflows/lint.yml)
+[![codecov](https://codecov.io/gh/zestic/weaviate-php-client/graph/badge.svg)](https://codecov.io/gh/zestic/weaviate-php-client)
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D8.3-blue.svg)](https://php.net/)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+
 A modern PHP client for Weaviate vector database with multi-tenancy support.
 
 ## License

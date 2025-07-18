@@ -42,12 +42,6 @@ jobs:
     
     - name: Run unit tests
       run: composer test-unit
-    
-    - name: Run PHPStan
-      run: composer phpstan
-    
-    - name: Check coding standards
-      run: composer cs-check
 
   integration-tests:
     name: Integration Tests
@@ -160,11 +154,11 @@ jobs:
         WEAVIATE_URL: http://localhost:18080
     
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
-        file: ./coverage/clover.xml
-        fail_ci_if_error: true
-    
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: zestic/weaviate-php-client
+        
     - name: Stop Weaviate
       if: always()
       run: docker compose down
