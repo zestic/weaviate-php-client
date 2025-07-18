@@ -172,24 +172,49 @@ class HttpConnection implements ConnectionInterface
 
     public function patch(string $path, array $data = []): array
     {
-        $url = $this->baseUrl . $path;
-        $request = $this->requestFactory->createRequest('PATCH', $url);
+        $operation = "PATCH {$path}";
 
-        if (!empty($data)) {
-            $json = json_encode($data);
-            if ($json === false) {
-                throw new \RuntimeException('Failed to encode JSON data');
+        $executeRequest = function () use ($path, $data): array {
+            $url = $this->baseUrl . $path;
+            $request = $this->requestFactory->createRequest('PATCH', $url);
+
+            if (!empty($data)) {
+                $json = json_encode($data);
+                if ($json === false) {
+                    throw new \RuntimeException('Failed to encode JSON data');
+                }
+                $stream = $this->streamFactory->createStream($json);
+                $request = $request->withBody($stream)
+                    ->withHeader('Content-Type', 'application/json');
             }
-            $stream = $this->streamFactory->createStream($json);
-            $request = $request->withBody($stream)
-                ->withHeader('Content-Type', 'application/json');
+
+            $request = $this->applyHeaders($request);
+            $request = $this->applyAuth($request);
+
+            try {
+                $response = $this->httpClient->sendRequest($request);
+            } catch (NetworkExceptionInterface $e) {
+                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
+            } catch (RequestExceptionInterface $e) {
+                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
+            }
+
+            // Handle HTTP error status codes
+            $statusCode = $response->getStatusCode();
+            if ($statusCode >= 400) {
+                $this->handleErrorResponse($response, "PATCH {$path}");
+            }
+
+            $body = (string) $response->getBody();
+            return json_decode($body, true) ?? [];
+        };
+
+        // Use retry handler if available
+        if ($this->retryHandler !== null) {
+            return $this->retryHandler->execute($operation, $executeRequest);
         }
 
-        $request = $this->applyHeaders($request);
-        $request = $this->applyAuth($request);
-        $response = $this->httpClient->sendRequest($request);
-        $body = (string) $response->getBody();
-        return json_decode($body, true) ?? [];
+        return $executeRequest();
     }
 
     public function post(string $path, array $data = []): array
@@ -241,24 +266,49 @@ class HttpConnection implements ConnectionInterface
 
     public function put(string $path, array $data = []): array
     {
-        $url = $this->baseUrl . $path;
-        $request = $this->requestFactory->createRequest('PUT', $url);
+        $operation = "PUT {$path}";
 
-        if (!empty($data)) {
-            $json = json_encode($data);
-            if ($json === false) {
-                throw new \RuntimeException('Failed to encode JSON data');
+        $executeRequest = function () use ($path, $data): array {
+            $url = $this->baseUrl . $path;
+            $request = $this->requestFactory->createRequest('PUT', $url);
+
+            if (!empty($data)) {
+                $json = json_encode($data);
+                if ($json === false) {
+                    throw new \RuntimeException('Failed to encode JSON data');
+                }
+                $stream = $this->streamFactory->createStream($json);
+                $request = $request->withBody($stream)
+                    ->withHeader('Content-Type', 'application/json');
             }
-            $stream = $this->streamFactory->createStream($json);
-            $request = $request->withBody($stream)
-                ->withHeader('Content-Type', 'application/json');
+
+            $request = $this->applyHeaders($request);
+            $request = $this->applyAuth($request);
+
+            try {
+                $response = $this->httpClient->sendRequest($request);
+            } catch (NetworkExceptionInterface $e) {
+                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
+            } catch (RequestExceptionInterface $e) {
+                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
+            }
+
+            // Handle HTTP error status codes
+            $statusCode = $response->getStatusCode();
+            if ($statusCode >= 400) {
+                $this->handleErrorResponse($response, "PUT {$path}");
+            }
+
+            $body = (string) $response->getBody();
+            return json_decode($body, true) ?? [];
+        };
+
+        // Use retry handler if available
+        if ($this->retryHandler !== null) {
+            return $this->retryHandler->execute($operation, $executeRequest);
         }
 
-        $request = $this->applyHeaders($request);
-        $request = $this->applyAuth($request);
-        $response = $this->httpClient->sendRequest($request);
-        $body = (string) $response->getBody();
-        return json_decode($body, true) ?? [];
+        return $executeRequest();
     }
 
     /**

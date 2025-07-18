@@ -272,7 +272,9 @@ class HttpConnectionIntegrationTest extends TestCase
         $this->connection->post('/v1/objects', $createObjectData);
 
         // Update object using PUT (full replacement)
+        // Note: PUT requests require id and class in the request body
         $updateData = [
+            'id' => $objectId,
             'class' => $collectionName,
             'properties' => [
                 'title' => 'Updated Title via PUT',
@@ -300,8 +302,8 @@ class HttpConnectionIntegrationTest extends TestCase
      */
     public function testCanMakeHeadRequest(): void
     {
-        // Test HEAD request to meta endpoint (should exist)
-        $result = $this->connection->head('/v1/meta');
+        // Test HEAD request to ready endpoint (should exist and support HEAD)
+        $result = $this->connection->head('/v1/.well-known/ready');
         $this->assertTrue($result);
 
         // Test HEAD request to non-existent endpoint
