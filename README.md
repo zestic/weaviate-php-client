@@ -94,9 +94,29 @@ if (!$client->collections()->exists('Organization')) {
     ]);
 }
 
+// Manage tenants
+use Weaviate\Tenants\Tenant;
+use Weaviate\Tenants\TenantActivityStatus;
+
+$collection = $client->collections()->get('Organization');
+$tenants = $collection->tenants();
+
+// Create tenants (multiple ways)
+$tenants->create(['tenant1', 'tenant2']);
+$tenants->create(new Tenant('tenant3', TenantActivityStatus::INACTIVE));
+
+// Retrieve tenants
+$allTenants = $tenants->get();
+$specificTenant = $tenants->getByName('tenant1');
+
+// Manage tenant status
+$tenants->activate('tenant3');
+$tenants->deactivate('tenant1');
+$tenants->offload('tenant2');
+
 // Work with tenant-specific data
 $orgId = '123e4567-e89b-12d3-a456-426614174000';
-$result = $client->collections()->get('Organization')
+$result = $collection
     ->withTenant('tenant1')
     ->data()
     ->create([
@@ -105,11 +125,159 @@ $result = $client->collections()->get('Organization')
         'createdAt' => '2024-01-01T00:00:00Z'
     ]);
 
-// Retrieve object
-$org = $client->collections()->get('Organization')
+// Retrieve object from specific tenant
+$org = $collection
     ->withTenant('tenant1')
     ->data()
     ->get($orgId);
+```
+
+## Multi-Tenancy
+
+Weaviate supports multi-tenancy, allowing you to isolate data for different tenants within the same collection. This PHP client provides comprehensive tenant management capabilities.
+
+### Creating Multi-Tenant Collections
+
+```php
+use Weaviate\WeaviateClient;
+use Weaviate\Connection\HttpConnection;
+
+$client = WeaviateClient::connectToLocal();
+
+// Create a collection with multi-tenancy enabled
+$client->collections()->create('Articles', [
+    'properties' => [
+        ['name' => 'title', 'dataType' => ['text']],
+        ['name' => 'content', 'dataType' => ['text']],
+        ['name' => 'author', 'dataType' => ['text']]
+    ],
+    'multiTenancyConfig' => ['enabled' => true]
+]);
+```
+
+### Managing Tenants
+
+```php
+use Weaviate\Tenants\Tenant;
+use Weaviate\Tenants\TenantActivityStatus;
+
+$collection = $client->collections()->get('Articles');
+$tenants = $collection->tenants();
+
+// Create tenants (multiple input types supported)
+$tenants->create('customer-123');                                    // String
+$tenants->create(['customer-456', 'customer-789']);                 // Array of strings
+$tenants->create(new Tenant('customer-abc', TenantActivityStatus::INACTIVE)); // Tenant object
+$tenants->create([
+    new Tenant('customer-def'),
+    new Tenant('customer-ghi', TenantActivityStatus::INACTIVE)
+]); // Array of Tenant objects
+
+// Retrieve tenants
+$allTenants = $tenants->get();                    // Returns array indexed by tenant name
+$specificTenant = $tenants->getByName('customer-123'); // Returns Tenant object or null
+$multipleTenants = $tenants->getByNames(['customer-123', 'customer-456']);
+
+// Check tenant existence
+if ($tenants->exists('customer-123')) {
+    echo "Tenant exists!";
+}
+
+// Remove tenants
+$tenants->remove('customer-123');                // Single tenant
+$tenants->remove(['customer-456', 'customer-789']); // Multiple tenants
+```
+
+### Tenant Activity Status Management
+
+Tenants can have different activity statuses that control how their data is stored and accessed:
+
+- **ACTIVE**: Tenant is fully active, data immediately accessible
+- **INACTIVE**: Tenant is inactive, data stored locally but not accessible
+- **OFFLOADED**: Tenant is inactive, data stored in cloud storage
+- **OFFLOADING**: (Read-only) Tenant is being moved to cloud storage
+- **ONLOADING**: (Read-only) Tenant is being activated from cloud storage
+
+```php
+// Manage tenant status
+$tenants->activate('customer-123');      // Set to ACTIVE
+$tenants->deactivate('customer-456');    // Set to INACTIVE
+$tenants->offload('customer-789');       // Set to OFFLOADED
+
+// Update multiple tenants at once
+$tenants->activate(['customer-123', 'customer-456']);
+
+// Manual status updates
+$tenants->update(new Tenant('customer-123', TenantActivityStatus::OFFLOADED));
+```
+
+### Working with Tenant Data
+
+Once tenants are created, you can work with tenant-specific data:
+
+```php
+// Get tenant-specific collection instance
+$customerCollection = $collection->withTenant('customer-123');
+
+// Create data for specific tenant
+$articleId = $customerCollection->data()->create([
+    'title' => 'Customer 123 Article',
+    'content' => 'This article belongs to customer 123',
+    'author' => 'John Doe'
+]);
+
+// Retrieve data from specific tenant
+$article = $customerCollection->data()->get($articleId);
+
+// Update data within tenant
+$customerCollection->data()->update($articleId, [
+    'title' => 'Updated Article Title'
+]);
+
+// Data isolation - tenant A cannot access tenant B's data
+$customerACollection = $collection->withTenant('customer-a');
+$customerBCollection = $collection->withTenant('customer-b');
+
+$articleA = $customerACollection->data()->create(['title' => 'Article A']);
+$articleB = $customerBCollection->data()->create(['title' => 'Article B']);
+
+// This will return null - tenant A cannot see tenant B's data
+$result = $customerACollection->data()->get($articleB); // null
+```
+
+### Tenant Management Best Practices
+
+1. **Tenant Naming**: Use consistent, meaningful tenant names (e.g., customer IDs, organization slugs)
+2. **Status Management**: Use INACTIVE for temporary suspension, OFFLOADED for long-term storage
+3. **Batch Operations**: Create/update multiple tenants at once for better performance
+4. **Error Handling**: Always check tenant existence before performing operations
+5. **Data Isolation**: Remember that tenant data is completely isolated
+
+```php
+// Example: Comprehensive tenant management
+try {
+    $tenants = $collection->tenants();
+
+    // Check if tenant exists before creating
+    if (!$tenants->exists('new-customer')) {
+        $tenants->create('new-customer');
+    }
+
+    // Batch create multiple tenants
+    $newTenants = ['customer-001', 'customer-002', 'customer-003'];
+    $tenants->create($newTenants);
+
+    // Get all active tenants
+    $allTenants = $tenants->get();
+    $activeTenants = array_filter($allTenants, function($tenant) {
+        return $tenant->getActivityStatus() === TenantActivityStatus::ACTIVE;
+    });
+
+    echo "Found " . count($activeTenants) . " active tenants";
+
+} catch (Exception $e) {
+    echo "Error managing tenants: " . $e->getMessage();
+}
 ```
 
 ## Development

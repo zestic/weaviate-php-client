@@ -22,6 +22,7 @@ namespace Weaviate\Collections;
 
 use Weaviate\Connection\ConnectionInterface;
 use Weaviate\Data\DataOperations;
+use Weaviate\Tenants\Tenants;
 
 /**
  * Individual collection operations
@@ -73,11 +74,15 @@ class Collection
 
     /**
      * Set the tenant for multi-tenancy operations
+     *
+     * Returns a new Collection instance with the specified tenant,
+     * leaving the original collection unchanged.
      */
     public function withTenant(string $tenant): static
     {
-        $this->tenant = $tenant;
-        return $this;
+        $clone = clone $this;
+        $clone->tenant = $tenant;
+        return $clone;
     }
 
     /**
@@ -99,8 +104,8 @@ class Collection
     /**
      * Get tenant operations for this collection
      */
-    public function tenants(): TenantOperations
+    public function tenants(): Tenants
     {
-        return new TenantOperations($this->connection, $this->name);
+        return new Tenants($this->connection, $this->name);
     }
 }

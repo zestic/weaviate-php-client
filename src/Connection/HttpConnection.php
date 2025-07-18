@@ -278,4 +278,26 @@ class HttpConnection implements ConnectionInterface
 
         return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
     }
+
+    public function deleteWithData(string $path, array $data = []): bool
+    {
+        $url = $this->baseUrl . $path;
+        $request = $this->requestFactory->createRequest('DELETE', $url);
+
+        if (!empty($data)) {
+            $json = json_encode($data);
+            if ($json === false) {
+                throw new \RuntimeException('Failed to encode JSON data');
+            }
+            $stream = $this->streamFactory->createStream($json);
+            $request = $request->withBody($stream)
+                ->withHeader('Content-Type', 'application/json');
+        }
+
+        $request = $this->applyHeaders($request);
+        $request = $this->applyAuth($request);
+        $response = $this->httpClient->sendRequest($request);
+
+        return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
+    }
 }

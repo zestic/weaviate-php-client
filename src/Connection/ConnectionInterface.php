@@ -68,4 +68,13 @@ interface ConnectionInterface
      * @return bool Success status
      */
     public function delete(string $path): bool;
+
+    /**
+     * Make a DELETE request with data
+     *
+     * @param string $path The API path
+     * @param array<string, mixed> $data Request body data
+     * @return bool Success status
+     */
+    public function deleteWithData(string $path, array $data = []): bool;
 }

@@ -39,8 +39,9 @@ class CollectionTest extends TestCase
 
         $result = $collection->withTenant('tenant1');
 
-        $this->assertSame($collection, $result);
-        $this->assertEquals('tenant1', $collection->getTenant());
+        $this->assertNotSame($collection, $result);
+        $this->assertEquals('tenant1', $result->getTenant());
+        $this->assertNull($collection->getTenant()); // Original should be unchanged
     }
 
     /**
@@ -67,9 +68,9 @@ class CollectionTest extends TestCase
     {
         $connection = $this->createMock(ConnectionInterface::class);
         $collection = new Collection($connection, 'Organization');
-        $collection->withTenant('tenant1');
+        $tenantCollection = $collection->withTenant('tenant1');
 
-        $data = $collection->data();
+        $data = $tenantCollection->data();
 
         $this->assertEquals('tenant1', $data->getTenant());
     }

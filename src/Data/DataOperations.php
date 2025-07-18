@@ -77,7 +77,7 @@ class DataOperations
         $path = "/v1/objects/{$this->className}/{$id}";
 
         if ($this->tenant !== null) {
-            $path .= "?tenant={$this->tenant}";
+            $path .= "?tenant=" . urlencode($this->tenant);
         }
 
         return $this->connection->get($path);
