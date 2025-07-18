@@ -82,6 +82,38 @@ class TenantTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Tenants\Tenant::toArray
+     * @covers \Weaviate\Tenants\Tenant::getApiStatusValue
+     * @dataProvider statusMappingProvider
+     */
+    public function testToArrayMapsAllStatusValuesCorrectly(TenantActivityStatus $status, string $expectedApiValue): void
+    {
+        $tenant = new Tenant('test-tenant', $status);
+        $array = $tenant->toArray();
+
+        $this->assertEquals([
+            'name' => 'test-tenant',
+            'activityStatus' => $expectedApiValue
+        ], $array);
+    }
+
+    /**
+     * Data provider for testing all status mappings
+     *
+     * @return array<string, array{TenantActivityStatus, string}>
+     */
+    public static function statusMappingProvider(): array
+    {
+        return [
+            'ACTIVE maps to HOT' => [TenantActivityStatus::ACTIVE, 'HOT'],
+            'INACTIVE maps to COLD' => [TenantActivityStatus::INACTIVE, 'COLD'],
+            'OFFLOADED maps to FROZEN' => [TenantActivityStatus::OFFLOADED, 'FROZEN'],
+            'OFFLOADING maps to OFFLOADING' => [TenantActivityStatus::OFFLOADING, 'OFFLOADING'],
+            'ONLOADING maps to ONLOADING' => [TenantActivityStatus::ONLOADING, 'ONLOADING'],
+        ];
+    }
+
+    /**
      * @covers \Weaviate\Tenants\Tenant::fromArray
      */
     public function testCanCreateFromArray(): void
