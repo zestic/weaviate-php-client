@@ -127,25 +127,25 @@ class WeaviateBatchExceptionTest extends TestCase
     }
 
     /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::forValidationErrors
+     * @covers \Weaviate\Exceptions\WeaviateBatchException::forTimeout
      */
-    public function testForValidationErrors(): void
+    public function testForTimeoutWithLargeTimeout(): void
     {
-        $validationErrors = [
-            'field1' => 'Required field missing',
-            'field2' => 'Invalid data type'
-        ];
-        $objectCount = 10;
+        $batchSize = 1000;
+        $timeoutSeconds = 300.0;
+        $context = ['retry_count' => 5, 'server_load' => 'high'];
 
-        $exception = WeaviateBatchException::forValidationErrors($validationErrors, $objectCount);
+        $exception = WeaviateBatchException::forTimeout($batchSize, $timeoutSeconds, $context);
 
-        $this->assertStringContainsString('Batch validation failed', $exception->getMessage());
-        $this->assertStringContainsString('10 objects', $exception->getMessage());
+        $this->assertStringContainsString('Batch operation with 1000 objects timed out', $exception->getMessage());
+        $this->assertStringContainsString('300 seconds', $exception->getMessage());
 
-        $context = $exception->getContext();
-        $this->assertSame($validationErrors, $context['validation_errors']);
-        $this->assertSame($objectCount, $context['object_count']);
-        $this->assertSame('validation_failure', $context['batch_type']);
+        $resultContext = $exception->getContext();
+        $this->assertSame($batchSize, $resultContext['batch_size']);
+        $this->assertSame($timeoutSeconds, $resultContext['timeout_seconds']);
+        $this->assertSame('timeout', $resultContext['batch_type']);
+        $this->assertSame(5, $resultContext['retry_count']);
+        $this->assertSame('high', $resultContext['server_load']);
     }
 
     /**
@@ -197,14 +197,25 @@ class WeaviateBatchExceptionTest extends TestCase
     }
 
     /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::forValidationErrors
+     * @covers \Weaviate\Exceptions\WeaviateBatchException::forPartialFailure
      */
-    public function testForValidationErrorsWithEmptyErrors(): void
+    public function testForPartialFailureWithLargeNumbers(): void
     {
-        $exception = WeaviateBatchException::forValidationErrors([], 5);
+        $successfulCount = 9500;
+        $failedCount = 500;
+        $failedObjects = [
+            ['id' => 'obj1', 'error' => 'Network timeout'],
+            ['id' => 'obj2', 'error' => 'Validation failed']
+        ];
+
+        $exception = WeaviateBatchException::forPartialFailure($successfulCount, $failedCount, $failedObjects);
+
+        $this->assertStringContainsString('9500 successful', $exception->getMessage());
+        $this->assertStringContainsString('500 failed', $exception->getMessage());
 
         $context = $exception->getContext();
-        $this->assertSame([], $context['validation_errors']);
-        $this->assertSame(5, $context['object_count']);
+        $this->assertSame($successfulCount, $context['successful_count']);
+        $this->assertSame($failedCount, $context['failed_count']);
+        $this->assertSame($failedObjects, $context['failed_objects']);
     }
 }

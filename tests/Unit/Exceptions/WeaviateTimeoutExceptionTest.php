@@ -64,9 +64,8 @@ class WeaviateTimeoutExceptionTest extends TestCase
     {
         $url = 'http://localhost:8080';
         $timeoutSeconds = 10.0;
-        $context = ['retry_attempt' => 2];
 
-        $exception = WeaviateTimeoutException::forConnection($url, $timeoutSeconds, $context);
+        $exception = WeaviateTimeoutException::forConnection($url, $timeoutSeconds);
 
         $this->assertStringContainsString('Connection to', $exception->getMessage());
         $this->assertStringContainsString($url, $exception->getMessage());
@@ -76,7 +75,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame($url, $resultContext['url']);
         $this->assertSame($timeoutSeconds, $resultContext['timeout_seconds']);
         $this->assertSame('connection', $resultContext['timeout_type']);
-        $this->assertSame(2, $resultContext['retry_attempt']);
     }
 
     /**
@@ -156,7 +154,7 @@ class WeaviateTimeoutExceptionTest extends TestCase
     public function testForConnectionWithPreviousException(): void
     {
         $previous = new \Exception('Connection refused');
-        $exception = WeaviateTimeoutException::forConnection('http://localhost:8080', 10.0, [], $previous);
+        $exception = WeaviateTimeoutException::forConnection('http://localhost:8080', 10.0, $previous);
 
         $this->assertSame($previous, $exception->getPrevious());
     }

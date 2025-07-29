@@ -181,24 +181,25 @@ class NotFoundExceptionTest extends TestCase
     }
 
     /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forProperty
+     * @covers \Weaviate\Exceptions\NotFoundException::fromResponse
      */
-    public function testForProperty(): void
+    public function testFromResponse(): void
     {
-        $propertyName = 'title';
-        $collectionName = 'Article';
+        $message = 'Resource not found';
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockResponse->method('getStatusCode')->willReturn(404);
+        $mockResponse->method('getBody')->willReturn('{"error": "Not found"}');
+        $mockResponse->method('getHeaders')->willReturn(['Content-Type' => ['application/json']]);
 
-        $exception = NotFoundException::forProperty($propertyName, $collectionName);
+        $context = ['operation' => 'get'];
 
-        $this->assertStringContainsString(
-            "Property 'title' not found in collection 'Article'",
-            $exception->getMessage()
-        );
+        $exception = NotFoundException::fromResponse($message, $mockResponse, $context);
 
-        $context = $exception->getContext();
-        $this->assertSame('property', $context['resource_type']);
-        $this->assertSame($propertyName, $context['resource_id']);
-        $this->assertSame($collectionName, $context['collection']);
+        $this->assertStringContainsString($message, $exception->getMessage());
+        $this->assertSame(404, $exception->getStatusCode());
+
+        $resultContext = $exception->getContext();
+        $this->assertSame('get', $resultContext['operation']);
     }
 
     /**
@@ -252,17 +253,21 @@ class NotFoundExceptionTest extends TestCase
     }
 
     /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forProperty
+     * @covers \Weaviate\Exceptions\NotFoundException::forObject
      */
-    public function testForPropertyWithEmptyNames(): void
+    public function testForObjectWithSpecialCharacters(): void
     {
-        $exception = NotFoundException::forProperty('', '');
+        $objectId = 'obj-with-special-chars!@#';
+        $collectionName = 'Special Collection';
 
-        $this->assertStringContainsString("Property '' not found in collection ''", $exception->getMessage());
+        $exception = NotFoundException::forObject($objectId, $collectionName);
+
+        $this->assertStringContainsString($objectId, $exception->getMessage());
+        $this->assertStringContainsString($collectionName, $exception->getMessage());
 
         $context = $exception->getContext();
-        $this->assertSame('', $context['resource_id']);
-        $this->assertSame('', $context['collection']);
+        $this->assertSame($objectId, $context['resource_id']);
+        $this->assertSame($collectionName, $context['collection']);
     }
 
     /**

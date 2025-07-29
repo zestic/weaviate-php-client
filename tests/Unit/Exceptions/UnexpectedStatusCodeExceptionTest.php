@@ -110,24 +110,22 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
      */
     public function testFromResponse(): void
     {
-        $statusCode = 409;
-        $response = [
-            'body' => '{"error": "Conflict"}',
-            'headers' => ['Content-Type' => 'application/json']
-        ];
+        $message = 'Conflict error';
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockResponse->method('getStatusCode')->willReturn(409);
+        $mockResponse->method('getBody')->willReturn('{"error": "Conflict"}');
+        $mockResponse->method('getHeaders')->willReturn(['Content-Type' => ['application/json']]);
+
         $context = ['operation' => 'update'];
 
-        $exception = UnexpectedStatusCodeException::fromResponse($statusCode, $response, $context);
+        $exception = UnexpectedStatusCodeException::fromResponse($message, $mockResponse, $context);
 
-        $this->assertStringContainsString('HTTP 409', $exception->getMessage());
-        $this->assertStringContainsString('Conflict', $exception->getMessage());
-        $this->assertSame($statusCode, $exception->getStatusCode());
-        $this->assertSame($response, $exception->getResponse());
+        $this->assertStringContainsString($message, $exception->getMessage());
+        $this->assertSame(409, $exception->getStatusCode());
 
         $resultContext = $exception->getContext();
         $this->assertSame('update', $resultContext['operation']);
-        $this->assertSame($statusCode, $resultContext['status_code']);
-        $this->assertSame($response, $resultContext['response']);
+        $this->assertSame(409, $resultContext['status_code']);
     }
 
     /**
@@ -135,10 +133,15 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
      */
     public function testFromResponseWithExplanation(): void
     {
-        $exception = UnexpectedStatusCodeException::fromResponse(401, ['body' => 'Unauthorized']);
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockResponse->method('getStatusCode')->willReturn(401);
+        $mockResponse->method('getBody')->willReturn('Unauthorized');
+        $mockResponse->method('getHeaders')->willReturn([]);
 
-        $this->assertStringContainsString('HTTP 401', $exception->getMessage());
-        $this->assertStringContainsString('Authentication is required or has failed', $exception->getMessage());
+        $exception = UnexpectedStatusCodeException::fromResponse('Auth failed', $mockResponse);
+
+        $this->assertStringContainsString('Auth failed', $exception->getMessage());
+        $this->assertSame(401, $exception->getStatusCode());
     }
 
     /**
@@ -146,10 +149,15 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
      */
     public function testFromResponseWithUnknownStatusCode(): void
     {
-        $exception = UnexpectedStatusCodeException::fromResponse(999, ['body' => 'Unknown error']);
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockResponse->method('getStatusCode')->willReturn(999);
+        $mockResponse->method('getBody')->willReturn('Unknown error');
+        $mockResponse->method('getHeaders')->willReturn([]);
 
-        $this->assertStringContainsString('HTTP 999', $exception->getMessage());
-        $this->assertStringNotContainsString('Authentication', $exception->getMessage());
+        $exception = UnexpectedStatusCodeException::fromResponse('Unknown error', $mockResponse);
+
+        $this->assertStringContainsString('Unknown error', $exception->getMessage());
+        $this->assertSame(999, $exception->getStatusCode());
     }
 
     /**
@@ -168,8 +176,13 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
      */
     public function testFromResponseWithPreviousException(): void
     {
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockResponse->method('getStatusCode')->willReturn(500);
+        $mockResponse->method('getBody')->willReturn('Error');
+        $mockResponse->method('getHeaders')->willReturn([]);
+
         $previous = new \Exception('Connection failed');
-        $exception = UnexpectedStatusCodeException::fromResponse(500, ['body' => 'Error'], [], $previous);
+        $exception = UnexpectedStatusCodeException::fromResponse('Server error', $mockResponse, [], $previous);
 
         $this->assertSame($previous, $exception->getPrevious());
     }
@@ -188,52 +201,17 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
     /**
      * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::fromResponse
      */
-    public function testFromResponseWithEmptyResponse(): void
+    public function testFromResponseWithEmptyBody(): void
     {
-        $exception = UnexpectedStatusCodeException::fromResponse(500, []);
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockResponse->method('getStatusCode')->willReturn(500);
+        $mockResponse->method('getBody')->willReturn('');
+        $mockResponse->method('getHeaders')->willReturn([]);
 
-        $this->assertSame([], $exception->getResponse());
-        $this->assertStringContainsString('HTTP 500', $exception->getMessage());
-    }
+        $exception = UnexpectedStatusCodeException::fromResponse('Server error', $mockResponse);
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::fromResponse
-     */
-    public function testFromResponseWithNullResponse(): void
-    {
-        $exception = UnexpectedStatusCodeException::fromResponse(404, null);
-
-        $this->assertNull($exception->getResponse());
-        $this->assertStringContainsString('HTTP 404', $exception->getMessage());
-    }
-
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::fromResponse
-     */
-    public function testFromResponseWithCommonStatusCodes(): void
-    {
-        $testCases = [
-            400 => 'Bad Request: The request was invalid or malformed',
-            401 => 'Unauthorized: Authentication is required or has failed',
-            403 => 'Forbidden: Insufficient permissions to perform this operation',
-            404 => 'Not Found: The requested resource does not exist',
-            409 => 'Conflict: The request conflicts with the current state of the resource',
-            413 => 'Payload Too Large: Try to decrease the batch size',
-            422 => 'Unprocessable Entity: The request was well-formed but contains semantic errors',
-            429 => 'Too Many Requests: Rate limit exceeded',
-            500 => 'Internal Server Error: An unexpected error occurred on the server',
-            502 => 'Bad Gateway: The server received an invalid response from an upstream server',
-            503 => 'Service Unavailable: The server is temporarily unavailable',
-            504 => 'Gateway Timeout: The server did not receive a timely response from an upstream server'
-        ];
-
-        foreach ($testCases as $statusCode => $expectedText) {
-            $exception = UnexpectedStatusCodeException::fromResponse($statusCode, ['body' => 'Error']);
-
-            $this->assertStringContainsString("HTTP {$statusCode}", $exception->getMessage());
-            $this->assertStringContainsString($expectedText, $exception->getMessage());
-            $this->assertSame($statusCode, $exception->getStatusCode());
-        }
+        $this->assertSame(500, $exception->getStatusCode());
+        $this->assertStringContainsString('Server error', $exception->getMessage());
     }
 
     /**

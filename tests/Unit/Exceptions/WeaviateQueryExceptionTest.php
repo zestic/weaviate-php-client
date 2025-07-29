@@ -279,7 +279,12 @@ class WeaviateQueryExceptionTest extends TestCase
         $validationErrors = ['field1' => 'error1', 'field2' => 'error2'];
         $exception = WeaviateQueryException::forValidation('test', $validationErrors);
 
-        $this->assertStringContainsString(json_encode($validationErrors), $exception->getMessage());
+        $encodedErrors = json_encode($validationErrors);
+        if ($encodedErrors !== false) {
+            $this->assertStringContainsString($encodedErrors, $exception->getMessage());
+        } else {
+            $this->assertStringContainsString('field1', $exception->getMessage());
+        }
     }
 
     /**

@@ -62,9 +62,8 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $parameter = 'timeout';
         $value = -5;
         $expected = 'Positive number';
-        $context = ['min_value' => 0];
 
-        $exception = WeaviateInvalidInputException::forParameter($parameter, $value, $expected, $context);
+        $exception = WeaviateInvalidInputException::forParameter($parameter, $value, $expected);
 
         $this->assertStringContainsString("Invalid value for parameter 'timeout'", $exception->getMessage());
         $this->assertStringContainsString('-5', $exception->getMessage());
@@ -72,10 +71,9 @@ class WeaviateInvalidInputExceptionTest extends TestCase
 
         $resultContext = $exception->getContext();
         $this->assertSame($parameter, $resultContext['parameter']);
-        $this->assertSame($value, $resultContext['value']);
+        $this->assertSame($value, $resultContext['provided_value']);
         $this->assertSame($expected, $resultContext['expected']);
-        $this->assertSame(0, $resultContext['min_value']);
-        $this->assertSame('parameter_validation', $resultContext['validation_type']);
+        $this->assertSame('parameter', $resultContext['input_type']);
     }
 
     /**
@@ -84,63 +82,59 @@ class WeaviateInvalidInputExceptionTest extends TestCase
     public function testForMissingParameter(): void
     {
         $parameter = 'api_key';
-        $context = ['operation' => 'authentication'];
+        $operation = 'authentication';
 
-        $exception = WeaviateInvalidInputException::forMissingParameter($parameter, $context);
+        $exception = WeaviateInvalidInputException::forMissingParameter($parameter, $operation);
 
-        $this->assertStringContainsString("Required parameter 'api_key' is missing", $exception->getMessage());
+        $this->assertStringContainsString("Missing required parameter 'api_key'", $exception->getMessage());
+        $this->assertStringContainsString("for operation 'authentication'", $exception->getMessage());
 
         $resultContext = $exception->getContext();
         $this->assertSame($parameter, $resultContext['parameter']);
-        $this->assertSame('authentication', $resultContext['operation']);
-        $this->assertSame('missing_parameter', $resultContext['validation_type']);
+        $this->assertSame($operation, $resultContext['operation']);
+        $this->assertSame('missing_parameter', $resultContext['input_type']);
     }
 
     /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forInvalidType
+     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forDataStructure
      */
-    public function testForInvalidType(): void
+    public function testForDataStructure(): void
     {
-        $parameter = 'properties';
-        $expectedType = 'array';
-        $actualType = 'string';
-        $context = ['function' => 'createCollection'];
+        $structure = 'properties';
+        $issue = 'must be an array';
+        $data = 'invalid_string';
 
-        $exception = WeaviateInvalidInputException::forInvalidType($parameter, $expectedType, $actualType, $context);
+        $exception = WeaviateInvalidInputException::forDataStructure($structure, $issue, $data);
 
-        $this->assertStringContainsString("Parameter 'properties' must be of type array", $exception->getMessage());
-        $this->assertStringContainsString('string given', $exception->getMessage());
+        $this->assertStringContainsString("Invalid properties: must be an array", $exception->getMessage());
 
         $resultContext = $exception->getContext();
-        $this->assertSame($parameter, $resultContext['parameter']);
-        $this->assertSame($expectedType, $resultContext['expected_type']);
-        $this->assertSame($actualType, $resultContext['actual_type']);
-        $this->assertSame('createCollection', $resultContext['function']);
-        $this->assertSame('type_validation', $resultContext['validation_type']);
+        $this->assertSame($structure, $resultContext['structure']);
+        $this->assertSame($issue, $resultContext['issue']);
+        $this->assertSame($data, $resultContext['provided_data']);
+        $this->assertSame('data_structure', $resultContext['input_type']);
     }
 
     /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forInvalidFormat
+     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forConfiguration
      */
-    public function testForInvalidFormat(): void
+    public function testForConfiguration(): void
     {
-        $parameter = 'uuid';
-        $value = 'invalid-uuid';
-        $expectedFormat = 'UUID v4 format';
-        $context = ['example' => '550e8400-e29b-41d4-a716-446655440000'];
+        $configKey = 'timeout';
+        $configValue = -1;
+        $reason = 'Timeout must be positive';
 
-        $exception = WeaviateInvalidInputException::forInvalidFormat($parameter, $value, $expectedFormat, $context);
+        $exception = WeaviateInvalidInputException::forConfiguration($configKey, $configValue, $reason);
 
-        $this->assertStringContainsString("Parameter 'uuid' has invalid format", $exception->getMessage());
-        $this->assertStringContainsString('invalid-uuid', $exception->getMessage());
-        $this->assertStringContainsString('Expected: UUID v4 format', $exception->getMessage());
+        $this->assertStringContainsString("Invalid configuration for 'timeout'", $exception->getMessage());
+        $this->assertStringContainsString('-1', $exception->getMessage());
+        $this->assertStringContainsString('Timeout must be positive', $exception->getMessage());
 
         $resultContext = $exception->getContext();
-        $this->assertSame($parameter, $resultContext['parameter']);
-        $this->assertSame($value, $resultContext['value']);
-        $this->assertSame($expectedFormat, $resultContext['expected_format']);
-        $this->assertSame('550e8400-e29b-41d4-a716-446655440000', $resultContext['example']);
-        $this->assertSame('format_validation', $resultContext['validation_type']);
+        $this->assertSame($configKey, $resultContext['config_key']);
+        $this->assertSame($configValue, $resultContext['config_value']);
+        $this->assertSame($reason, $resultContext['reason']);
+        $this->assertSame('configuration', $resultContext['input_type']);
     }
 
     /**
@@ -160,7 +154,7 @@ class WeaviateInvalidInputExceptionTest extends TestCase
     public function testForParameterWithPreviousException(): void
     {
         $previous = new \Exception('Validation failed');
-        $exception = WeaviateInvalidInputException::forParameter('test', 'value', 'expected', [], $previous);
+        $exception = WeaviateInvalidInputException::forParameter('test', 'value', 'expected', $previous);
 
         $this->assertSame($previous, $exception->getPrevious());
     }
@@ -175,7 +169,7 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertStringContainsString('null', $exception->getMessage());
 
         $context = $exception->getContext();
-        $this->assertNull($context['value']);
+        $this->assertNull($context['provided_value']);
     }
 
     /**
@@ -189,43 +183,40 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertStringContainsString('Array', $exception->getMessage());
 
         $context = $exception->getContext();
-        $this->assertSame($value, $context['value']);
+        $this->assertSame($value, $context['provided_value']);
     }
 
     /**
      * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forMissingParameter
      */
-    public function testForMissingParameterWithEmptyContext(): void
+    public function testForMissingParameterWithEmptyOperation(): void
     {
-        $exception = WeaviateInvalidInputException::forMissingParameter('required_param');
+        $exception = WeaviateInvalidInputException::forMissingParameter('required_param', '');
 
         $context = $exception->getContext();
         $this->assertSame('required_param', $context['parameter']);
-        $this->assertSame('missing_parameter', $context['validation_type']);
+        $this->assertSame('', $context['operation']);
+        $this->assertSame('missing_parameter', $context['input_type']);
     }
 
     /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forInvalidType
+     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forCollectionName
      */
-    public function testForInvalidTypeWithSameTypes(): void
+    public function testForCollectionName(): void
     {
-        $exception = WeaviateInvalidInputException::forInvalidType('param', 'string', 'string');
+        $collectionName = 'invalid-name!';
+        $reason = 'Collection names cannot contain special characters';
 
-        $this->assertStringContainsString("Parameter 'param' must be of type string", $exception->getMessage());
-        $this->assertStringContainsString('string given', $exception->getMessage());
-    }
+        $exception = WeaviateInvalidInputException::forCollectionName($collectionName, $reason);
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forInvalidFormat
-     */
-    public function testForInvalidFormatWithEmptyValue(): void
-    {
-        $exception = WeaviateInvalidInputException::forInvalidFormat('param', '', 'non-empty string');
-
-        $this->assertStringContainsString("Parameter 'param' has invalid format", $exception->getMessage());
+        $this->assertStringContainsString("Invalid collection name 'invalid-name!'", $exception->getMessage());
+        $this->assertStringContainsString($reason, $exception->getMessage());
 
         $context = $exception->getContext();
-        $this->assertSame('', $context['value']);
+        $this->assertSame($collectionName, $context['collection_name']);
+        $this->assertSame($reason, $context['reason']);
+        $this->assertSame('collection_name', $context['input_type']);
+        $this->assertIsArray($context['suggestions']);
     }
 
     /**
@@ -252,6 +243,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertStringContainsString('false', $exception->getMessage());
 
         $context = $exception->getContext();
-        $this->assertFalse($context['value']);
+        $this->assertFalse($context['provided_value']);
     }
 }

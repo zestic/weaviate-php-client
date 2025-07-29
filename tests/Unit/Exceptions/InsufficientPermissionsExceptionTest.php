@@ -86,51 +86,54 @@ class InsufficientPermissionsExceptionTest extends TestCase
     }
 
     /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forApiKey
+     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forRbacRestriction
      */
-    public function testForApiKey(): void
+    public function testForRbacRestriction(): void
     {
         $operation = 'create_collection';
-        $context = ['api_key_id' => 'key123'];
+        $resource = 'collections/Article';
+        $context = ['user_role' => 'reader'];
 
-        $exception = InsufficientPermissionsException::forApiKey($operation, $context);
+        $exception = InsufficientPermissionsException::forRbacRestriction($operation, $resource, $context);
 
-        $this->assertStringContainsString('API key does not have permission', $exception->getMessage());
+        $this->assertStringContainsString('RBAC policy prevents', $exception->getMessage());
         $this->assertStringContainsString($operation, $exception->getMessage());
+        $this->assertStringContainsString($resource, $exception->getMessage());
 
         $resultContext = $exception->getContext();
         $this->assertSame($operation, $resultContext['operation']);
-        $this->assertSame('api_key', $resultContext['auth_type']);
-        $this->assertSame('key123', $resultContext['api_key_id']);
-        $this->assertSame('api_key_insufficient', $resultContext['error_subtype']);
+        $this->assertSame($resource, $resultContext['resource']);
+        $this->assertSame('reader', $resultContext['user_role']);
+        $this->assertSame('rbac_restriction', $resultContext['error_subtype']);
     }
 
     /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forTenant
+     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::fromResponse
      */
-    public function testForTenant(): void
+    public function testFromResponse(): void
     {
-        $tenantName = 'tenant123';
-        $operation = 'read_data';
-        $context = ['collection' => 'Article'];
+        $message = 'Access denied';
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockResponse->method('getStatusCode')->willReturn(403);
+        $mockResponse->method('getBody')->willReturn('{"error": "Forbidden"}');
+        $mockResponse->method('getHeaders')->willReturn(['Content-Type' => ['application/json']]);
 
-        $exception = InsufficientPermissionsException::forTenant($tenantName, $operation, $context);
+        $context = ['operation' => 'delete'];
 
-        $this->assertStringContainsString('Insufficient permissions for tenant', $exception->getMessage());
-        $this->assertStringContainsString($tenantName, $exception->getMessage());
-        $this->assertStringContainsString($operation, $exception->getMessage());
+        $exception = InsufficientPermissionsException::fromResponse($message, $mockResponse, $context);
+
+        $this->assertStringContainsString($message, $exception->getMessage());
+        $this->assertSame(403, $exception->getStatusCode());
 
         $resultContext = $exception->getContext();
-        $this->assertSame($tenantName, $resultContext['tenant']);
-        $this->assertSame($operation, $resultContext['operation']);
-        $this->assertSame('Article', $resultContext['collection']);
-        $this->assertSame('tenant_access_denied', $resultContext['error_subtype']);
+        $this->assertSame('delete', $resultContext['operation']);
+        $this->assertSame('insufficient_permissions', $resultContext['error_type']);
     }
 
     /**
      * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forRbacRestriction
      */
-    public function testForRbacRestriction(): void
+    public function testForRbacRestrictionWithDifferentOperation(): void
     {
         $operation = 'delete';
         $resource = 'collections/Article';
@@ -161,27 +164,14 @@ class InsufficientPermissionsExceptionTest extends TestCase
     }
 
     /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forApiKey
+     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forRbacRestriction
      */
-    public function testForApiKeyWithPreviousException(): void
+    public function testForRbacRestrictionWithPreviousException(): void
     {
         $previous = new \Exception('Token expired');
-        $exception = InsufficientPermissionsException::forApiKey('read', [], $previous);
+        $exception = InsufficientPermissionsException::forRbacRestriction('read', 'collections', [], $previous);
 
         $this->assertSame($previous, $exception->getPrevious());
-    }
-
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forTenant
-     */
-    public function testForTenantWithEmptyContext(): void
-    {
-        $exception = InsufficientPermissionsException::forTenant('tenant1', 'write');
-
-        $context = $exception->getContext();
-        $this->assertSame('tenant1', $context['tenant']);
-        $this->assertSame('write', $context['operation']);
-        $this->assertSame('tenant_access_denied', $context['error_subtype']);
     }
 
     /**
@@ -212,30 +202,17 @@ class InsufficientPermissionsExceptionTest extends TestCase
     }
 
     /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forApiKey
+     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forRbacRestriction
      */
-    public function testForApiKeyWithEmptyOperation(): void
+    public function testForRbacRestrictionWithEmptyOperation(): void
     {
-        $exception = InsufficientPermissionsException::forApiKey('');
+        $exception = InsufficientPermissionsException::forRbacRestriction('', 'collections');
 
-        $this->assertStringContainsString('API key does not have permission', $exception->getMessage());
+        $this->assertStringContainsString('RBAC policy prevents', $exception->getMessage());
 
         $context = $exception->getContext();
         $this->assertSame('', $context['operation']);
-    }
-
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forTenant
-     */
-    public function testForTenantWithEmptyTenantName(): void
-    {
-        $exception = InsufficientPermissionsException::forTenant('', 'read');
-
-        $this->assertStringContainsString('Insufficient permissions for tenant', $exception->getMessage());
-
-        $context = $exception->getContext();
-        $this->assertSame('', $context['tenant']);
-        $this->assertSame('read', $context['operation']);
+        $this->assertSame('collections', $context['resource']);
     }
 
     /**
