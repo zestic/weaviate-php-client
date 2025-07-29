@@ -35,7 +35,7 @@ class WeaviateInvalidInputExceptionTest extends TestCase
 
         $this->assertInstanceOf(WeaviateBaseException::class, $exception);
         $this->assertSame('Invalid parameter value', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame('invalid_input', $context['error_type']);
     }
@@ -173,7 +173,7 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $exception = WeaviateInvalidInputException::forParameter('param', null, 'non-null value');
 
         $this->assertStringContainsString('null', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertNull($context['value']);
     }
@@ -187,7 +187,7 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $exception = WeaviateInvalidInputException::forParameter('param', $value, 'string');
 
         $this->assertStringContainsString('Array', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame($value, $context['value']);
     }
@@ -223,7 +223,7 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $exception = WeaviateInvalidInputException::forInvalidFormat('param', '', 'non-empty string');
 
         $this->assertStringContainsString("Parameter 'param' has invalid format", $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame('', $context['value']);
     }
@@ -250,7 +250,7 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $exception = WeaviateInvalidInputException::forParameter('enabled', false, 'true');
 
         $this->assertStringContainsString('false', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertFalse($context['value']);
     }

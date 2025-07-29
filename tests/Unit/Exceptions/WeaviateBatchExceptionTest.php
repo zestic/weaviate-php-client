@@ -35,7 +35,7 @@ class WeaviateBatchExceptionTest extends TestCase
 
         $this->assertInstanceOf(WeaviateQueryException::class, $exception);
         $this->assertStringContainsString('Batch operation failed', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame('batch_failure', $context['error_type']);
         $this->assertSame('Batch', $context['query_type']);
@@ -191,7 +191,7 @@ class WeaviateBatchExceptionTest extends TestCase
         $exception = WeaviateBatchException::forTimeout(10, 0.0);
 
         $this->assertStringContainsString('0 seconds', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame(0.0, $context['timeout_seconds']);
     }

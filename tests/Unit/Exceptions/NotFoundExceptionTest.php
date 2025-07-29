@@ -132,7 +132,10 @@ class NotFoundExceptionTest extends TestCase
 
         $exception = NotFoundException::forObject($objectId, $collectionName);
 
-        $this->assertStringContainsString("Object 'obj-123' not found in collection 'Article'", $exception->getMessage());
+        $this->assertStringContainsString(
+            "Object 'obj-123' not found in collection 'Article'",
+            $exception->getMessage()
+        );
 
         $context = $exception->getContext();
         $this->assertSame('object', $context['resource_type']);
@@ -166,7 +169,10 @@ class NotFoundExceptionTest extends TestCase
 
         $exception = NotFoundException::forTenant($tenantName, $collectionName);
 
-        $this->assertStringContainsString("Tenant 'tenant123' not found in collection 'Article'", $exception->getMessage());
+        $this->assertStringContainsString(
+            "Tenant 'tenant123' not found in collection 'Article'",
+            $exception->getMessage()
+        );
 
         $context = $exception->getContext();
         $this->assertSame('tenant', $context['resource_type']);
@@ -184,7 +190,10 @@ class NotFoundExceptionTest extends TestCase
 
         $exception = NotFoundException::forProperty($propertyName, $collectionName);
 
-        $this->assertStringContainsString("Property 'title' not found in collection 'Article'", $exception->getMessage());
+        $this->assertStringContainsString(
+            "Property 'title' not found in collection 'Article'",
+            $exception->getMessage()
+        );
 
         $context = $exception->getContext();
         $this->assertSame('property', $context['resource_type']);
@@ -211,7 +220,7 @@ class NotFoundExceptionTest extends TestCase
         $exception = NotFoundException::forCollection('');
 
         $this->assertStringContainsString("Collection '' not found", $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame('', $context['resource_id']);
     }
@@ -224,7 +233,7 @@ class NotFoundExceptionTest extends TestCase
         $exception = NotFoundException::forObject('');
 
         $this->assertStringContainsString("Object '' not found", $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame('', $context['resource_id']);
     }
@@ -237,7 +246,7 @@ class NotFoundExceptionTest extends TestCase
         $exception = NotFoundException::forTenant('');
 
         $this->assertStringContainsString("Tenant '' not found", $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame('', $context['resource_id']);
     }
@@ -250,7 +259,7 @@ class NotFoundExceptionTest extends TestCase
         $exception = NotFoundException::forProperty('', '');
 
         $this->assertStringContainsString("Property '' not found in collection ''", $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame('', $context['resource_id']);
         $this->assertSame('', $context['collection']);
@@ -289,7 +298,7 @@ class NotFoundExceptionTest extends TestCase
 
         $this->assertStringContainsString("Object 'obj-123' not found", $exception->getMessage());
         $this->assertStringNotContainsString('in collection', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertArrayNotHasKey('collection', $context);
     }
@@ -303,7 +312,7 @@ class NotFoundExceptionTest extends TestCase
 
         $this->assertStringContainsString("Tenant 'tenant123' not found", $exception->getMessage());
         $this->assertStringNotContainsString('in collection', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertArrayNotHasKey('collection', $context);
     }

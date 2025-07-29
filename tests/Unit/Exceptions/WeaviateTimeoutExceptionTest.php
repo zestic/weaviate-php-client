@@ -36,7 +36,7 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertInstanceOf(WeaviateBaseException::class, $exception);
         $this->assertStringContainsString('Operation timed out', $exception->getMessage());
         $this->assertStringContainsString('30 seconds', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame(30.0, $context['timeout_seconds']);
         $this->assertSame('timeout', $context['error_type']);
@@ -203,7 +203,7 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $exception = WeaviateTimeoutException::forBatch(0, 30.0);
 
         $this->assertStringContainsString('0 items', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame(0, $context['batch_size']);
     }

@@ -34,9 +34,12 @@ class WeaviateQueryExceptionTest extends TestCase
         $exception = new WeaviateQueryException('Query failed');
 
         $this->assertInstanceOf(WeaviateBaseException::class, $exception);
-        $this->assertStringContainsString('Query call with protocol unknown failed with message Query failed', $exception->getMessage());
+        $this->assertStringContainsString(
+            'Query call with protocol unknown failed with message Query failed',
+            $exception->getMessage()
+        );
         $this->assertSame('unknown', $exception->getQueryType());
-        
+
         $context = $exception->getContext();
         $this->assertSame('unknown', $context['query_type']);
         $this->assertSame('query_failure', $context['error_type']);
@@ -93,7 +96,10 @@ class WeaviateQueryExceptionTest extends TestCase
 
         $exception = WeaviateQueryException::forRestQuery($method, $path, $error, $context);
 
-        $this->assertStringContainsString('Query call with protocol REST failed with message Validation failed', $exception->getMessage());
+        $this->assertStringContainsString(
+            'Query call with protocol REST failed with message Validation failed',
+            $exception->getMessage()
+        );
         $this->assertSame('REST', $exception->getQueryType());
 
         $resultContext = $exception->getContext();
@@ -115,7 +121,10 @@ class WeaviateQueryExceptionTest extends TestCase
 
         $exception = WeaviateQueryException::forGraphQLQuery($query, $error, $context);
 
-        $this->assertStringContainsString('Query call with protocol GraphQL failed with message Field not found', $exception->getMessage());
+        $this->assertStringContainsString(
+            'Query call with protocol GraphQL failed with message Field not found',
+            $exception->getMessage()
+        );
         $this->assertSame('GraphQL', $exception->getQueryType());
 
         $resultContext = $exception->getContext();
@@ -139,8 +148,14 @@ class WeaviateQueryExceptionTest extends TestCase
 
         $exception = WeaviateQueryException::forValidation($operation, $validationErrors, $context);
 
-        $this->assertStringContainsString('Query call with protocol Validation failed', $exception->getMessage());
-        $this->assertStringContainsString("Validation failed for operation 'create_object'", $exception->getMessage());
+        $this->assertStringContainsString(
+            'Query call with protocol Validation failed',
+            $exception->getMessage()
+        );
+        $this->assertStringContainsString(
+            "Validation failed for operation 'create_object'",
+            $exception->getMessage()
+        );
         $this->assertSame('Validation', $exception->getQueryType());
 
         $resultContext = $exception->getContext();

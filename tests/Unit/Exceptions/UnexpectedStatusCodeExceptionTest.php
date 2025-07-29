@@ -37,7 +37,7 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame('Server error', $exception->getMessage());
         $this->assertSame(500, $exception->getStatusCode());
         $this->assertSame(500, $exception->getCode());
-        
+
         $context = $exception->getContext();
         $this->assertSame(500, $context['status_code']);
     }
@@ -54,7 +54,7 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $exception = new UnexpectedStatusCodeException('Server error', 500, $response);
 
         $this->assertSame($response, $exception->getResponse());
-        
+
         $context = $exception->getContext();
         $this->assertSame($response, $context['response']);
         $this->assertSame(500, $context['status_code']);
@@ -229,7 +229,7 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
 
         foreach ($testCases as $statusCode => $expectedText) {
             $exception = UnexpectedStatusCodeException::fromResponse($statusCode, ['body' => 'Error']);
-            
+
             $this->assertStringContainsString("HTTP {$statusCode}", $exception->getMessage());
             $this->assertStringContainsString($expectedText, $exception->getMessage());
             $this->assertSame($statusCode, $exception->getStatusCode());

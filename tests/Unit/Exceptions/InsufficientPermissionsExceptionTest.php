@@ -36,7 +36,7 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertInstanceOf(UnexpectedStatusCodeException::class, $exception);
         $this->assertSame('Insufficient permissions to perform this operation', $exception->getMessage());
         $this->assertSame(403, $exception->getStatusCode());
-        
+
         $context = $exception->getContext();
         $this->assertSame('insufficient_permissions', $context['error_type']);
         $this->assertSame(403, $context['status_code']);
@@ -66,7 +66,7 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $exception = new InsufficientPermissionsException('Access denied', $response);
 
         $this->assertSame($response, $exception->getResponse());
-        
+
         $context = $exception->getContext();
         $this->assertSame($response, $context['response']);
     }
@@ -219,7 +219,7 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $exception = InsufficientPermissionsException::forApiKey('');
 
         $this->assertStringContainsString('API key does not have permission', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame('', $context['operation']);
     }
@@ -232,7 +232,7 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $exception = InsufficientPermissionsException::forTenant('', 'read');
 
         $this->assertStringContainsString('Insufficient permissions for tenant', $exception->getMessage());
-        
+
         $context = $exception->getContext();
         $this->assertSame('', $context['tenant']);
         $this->assertSame('read', $context['operation']);

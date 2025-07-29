@@ -37,7 +37,7 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertStringContainsString('The request to Weaviate failed after 3 retries', $exception->getMessage());
         $this->assertStringContainsString('Final error: Connection failed', $exception->getMessage());
         $this->assertSame(3, $exception->getRetryCount());
-        
+
         $context = $exception->getContext();
         $this->assertSame(3, $context['retry_count']);
         $this->assertSame('retry_exhausted', $context['error_type']);
