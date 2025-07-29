@@ -35,7 +35,7 @@ class WeaviateTimeoutExceptionTest extends TestCase
 
         $this->assertInstanceOf(WeaviateBaseException::class, $exception);
         $this->assertStringContainsString('Operation timed out', $exception->getMessage());
-        $this->assertStringContainsString('30 seconds', $exception->getMessage());
+        $this->assertStringContainsString('(timeout: 30s)', $exception->getMessage());
 
         $context = $exception->getContext();
         $this->assertSame(30.0, $context['timeout_seconds']);
@@ -88,10 +88,10 @@ class WeaviateTimeoutExceptionTest extends TestCase
 
         $exception = WeaviateTimeoutException::forQuery($query, $timeoutSeconds, $context);
 
-        $this->assertStringContainsString('Query execution timed out', $exception->getMessage());
+        $this->assertStringContainsString("Query operation 'SELECT * FROM Article' timed out", $exception->getMessage());
 
         $resultContext = $exception->getContext();
-        $this->assertSame($query, $resultContext['query']);
+        $this->assertSame($query, $resultContext['operation']);
         $this->assertSame($timeoutSeconds, $resultContext['timeout_seconds']);
         $this->assertSame('query', $resultContext['timeout_type']);
         $this->assertSame('Article', $resultContext['collection']);
@@ -132,7 +132,7 @@ class WeaviateTimeoutExceptionTest extends TestCase
      */
     public function testGetTimeoutSecondsReturnsNullWhenNotSet(): void
     {
-        $exception = new WeaviateTimeoutException('Timeout', 0.0, ['timeout_seconds' => null]);
+        $exception = new WeaviateTimeoutException('Timeout');
 
         $this->assertNull($exception->getTimeoutSeconds());
     }
@@ -166,7 +166,7 @@ class WeaviateTimeoutExceptionTest extends TestCase
     {
         $exception = new WeaviateTimeoutException('Immediate timeout', 0.0);
 
-        $this->assertStringContainsString('0 seconds', $exception->getMessage());
+        $this->assertStringContainsString('(timeout: 0s)', $exception->getMessage());
         $this->assertSame(0.0, $exception->getTimeoutSeconds());
     }
 
@@ -177,7 +177,7 @@ class WeaviateTimeoutExceptionTest extends TestCase
     {
         $exception = new WeaviateTimeoutException('Invalid timeout', -5.0);
 
-        $this->assertStringContainsString('-5 seconds', $exception->getMessage());
+        $this->assertStringContainsString('(timeout: -5s)', $exception->getMessage());
         $this->assertSame(-5.0, $exception->getTimeoutSeconds());
     }
 
@@ -189,7 +189,7 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $exception = WeaviateTimeoutException::forQuery('', 30.0);
 
         $context = $exception->getContext();
-        $this->assertSame('', $context['query']);
+        $this->assertSame('', $context['operation']);
         $this->assertSame('query', $context['timeout_type']);
     }
 
@@ -215,8 +215,8 @@ class WeaviateTimeoutExceptionTest extends TestCase
 
         $context = $exception->getContext();
         $this->assertIsArray($context['suggestions']);
-        $this->assertContains('Increase timeout configuration', $context['suggestions']);
+        $this->assertContains('Increase the timeout configuration for your client', $context['suggestions']);
         $this->assertContains('Check server performance and load', $context['suggestions']);
-        $this->assertContains('Verify network connectivity is stable', $context['suggestions']);
+        $this->assertContains('Simplify the operation if possible', $context['suggestions']);
     }
 }

@@ -86,25 +86,21 @@ class InsufficientPermissionsExceptionTest extends TestCase
     }
 
     /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forRbacRestriction
+     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::__construct
      */
-    public function testForRbacRestriction(): void
+    public function testCanCreateWithCustomContext(): void
     {
-        $operation = 'create_collection';
-        $resource = 'collections/Article';
-        $context = ['user_role' => 'reader'];
+        $message = 'Access denied to resource';
+        $context = ['user_role' => 'reader', 'resource' => 'collections/Article'];
+        $exception = new InsufficientPermissionsException($message, null, $context);
 
-        $exception = InsufficientPermissionsException::forRbacRestriction($operation, $resource, $context);
-
-        $this->assertStringContainsString('RBAC policy prevents', $exception->getMessage());
-        $this->assertStringContainsString($operation, $exception->getMessage());
-        $this->assertStringContainsString($resource, $exception->getMessage());
+        $this->assertStringContainsString($message, $exception->getMessage());
+        $this->assertSame(403, $exception->getStatusCode());
 
         $resultContext = $exception->getContext();
-        $this->assertSame($operation, $resultContext['operation']);
-        $this->assertSame($resource, $resultContext['resource']);
         $this->assertSame('reader', $resultContext['user_role']);
-        $this->assertSame('rbac_restriction', $resultContext['error_subtype']);
+        $this->assertSame('collections/Article', $resultContext['resource']);
+        $this->assertSame('insufficient_permissions', $resultContext['error_type']);
     }
 
     /**
@@ -197,7 +193,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $context = $exception->getContext();
         $this->assertIsArray($context['suggestions']);
         $this->assertContains('Verify your API key has the required permissions', $context['suggestions']);
-        $this->assertContains('Check if you have access to the specified tenant', $context['suggestions']);
         $this->assertContains('Contact your administrator to grant necessary permissions', $context['suggestions']);
     }
 

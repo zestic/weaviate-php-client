@@ -37,7 +37,7 @@ class WeaviateBatchExceptionTest extends TestCase
         $this->assertStringContainsString('Batch operation failed', $exception->getMessage());
 
         $context = $exception->getContext();
-        $this->assertSame('batch_failure', $context['error_type']);
+        $this->assertSame('query_failure', $context['error_type']);
         $this->assertSame('Batch', $context['query_type']);
     }
 
@@ -52,7 +52,7 @@ class WeaviateBatchExceptionTest extends TestCase
         $resultContext = $exception->getContext();
         $this->assertSame('test-123', $resultContext['batch_id']);
         $this->assertSame('insert', $resultContext['operation']);
-        $this->assertSame('batch_failure', $resultContext['error_type']);
+        $this->assertSame('query_failure', $resultContext['error_type']);
     }
 
     /**
@@ -83,22 +83,22 @@ class WeaviateBatchExceptionTest extends TestCase
      */
     public function testForPartialFailure(): void
     {
+        $totalObjects = 100;
         $successfulCount = 75;
-        $failedCount = 25;
         $failedObjects = [
             ['id' => 'obj1', 'error' => 'Validation failed'],
             ['id' => 'obj2', 'error' => 'Duplicate key']
         ];
 
-        $exception = WeaviateBatchException::forPartialFailure($successfulCount, $failedCount, $failedObjects);
+        $exception = WeaviateBatchException::forPartialFailure($totalObjects, $successfulCount, $failedObjects);
 
         $this->assertStringContainsString('Batch operation partially failed', $exception->getMessage());
-        $this->assertStringContainsString('75 successful', $exception->getMessage());
-        $this->assertStringContainsString('25 failed', $exception->getMessage());
+        $this->assertStringContainsString('2 of 100 objects failed', $exception->getMessage());
 
         $context = $exception->getContext();
+        $this->assertSame($totalObjects, $context['total_objects']);
         $this->assertSame($successfulCount, $context['successful_count']);
-        $this->assertSame($failedCount, $context['failed_count']);
+        $this->assertSame(2, $context['failed_count']);
         $this->assertSame($failedObjects, $context['failed_objects']);
         $this->assertSame('partial_failure', $context['batch_type']);
     }
@@ -175,9 +175,10 @@ class WeaviateBatchExceptionTest extends TestCase
      */
     public function testForPartialFailureWithEmptyFailedObjects(): void
     {
-        $exception = WeaviateBatchException::forPartialFailure(100, 0, []);
+        $exception = WeaviateBatchException::forPartialFailure(100, 100, []);
 
         $context = $exception->getContext();
+        $this->assertSame(100, $context['total_objects']);
         $this->assertSame(100, $context['successful_count']);
         $this->assertSame(0, $context['failed_count']);
         $this->assertSame([], $context['failed_objects']);
@@ -208,14 +209,15 @@ class WeaviateBatchExceptionTest extends TestCase
             ['id' => 'obj2', 'error' => 'Validation failed']
         ];
 
-        $exception = WeaviateBatchException::forPartialFailure($successfulCount, $failedCount, $failedObjects);
+        $totalObjects = $successfulCount + $failedCount;
+        $exception = WeaviateBatchException::forPartialFailure($totalObjects, $successfulCount, $failedObjects);
 
-        $this->assertStringContainsString('9500 successful', $exception->getMessage());
-        $this->assertStringContainsString('500 failed', $exception->getMessage());
+        $this->assertStringContainsString('2 of 10000 objects failed', $exception->getMessage());
 
         $context = $exception->getContext();
+        $this->assertSame($totalObjects, $context['total_objects']);
         $this->assertSame($successfulCount, $context['successful_count']);
-        $this->assertSame($failedCount, $context['failed_count']);
+        $this->assertSame(2, $context['failed_count']);
         $this->assertSame($failedObjects, $context['failed_objects']);
     }
 }

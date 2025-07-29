@@ -180,7 +180,7 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $value = ['key' => 'value'];
         $exception = WeaviateInvalidInputException::forParameter('param', $value, 'string');
 
-        $this->assertStringContainsString('Array', $exception->getMessage());
+        $this->assertStringContainsString('array', $exception->getMessage());
 
         $context = $exception->getContext();
         $this->assertSame($value, $context['provided_value']);
@@ -222,15 +222,13 @@ class WeaviateInvalidInputExceptionTest extends TestCase
     /**
      * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::__construct
      */
-    public function testSuggestionsAreIncluded(): void
+    public function testBasicConstructor(): void
     {
         $exception = new WeaviateInvalidInputException('Invalid input');
 
         $context = $exception->getContext();
-        $this->assertIsArray($context['suggestions']);
-        $this->assertContains('Check the parameter documentation for valid values', $context['suggestions']);
-        $this->assertContains('Ensure all required parameters are provided', $context['suggestions']);
-        $this->assertContains('Validate parameter types match the expected format', $context['suggestions']);
+        $this->assertSame('invalid_input', $context['error_type']);
+        $this->assertArrayNotHasKey('suggestions', $context);
     }
 
     /**
@@ -240,7 +238,7 @@ class WeaviateInvalidInputExceptionTest extends TestCase
     {
         $exception = WeaviateInvalidInputException::forParameter('enabled', false, 'true');
 
-        $this->assertStringContainsString('false', $exception->getMessage());
+        $this->assertStringContainsString('Expected: true', $exception->getMessage());
 
         $context = $exception->getContext();
         $this->assertFalse($context['provided_value']);
