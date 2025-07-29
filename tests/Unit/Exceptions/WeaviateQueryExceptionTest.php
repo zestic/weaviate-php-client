@@ -54,7 +54,6 @@ class WeaviateQueryExceptionTest extends TestCase
 
         $this->assertStringContainsString('Query call with protocol GraphQL failed', $exception->getMessage());
         $this->assertSame('GraphQL', $exception->getQueryType());
-        
         $context = $exception->getContext();
         $this->assertSame('GraphQL', $context['query_type']);
     }
@@ -177,7 +176,10 @@ class WeaviateQueryExceptionTest extends TestCase
 
         $exception = WeaviateQueryException::forSchema($collection, $operation, $error, $context);
 
-        $this->assertStringContainsString('Query call with protocol Schema failed with message Collection already exists', $exception->getMessage());
+        $this->assertStringContainsString(
+            'Query call with protocol Schema failed with message Collection already exists',
+            $exception->getMessage()
+        );
         $this->assertSame('Schema', $exception->getQueryType());
 
         $resultContext = $exception->getContext();
