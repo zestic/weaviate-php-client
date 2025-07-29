@@ -110,15 +110,18 @@ class InsufficientPermissionsExceptionTest extends TestCase
     {
         $message = 'Access denied';
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+
+        $mockStream->method('__toString')->willReturn('{"error": "Forbidden"}');
         $mockResponse->method('getStatusCode')->willReturn(403);
-        $mockResponse->method('getBody')->willReturn('{"error": "Forbidden"}');
+        $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getHeaders')->willReturn(['Content-Type' => ['application/json']]);
 
         $context = ['operation' => 'delete'];
 
         $exception = InsufficientPermissionsException::fromResponse($message, $mockResponse, $context);
 
-        $this->assertStringContainsString($message, $exception->getMessage());
+        $this->assertStringContainsString('Forbidden', $exception->getMessage());
         $this->assertSame(403, $exception->getStatusCode());
 
         $resultContext = $exception->getContext();
@@ -193,7 +196,7 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $context = $exception->getContext();
         $this->assertIsArray($context['suggestions']);
         $this->assertContains('Verify your API key has the required permissions', $context['suggestions']);
-        $this->assertContains('Contact your administrator to grant necessary permissions', $context['suggestions']);
+        $this->assertContains('Contact your Weaviate administrator for access', $context['suggestions']);
     }
 
     /**

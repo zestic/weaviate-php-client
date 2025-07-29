@@ -112,8 +112,11 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
     {
         $message = 'Conflict error';
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+
+        $mockStream->method('__toString')->willReturn('{"error": "Conflict"}');
         $mockResponse->method('getStatusCode')->willReturn(409);
-        $mockResponse->method('getBody')->willReturn('{"error": "Conflict"}');
+        $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getHeaders')->willReturn(['Content-Type' => ['application/json']]);
 
         $context = ['operation' => 'update'];
@@ -134,8 +137,11 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
     public function testFromResponseWithExplanation(): void
     {
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+
+        $mockStream->method('__toString')->willReturn('Unauthorized');
         $mockResponse->method('getStatusCode')->willReturn(401);
-        $mockResponse->method('getBody')->willReturn('Unauthorized');
+        $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getHeaders')->willReturn([]);
 
         $exception = UnexpectedStatusCodeException::fromResponse('Auth failed', $mockResponse);
@@ -150,8 +156,11 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
     public function testFromResponseWithUnknownStatusCode(): void
     {
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+
+        $mockStream->method('__toString')->willReturn('Unknown error');
         $mockResponse->method('getStatusCode')->willReturn(999);
-        $mockResponse->method('getBody')->willReturn('Unknown error');
+        $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getHeaders')->willReturn([]);
 
         $exception = UnexpectedStatusCodeException::fromResponse('Unknown error', $mockResponse);
@@ -177,8 +186,11 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
     public function testFromResponseWithPreviousException(): void
     {
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+
+        $mockStream->method('__toString')->willReturn('Error');
         $mockResponse->method('getStatusCode')->willReturn(500);
-        $mockResponse->method('getBody')->willReturn('Error');
+        $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getHeaders')->willReturn([]);
 
         $previous = new \Exception('Connection failed');
@@ -204,8 +216,11 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
     public function testFromResponseWithEmptyBody(): void
     {
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+
+        $mockStream->method('__toString')->willReturn('');
         $mockResponse->method('getStatusCode')->willReturn(500);
-        $mockResponse->method('getBody')->willReturn('');
+        $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getHeaders')->willReturn([]);
 
         $exception = UnexpectedStatusCodeException::fromResponse('Server error', $mockResponse);

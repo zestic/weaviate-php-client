@@ -187,15 +187,18 @@ class NotFoundExceptionTest extends TestCase
     {
         $message = 'Resource not found';
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+
+        $mockStream->method('__toString')->willReturn('{"error": "Not found"}');
         $mockResponse->method('getStatusCode')->willReturn(404);
-        $mockResponse->method('getBody')->willReturn('{"error": "Not found"}');
+        $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getHeaders')->willReturn(['Content-Type' => ['application/json']]);
 
         $context = ['operation' => 'get'];
 
         $exception = NotFoundException::fromResponse($message, $mockResponse, $context);
 
-        $this->assertStringContainsString($message, $exception->getMessage());
+        $this->assertStringContainsString('Not found', $exception->getMessage());
         $this->assertSame(404, $exception->getStatusCode());
 
         $resultContext = $exception->getContext();

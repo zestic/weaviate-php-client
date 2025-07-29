@@ -88,7 +88,10 @@ class WeaviateTimeoutExceptionTest extends TestCase
 
         $exception = WeaviateTimeoutException::forQuery($query, $timeoutSeconds, $context);
 
-        $this->assertStringContainsString("Query operation 'SELECT * FROM Article' timed out", $exception->getMessage());
+        $this->assertStringContainsString(
+            "Query operation 'SELECT * FROM Article' timed out",
+            $exception->getMessage()
+        );
 
         $resultContext = $exception->getContext();
         $this->assertSame($query, $resultContext['operation']);
