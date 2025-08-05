@@ -22,19 +22,41 @@ namespace Weaviate\Tests\Integration\Query;
 
 use Weaviate\Query\Filter;
 use Weaviate\Tests\TestCase;
+use Weaviate\WeaviateClient;
+use Weaviate\Connection\HttpConnection;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 
 /**
  * Integration tests for Query functionality
- * 
+ *
  * These tests run against a real Weaviate instance to ensure
  * the query functionality works correctly in practice.
  */
 class QueryIntegrationTest extends TestCase
 {
+    private WeaviateClient $client;
     private string $testClassName = 'QueryTestClass';
 
     protected function setUp(): void
     {
+        $this->skipIfWeaviateNotAvailable();
+
+        // Create HTTP client and factories
+        $httpClient = new Client();
+        $httpFactory = new HttpFactory();
+
+        // Create connection
+        $connection = new HttpConnection(
+            $this->getWeaviateUrl(),
+            $httpClient,
+            $httpFactory,
+            $httpFactory
+        );
+
+        // Create client (no auth needed for test instance)
+        $this->client = new WeaviateClient($connection);
+
         parent::setUp();
         $this->createTestCollection();
         $this->insertTestData();
