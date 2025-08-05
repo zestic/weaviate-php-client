@@ -22,6 +22,7 @@ namespace Weaviate\Collections;
 
 use Weaviate\Connection\ConnectionInterface;
 use Weaviate\Data\DataOperations;
+use Weaviate\Query\QueryBuilder;
 use Weaviate\Tenants\Tenants;
 
 /**
@@ -65,6 +66,7 @@ use Weaviate\Tenants\Tenants;
 class Collection
 {
     private ?string $tenant = null;
+    private ?string $defaultQueryFields = null;
 
     public function __construct(
         private readonly ConnectionInterface $connection,
@@ -82,6 +84,7 @@ class Collection
     {
         $clone = clone $this;
         $clone->tenant = $tenant;
+        $clone->defaultQueryFields = $this->defaultQueryFields;
         return $clone;
     }
 
@@ -98,7 +101,7 @@ class Collection
      */
     public function data(): DataOperations
     {
-        return new DataOperations($this->connection, $this->name, $this->tenant);
+        return new DataOperations($this->connection, $this->name, $this->tenant, $this->defaultQueryFields);
     }
 
     /**
@@ -107,5 +110,38 @@ class Collection
     public function tenants(): Tenants
     {
         return new Tenants($this->connection, $this->name);
+    }
+
+    /**
+     * Get query builder for this collection
+     *
+     * Creates a QueryBuilder instance that allows building and executing
+     * GraphQL queries with filtering, property selection, and limits.
+     */
+    public function query(): QueryBuilder
+    {
+        $queryBuilder = new QueryBuilder($this->connection, $this->name, $this->tenant);
+
+        // Set collection-specific default fields if configured
+        if ($this->defaultQueryFields !== null) {
+            $queryBuilder->setDefaultFields($this->defaultQueryFields);
+        }
+
+        return $queryBuilder;
+    }
+
+    /**
+     * Set default query fields for this collection
+     *
+     * These fields will be returned by default when no specific properties
+     * are requested in queries.
+     *
+     * @param string $fields Space-separated list of field names
+     * @return $this
+     */
+    public function setDefaultQueryFields(string $fields): self
+    {
+        $this->defaultQueryFields = $fields;
+        return $this;
     }
 }

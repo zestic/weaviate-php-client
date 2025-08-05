@@ -21,6 +21,8 @@ declare(strict_types=1);
 namespace Weaviate\Data;
 
 use Weaviate\Connection\ConnectionInterface;
+use Weaviate\Query\Filter;
+use Weaviate\Query\QueryBuilder;
 
 /**
  * Data operations for objects in collections
@@ -30,7 +32,8 @@ class DataOperations
     public function __construct(
         private readonly ConnectionInterface $connection,
         private readonly string $className,
-        private readonly ?string $tenant = null
+        private readonly ?string $tenant = null,
+        private readonly ?string $defaultQueryFields = null
     ) {
     }
 
@@ -128,6 +131,73 @@ class DataOperations
         }
 
         return $this->connection->delete($path);
+    }
+
+    /**
+     * Fetch objects using filters and optional limit
+     *
+     * @param Filter|null $filters Optional filter to apply
+     * @param int|null $limit Optional limit on number of results
+     * @return array<int, array<string, mixed>> Array of matching objects
+     */
+    public function fetchObjects(?Filter $filters = null, ?int $limit = null): array
+    {
+        $query = new QueryBuilder($this->connection, $this->className, $this->tenant);
+
+        if ($this->defaultQueryFields !== null) {
+            $query->setDefaultFields($this->defaultQueryFields);
+        }
+
+        if ($filters) {
+            $query->where($filters);
+        }
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        return $query->fetchObjects();
+    }
+
+    /**
+     * Find objects by criteria
+     *
+     * This is a convenience method that converts simple key-value criteria
+     * into appropriate filters and executes the query.
+     *
+     * @param array<string, mixed> $criteria Key-value pairs to filter by
+     * @param int|null $limit Optional limit on number of results
+     * @return array<int, array<string, mixed>> Array of matching objects
+     */
+    public function findBy(array $criteria, ?int $limit = null): array
+    {
+        $filters = [];
+        foreach ($criteria as $property => $value) {
+            if ($value === null) {
+                $filters[] = Filter::byProperty($property)->isNull(true);
+            } else {
+                $filters[] = Filter::byProperty($property)->equal($value);
+            }
+        }
+
+        $filter = count($filters) === 1 ? $filters[0] : Filter::allOf($filters);
+
+        return $this->fetchObjects($filter, $limit);
+    }
+
+    /**
+     * Find a single object by criteria
+     *
+     * This method finds the first object matching the given criteria.
+     * Returns null if no matching object is found.
+     *
+     * @param array<string, mixed> $criteria Key-value pairs to filter by
+     * @return array<string, mixed>|null The matching object or null if not found
+     */
+    public function findOneBy(array $criteria): ?array
+    {
+        $results = $this->findBy($criteria, 1);
+        return $results[0] ?? null;
     }
 
     /**
