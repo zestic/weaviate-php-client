@@ -414,7 +414,7 @@ class NestedFilterIntegrationTest extends TestCase
         $this->assertIsArray($results);
 
         foreach ($results as $result) {
-            $this->assertStringContains('Dr', $result['author']);
+            $this->assertStringContainsString('Dr', $result['author']);
             $this->assertTrue($result['active']);
             $this->assertGreaterThan(1000, $result['viewCount']);
             $this->assertGreaterThan(4.5, $result['rating']);

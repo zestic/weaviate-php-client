@@ -115,7 +115,7 @@ class QueryPerformanceTest extends TestCase
                 'score' => round(($i % 100) / 10, 2),
                 'active' => ($i % 2) === 0,
                 'tags' => array_slice($tags, $i % 5, 3),
-                'createdAt' => date('c', strtotime("-{$i} hours")),
+                'createdAt' => date('c', time() - ($i * 3600)), // $i hours ago
                 'metadata' => json_encode(['index' => $i, 'batch' => floor($i / 100)])
             ];
 

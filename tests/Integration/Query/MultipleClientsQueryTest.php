@@ -249,15 +249,15 @@ class MultipleClientsQueryTest extends TestCase
 
         // Verify data isolation
         foreach ($results1 as $result) {
-            $this->assertStringContains('Client1', $result['title']);
+            $this->assertStringContainsString('Client1', $result['title']);
         }
 
         foreach ($results2 as $result) {
-            $this->assertStringContains('Client2', $result['title']);
+            $this->assertStringContainsString('Client2', $result['title']);
         }
 
         foreach ($results3 as $result) {
-            $this->assertStringContains('Client3', $result['title']);
+            $this->assertStringContainsString('Client3', $result['title']);
         }
     }
 
