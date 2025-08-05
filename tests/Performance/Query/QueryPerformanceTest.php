@@ -340,7 +340,7 @@ class QueryPerformanceTest extends TestCase
                 ->fetchObjects();
 
             $duration = microtime(true) - $startTime;
-            
+
             $results[] = [
                 'limit' => $limit,
                 'duration' => $duration,
