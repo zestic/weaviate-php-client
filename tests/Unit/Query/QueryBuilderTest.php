@@ -148,7 +148,7 @@ class QueryBuilderTest extends TestCase
         $filter = Filter::byProperty('name')->equal('John');
         
         $expectedQuery = [
-            'query' => 'query { Get { TestClass(where: {path: ["name"], operator: "Equal", valueText: "John"}) { _additional { id } } } }'
+            'query' => 'query { Get { TestClass(where: {path: ["name"], operator: Equal, valueText: "John"}) { _additional { id } } } }'
         ];
 
         $expectedResponse = [
