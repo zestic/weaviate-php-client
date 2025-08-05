@@ -94,7 +94,7 @@ class QueryIntegrationTest extends TestCase
         
         $this->assertIsArray($results);
         foreach ($results as $result) {
-            $this->assertEquals('active', $result['properties']['status']);
+            $this->assertEquals('active', $result['status']);
         }
     }
 
@@ -119,19 +119,19 @@ class QueryIntegrationTest extends TestCase
     public function testQueryWithCustomProperties(): void
     {
         $collection = $this->client->collections()->get($this->testClassName);
-        
+
         $results = $collection->query()
             ->returnProperties(['name', 'status'])
             ->limit(1)
             ->fetchObjects();
-        
+
         $this->assertIsArray($results);
         $this->assertGreaterThan(0, count($results));
-        
+
         $result = $results[0];
-        $this->assertArrayHasKey('properties', $result);
-        $this->assertArrayHasKey('name', $result['properties']);
-        $this->assertArrayHasKey('status', $result['properties']);
+        // Weaviate returns properties directly, not wrapped in a 'properties' key
+        $this->assertArrayHasKey('name', $result);
+        $this->assertArrayHasKey('status', $result);
     }
 
     /**
@@ -152,8 +152,8 @@ class QueryIntegrationTest extends TestCase
         
         $this->assertIsArray($results);
         foreach ($results as $result) {
-            $this->assertEquals('active', $result['properties']['status']);
-            $this->assertGreaterThan(18, $result['properties']['age']);
+            $this->assertEquals('active', $result['status']);
+            $this->assertGreaterThan(18, $result['age']);
         }
     }
 
@@ -168,7 +168,7 @@ class QueryIntegrationTest extends TestCase
         
         $this->assertIsArray($results);
         foreach ($results as $result) {
-            $this->assertEquals('active', $result['properties']['status']);
+            $this->assertEquals('active', $result['status']);
         }
     }
 
@@ -180,9 +180,9 @@ class QueryIntegrationTest extends TestCase
         $collection = $this->client->collections()->get($this->testClassName);
         
         $result = $collection->data()->findOneBy(['name' => 'John Doe']);
-        
+
         $this->assertIsArray($result);
-        $this->assertEquals('John Doe', $result['properties']['name']);
+        $this->assertEquals('John Doe', $result['name']);
     }
 
     /**

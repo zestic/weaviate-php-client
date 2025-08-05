@@ -200,7 +200,12 @@ class QueryBuilder
                     $parts[] = $key . ': ' . $this->arrayToGraphQL($value);
                 }
             } elseif (is_string($value)) {
-                $parts[] = $key . ': "' . addslashes($value) . '"';
+                // Special case: operator values should not be quoted (they are GraphQL enums)
+                if ($key === 'operator') {
+                    $parts[] = $key . ': ' . $value;
+                } else {
+                    $parts[] = $key . ': "' . addslashes($value) . '"';
+                }
             } elseif (is_bool($value)) {
                 $parts[] = $key . ': ' . ($value ? 'true' : 'false');
             } elseif (is_null($value)) {
