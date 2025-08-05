@@ -87,11 +87,12 @@ class QueryIntegrationTest extends TestCase
     public function testQueryWithSimpleFilter(): void
     {
         $collection = $this->client->collections()->get($this->testClassName);
-        
+
         $results = $collection->query()
             ->where(Filter::byProperty('status')->equal('active'))
+            ->returnProperties(['name', 'status', 'age', 'email'])
             ->fetchObjects();
-        
+
         $this->assertIsArray($results);
         foreach ($results as $result) {
             $this->assertEquals('active', $result['status']);
@@ -140,16 +141,17 @@ class QueryIntegrationTest extends TestCase
     public function testQueryWithComplexFilter(): void
     {
         $collection = $this->client->collections()->get($this->testClassName);
-        
+
         $filter = Filter::allOf([
             Filter::byProperty('status')->equal('active'),
             Filter::byProperty('age')->greaterThan(18)
         ]);
-        
+
         $results = $collection->query()
             ->where($filter)
+            ->returnProperties(['name', 'status', 'age', 'email'])
             ->fetchObjects();
-        
+
         $this->assertIsArray($results);
         foreach ($results as $result) {
             $this->assertEquals('active', $result['status']);
@@ -162,10 +164,11 @@ class QueryIntegrationTest extends TestCase
      */
     public function testFindByMethod(): void
     {
-        $collection = $this->client->collections()->get($this->testClassName);
-        
+        $collection = $this->client->collections()->get($this->testClassName)
+            ->setDefaultQueryFields('name status age email');
+
         $results = $collection->data()->findBy(['status' => 'active']);
-        
+
         $this->assertIsArray($results);
         foreach ($results as $result) {
             $this->assertEquals('active', $result['status']);
@@ -177,8 +180,9 @@ class QueryIntegrationTest extends TestCase
      */
     public function testFindOneByMethod(): void
     {
-        $collection = $this->client->collections()->get($this->testClassName);
-        
+        $collection = $this->client->collections()->get($this->testClassName)
+            ->setDefaultQueryFields('name status age email');
+
         $result = $collection->data()->findOneBy(['name' => 'John Doe']);
 
         $this->assertIsArray($result);
