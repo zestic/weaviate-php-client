@@ -52,13 +52,12 @@ class MultipleClientsQueryTest extends TestCase
         $httpClient = new Client();
         $httpFactory = new HttpFactory();
 
-        // Create connection for main client
+        // Create connection for main client (no auth for test instance)
         $connection = new HttpConnection(
             $this->getWeaviateUrl(),
             $httpClient,
             $httpFactory,
-            $httpFactory,
-            $this->getWeaviateApiKey()
+            $httpFactory
         );
 
         // Create main client
@@ -69,8 +68,7 @@ class MultipleClientsQueryTest extends TestCase
             $this->getWeaviateUrl(),
             new Client(),
             $httpFactory,
-            $httpFactory,
-            $this->getWeaviateApiKey()
+            $httpFactory
         );
         $this->client2 = new WeaviateClient($connection2);
 
@@ -78,8 +76,7 @@ class MultipleClientsQueryTest extends TestCase
             $this->getWeaviateUrl(),
             new Client(),
             $httpFactory,
-            $httpFactory,
-            $this->getWeaviateApiKey()
+            $httpFactory
         );
         $this->client3 = new WeaviateClient($connection3);
 
@@ -114,11 +111,7 @@ class MultipleClientsQueryTest extends TestCase
 
         // Create tenants for isolation testing
         $collection = $this->client->collections()->get($this->testClassName);
-        $collection->tenants()->create([
-            ['name' => 'tenant1'],
-            ['name' => 'tenant2'],
-            ['name' => 'tenant3']
-        ]);
+        $collection->tenants()->create(['tenant1', 'tenant2', 'tenant3']);
 
         // Wait for tenant creation
         sleep(2);

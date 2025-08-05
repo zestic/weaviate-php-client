@@ -51,13 +51,12 @@ class QueryPerformanceTest extends TestCase
         $httpClient = new Client();
         $httpFactory = new HttpFactory();
 
-        // Create connection
+        // Create connection (no auth for test instance)
         $connection = new HttpConnection(
             $this->getWeaviateUrl(),
             $httpClient,
             $httpFactory,
-            $httpFactory,
-            $this->getWeaviateApiKey()
+            $httpFactory
         );
 
         // Create client
