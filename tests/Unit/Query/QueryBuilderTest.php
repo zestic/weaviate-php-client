@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace Weaviate\Tests\Unit\Query;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Weaviate\Connection\ConnectionInterface;
 use Weaviate\Query\Filter;
 use Weaviate\Query\QueryBuilder;
@@ -31,6 +32,7 @@ use Weaviate\Query\Exception\QueryException;
  */
 class QueryBuilderTest extends TestCase
 {
+    /** @var ConnectionInterface&MockObject */
     private ConnectionInterface $connection;
 
     protected function setUp(): void

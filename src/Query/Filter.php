@@ -98,11 +98,11 @@ class Filter
      * filters are true. This is equivalent to the & operator in the Python client.
      *
      * @param array<Filter> $filters Array of filters to combine with AND
-     * @return static A combined filter with AND logic
+     * @return self A combined filter with AND logic
      */
-    public static function allOf(array $filters): static
+    public static function allOf(array $filters): self
     {
-        $filter = new static();
+        $filter = new self();
         $filter->conditions = [
             'operator' => 'And',
             'operands' => array_map(fn(Filter $f) => $f->toArray(), $filters)
@@ -117,11 +117,11 @@ class Filter
      * filters are true. This is equivalent to the | operator in the Python client.
      *
      * @param array<Filter> $filters Array of filters to combine with OR
-     * @return static A combined filter with OR logic
+     * @return self A combined filter with OR logic
      */
-    public static function anyOf(array $filters): static
+    public static function anyOf(array $filters): self
     {
-        $filter = new static();
+        $filter = new self();
         $filter->conditions = [
             'operator' => 'Or',
             'operands' => array_map(fn(Filter $f) => $f->toArray(), $filters)

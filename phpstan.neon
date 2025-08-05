@@ -1,0 +1,8 @@
+parameters:
+    level: 8
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+        # Integration tests initialize client in setUp() which PHPStan doesn't understand
+        - '#Access to an undefined property Weaviate\\Tests\\Integration\\Query\\QueryIntegrationTest::\$client#'
