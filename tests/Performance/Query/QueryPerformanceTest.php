@@ -20,9 +20,12 @@ declare(strict_types=1);
 
 namespace Weaviate\Tests\Performance\Query;
 
-use PHPUnit\Framework\TestCase;
 use Weaviate\Query\Filter;
-use Weaviate\Tests\Integration\IntegrationTestCase;
+use Weaviate\Tests\TestCase;
+use Weaviate\WeaviateClient;
+use Weaviate\Connection\HttpConnection;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 
 /**
  * Performance tests for query operations
@@ -34,14 +37,32 @@ use Weaviate\Tests\Integration\IntegrationTestCase;
  * @covers \Weaviate\Query\QueryBuilder
  * @covers \Weaviate\Query\Filter
  */
-class QueryPerformanceTest extends IntegrationTestCase
+class QueryPerformanceTest extends TestCase
 {
+    private WeaviateClient $client;
     private string $testClassName = 'PerformanceTestClass';
     private int $testDataSize = 1000;
 
     protected function setUp(): void
     {
-        parent::setUp();
+        $this->skipIfWeaviateNotAvailable();
+
+        // Create HTTP client and factories
+        $httpClient = new Client();
+        $httpFactory = new HttpFactory();
+
+        // Create connection
+        $connection = new HttpConnection(
+            $this->getWeaviateUrl(),
+            $httpClient,
+            $httpFactory,
+            $httpFactory,
+            $this->getWeaviateApiKey()
+        );
+
+        // Create client
+        $this->client = new WeaviateClient($connection);
+
         $this->createTestCollection();
         $this->insertLargeTestDataset();
     }
@@ -49,7 +70,6 @@ class QueryPerformanceTest extends IntegrationTestCase
     protected function tearDown(): void
     {
         $this->cleanupTestCollection();
-        parent::tearDown();
     }
 
     /**

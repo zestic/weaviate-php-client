@@ -20,10 +20,12 @@ declare(strict_types=1);
 
 namespace Weaviate\Tests\Integration\Query;
 
-use PHPUnit\Framework\TestCase;
 use Weaviate\Query\Filter;
-use Weaviate\Tests\Integration\IntegrationTestCase;
+use Weaviate\Tests\TestCase;
 use Weaviate\WeaviateClient;
+use Weaviate\Connection\HttpConnection;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 
 /**
  * Integration tests for query isolation between multiple clients
@@ -35,20 +37,52 @@ use Weaviate\WeaviateClient;
  * @covers \Weaviate\Query\QueryBuilder
  * @covers \Weaviate\Collections\Collection
  */
-class MultipleClientsQueryTest extends IntegrationTestCase
+class MultipleClientsQueryTest extends TestCase
 {
+    private WeaviateClient $client;
     private string $testClassName = 'MultiClientTestClass';
     private WeaviateClient $client2;
     private WeaviateClient $client3;
 
     protected function setUp(): void
     {
-        parent::setUp();
-        
+        $this->skipIfWeaviateNotAvailable();
+
+        // Create HTTP client and factories
+        $httpClient = new Client();
+        $httpFactory = new HttpFactory();
+
+        // Create connection for main client
+        $connection = new HttpConnection(
+            $this->getWeaviateUrl(),
+            $httpClient,
+            $httpFactory,
+            $httpFactory,
+            $this->getWeaviateApiKey()
+        );
+
+        // Create main client
+        $this->client = new WeaviateClient($connection);
+
         // Create additional client instances
-        $this->client2 = WeaviateClient::connectToLocal();
-        $this->client3 = WeaviateClient::connectToLocal();
-        
+        $connection2 = new HttpConnection(
+            $this->getWeaviateUrl(),
+            new Client(),
+            $httpFactory,
+            $httpFactory,
+            $this->getWeaviateApiKey()
+        );
+        $this->client2 = new WeaviateClient($connection2);
+
+        $connection3 = new HttpConnection(
+            $this->getWeaviateUrl(),
+            new Client(),
+            $httpFactory,
+            $httpFactory,
+            $this->getWeaviateApiKey()
+        );
+        $this->client3 = new WeaviateClient($connection3);
+
         $this->createTestCollection();
         $this->insertTestData();
     }
@@ -56,7 +90,6 @@ class MultipleClientsQueryTest extends IntegrationTestCase
     protected function tearDown(): void
     {
         $this->cleanupTestCollection();
-        parent::tearDown();
     }
 
     /**

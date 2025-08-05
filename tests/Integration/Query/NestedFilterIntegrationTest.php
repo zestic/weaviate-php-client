@@ -21,9 +21,12 @@ declare(strict_types=1);
 namespace Weaviate\Tests\Integration\Query;
 
 use DateTime;
-use PHPUnit\Framework\TestCase;
 use Weaviate\Query\Filter;
-use Weaviate\Tests\Integration\IntegrationTestCase;
+use Weaviate\Tests\TestCase;
+use Weaviate\WeaviateClient;
+use Weaviate\Connection\HttpConnection;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
 
 /**
  * Integration tests for complex nested filters against real Weaviate instance
@@ -33,13 +36,31 @@ use Weaviate\Tests\Integration\IntegrationTestCase;
  * @covers \Weaviate\Query\PropertyFilter
  * @covers \Weaviate\Query\QueryBuilder
  */
-class NestedFilterIntegrationTest extends IntegrationTestCase
+class NestedFilterIntegrationTest extends TestCase
 {
+    private WeaviateClient $client;
     private string $testClassName = 'NestedFilterTestClass';
 
     protected function setUp(): void
     {
-        parent::setUp();
+        $this->skipIfWeaviateNotAvailable();
+
+        // Create HTTP client and factories
+        $httpClient = new Client();
+        $httpFactory = new HttpFactory();
+
+        // Create connection
+        $connection = new HttpConnection(
+            $this->getWeaviateUrl(),
+            $httpClient,
+            $httpFactory,
+            $httpFactory,
+            $this->getWeaviateApiKey()
+        );
+
+        // Create client
+        $this->client = new WeaviateClient($connection);
+
         $this->createTestCollection();
         $this->insertTestData();
     }
@@ -47,7 +68,6 @@ class NestedFilterIntegrationTest extends IntegrationTestCase
     protected function tearDown(): void
     {
         $this->cleanupTestCollection();
-        parent::tearDown();
     }
 
     /**
