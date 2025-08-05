@@ -83,7 +83,11 @@ class NestedFilterIntegrationTest extends TestCase
                 ['name' => 'featured', 'dataType' => ['boolean']],
                 ['name' => 'viewCount', 'dataType' => ['int']],
                 ['name' => 'rating', 'dataType' => ['number']],
-                ['name' => 'publishedAt', 'dataType' => ['date']],
+                [
+                    'name' => 'publishedAt',
+                    'dataType' => ['date'],
+                    'indexNullState' => true
+                ],
                 ['name' => 'tags', 'dataType' => ['text[]']],
                 ['name' => 'author', 'dataType' => ['text']],
                 ['name' => 'active', 'dataType' => ['boolean']],
@@ -372,6 +376,7 @@ class NestedFilterIntegrationTest extends TestCase
         $results = $collection->query()
             ->where($performanceFilter)
             ->limit(100)
+            ->returnProperties(['category', 'status', 'active'])
             ->fetchObjects();
 
         $endTime = microtime(true);
@@ -382,6 +387,10 @@ class NestedFilterIntegrationTest extends TestCase
 
         // Verify results match the complex criteria
         foreach ($results as $result) {
+            $this->assertArrayHasKey('category', $result);
+            $this->assertArrayHasKey('status', $result);
+            $this->assertArrayHasKey('active', $result);
+
             $this->assertContains($result['category'], ['technology', 'lifestyle', 'travel']);
             $this->assertEquals('published', $result['status']);
             $this->assertTrue($result['active']);

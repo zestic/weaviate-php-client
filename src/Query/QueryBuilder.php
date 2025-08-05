@@ -197,6 +197,10 @@ class QueryBuilder
                     // Handle nested operands for complex filters
                     $operandParts = array_map(fn($operand) => $this->arrayToGraphQL($operand), $value);
                     $parts[] = $key . ': [' . implode(', ', $operandParts) . ']';
+                } elseif (in_array($key, ['valueText', 'valueInt', 'valueNumber']) && is_array($value)) {
+                    // Handle array values for containsAny operations
+                    $arrayValues = array_map(fn($v) => '"' . addslashes($v) . '"', $value);
+                    $parts[] = $key . ': [' . implode(', ', $arrayValues) . ']';
                 } else {
                     $parts[] = $key . ': ' . $this->arrayToGraphQL($value);
                 }
