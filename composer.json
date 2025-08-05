@@ -1,12 +1,16 @@
 {
     "name": "zestic/weaviate-php-client",
-    "description": "A modern PHP client for Weaviate vector database with multi-tenancy support",
+    "version": "0.4.0",
+    "description": "A modern PHP client for Weaviate vector database with comprehensive query capabilities and multi-tenancy support",
     "license": "Apache-2.0",
     "type": "library",
     "keywords": [
         "weaviate",
         "vector-database",
         "search",
+        "query",
+        "filtering",
+        "graphql",
         "ai",
         "machine-learning",
         "multi-tenancy"
