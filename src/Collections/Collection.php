@@ -101,7 +101,7 @@ class Collection
      */
     public function data(): DataOperations
     {
-        return new DataOperations($this->connection, $this->name, $this->tenant);
+        return new DataOperations($this->connection, $this->name, $this->tenant, $this->defaultQueryFields);
     }
 
     /**

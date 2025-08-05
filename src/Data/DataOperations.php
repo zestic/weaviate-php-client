@@ -32,7 +32,8 @@ class DataOperations
     public function __construct(
         private readonly ConnectionInterface $connection,
         private readonly string $className,
-        private readonly ?string $tenant = null
+        private readonly ?string $tenant = null,
+        private readonly ?string $defaultQueryFields = null
     ) {
     }
 
@@ -142,6 +143,10 @@ class DataOperations
     public function fetchObjects(?Filter $filters = null, ?int $limit = null): array
     {
         $query = new QueryBuilder($this->connection, $this->className, $this->tenant);
+
+        if ($this->defaultQueryFields !== null) {
+            $query->setDefaultFields($this->defaultQueryFields);
+        }
 
         if ($filters) {
             $query->where($filters);
