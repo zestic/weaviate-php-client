@@ -137,30 +137,30 @@ class QueryBuilder
      */
     private function buildGraphQLQuery(): array
     {
-        $fields = empty($this->returnProperties) 
-            ? $this->getDefaultFields() 
-            : implode(' ', $this->returnProperties);
-            
+        $fields = empty($this->returnProperties)
+            ? $this->getDefaultFields()
+            : implode(' ', $this->returnProperties) . ' _additional { id }';
+
         $whereClause = $this->filter ? $this->buildWhereClause() : '';
         $limitClause = $this->limit ? "limit: {$this->limit}" : '';
-        
+
         $arguments = array_filter([$whereClause, $limitClause]);
         $argumentsStr = empty($arguments) ? '' : '(' . implode(', ', $arguments) . ')';
-        
+
         $query = sprintf(
-            'query { Get { %s%s { %s _additional { id } } } }',
+            'query { Get { %s%s { %s } } }',
             $this->className,
             $argumentsStr,
             $fields
         );
-        
+
         $payload = ['query' => $query];
-        
+
         // Add tenant to variables if specified
         if ($this->tenant) {
             $payload['variables'] = ['tenant' => $this->tenant];
         }
-        
+
         return $payload;
     }
 
