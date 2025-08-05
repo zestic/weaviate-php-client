@@ -76,6 +76,9 @@ class NestedFilterIntegrationTest extends TestCase
     {
         $schema = [
             'class' => $this->testClassName,
+            'invertedIndexConfig' => [
+                'indexNullState' => true
+            ],
             'properties' => [
                 ['name' => 'title', 'dataType' => ['text']],
                 ['name' => 'category', 'dataType' => ['text']],

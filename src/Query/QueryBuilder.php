@@ -125,14 +125,10 @@ class QueryBuilder
     public function fetchObjects(): array
     {
         $query = $this->buildGraphQLQuery();
-        $endpoint = '/v1/graphql';
 
-        // Add tenant as query parameter if specified
-        if ($this->tenant) {
-            $endpoint .= '?tenant=' . urlencode($this->tenant);
-        }
-
-        $response = $this->connection->post($endpoint, $query);
+        // For multi-tenant queries, we need to use a different approach
+        // Let's try passing tenant in the GraphQL query itself
+        $response = $this->connection->post('/v1/graphql', $query);
 
         return $this->parseResponse($response);
     }
@@ -150,8 +146,9 @@ class QueryBuilder
 
         $whereClause = $this->filter ? $this->buildWhereClause() : '';
         $limitClause = $this->limit ? "limit: {$this->limit}" : '';
+        $tenantClause = $this->tenant ? "tenant: \"{$this->tenant}\"" : '';
 
-        $arguments = array_filter([$whereClause, $limitClause]);
+        $arguments = array_filter([$whereClause, $limitClause, $tenantClause]);
         $argumentsStr = empty($arguments) ? '' : '(' . implode(', ', $arguments) . ')';
 
         $query = sprintf(
