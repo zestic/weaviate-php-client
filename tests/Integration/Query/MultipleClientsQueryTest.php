@@ -253,9 +253,9 @@ class MultipleClientsQueryTest extends TestCase
         $filter3 = Filter::byProperty('priority')->greaterThan(1);
 
         // Execute queries
-        $results1 = $collection1->query()->where($filter1)->fetchObjects();
-        $results2 = $collection2->query()->where($filter2)->fetchObjects();
-        $results3 = $collection3->query()->where($filter3)->fetchObjects();
+        $results1 = $collection1->query()->where($filter1)->returnProperties(['title', 'clientId'])->fetchObjects();
+        $results2 = $collection2->query()->where($filter2)->returnProperties(['title', 'clientId'])->fetchObjects();
+        $results3 = $collection3->query()->where($filter3)->returnProperties(['title', 'clientId'])->fetchObjects();
 
         $totalTime = microtime(true) - $startTime;
 
@@ -269,14 +269,20 @@ class MultipleClientsQueryTest extends TestCase
 
         // Verify data isolation
         foreach ($results1 as $result) {
+            $this->assertArrayHasKey('title', $result);
+            $this->assertNotNull($result['title']);
             $this->assertStringContainsString('Client1', $result['title']);
         }
 
         foreach ($results2 as $result) {
+            $this->assertArrayHasKey('title', $result);
+            $this->assertNotNull($result['title']);
             $this->assertStringContainsString('Client2', $result['title']);
         }
 
         foreach ($results3 as $result) {
+            $this->assertArrayHasKey('title', $result);
+            $this->assertNotNull($result['title']);
             $this->assertStringContainsString('Client3', $result['title']);
         }
     }
