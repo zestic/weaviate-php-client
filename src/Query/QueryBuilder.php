@@ -55,10 +55,10 @@ class QueryBuilder
 {
     private ?Filter $filter = null;
     private ?int $limit = null;
-    
+
     /** @var array<string> */
     private array $returnProperties = [];
-    
+
     private ?string $defaultFields = null;
 
     public function __construct(
@@ -126,7 +126,7 @@ class QueryBuilder
     {
         $query = $this->buildGraphQLQuery();
         $response = $this->connection->post('/v1/graphql', $query);
-        
+
         return $this->parseResponse($response);
     }
 
@@ -174,7 +174,7 @@ class QueryBuilder
         if (!$this->filter) {
             return '';
         }
-        
+
         $conditions = $this->filter->toArray();
         return 'where: ' . $this->arrayToGraphQL($conditions);
     }
@@ -191,7 +191,8 @@ class QueryBuilder
         foreach ($array as $key => $value) {
             if (is_array($value)) {
                 if ($key === 'path') {
-                    $parts[] = $key . ': [' . implode(', ', array_map(fn($v) => '"' . addslashes($v) . '"', $value)) . ']';
+                    $pathValues = array_map(fn($v) => '"' . addslashes($v) . '"', $value);
+                    $parts[] = $key . ': [' . implode(', ', $pathValues) . ']';
                 } elseif ($key === 'operands') {
                     // Handle nested operands for complex filters
                     $operandParts = array_map(fn($operand) => $this->arrayToGraphQL($operand), $value);

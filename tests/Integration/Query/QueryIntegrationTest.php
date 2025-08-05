@@ -74,9 +74,9 @@ class QueryIntegrationTest extends TestCase
     public function testBasicQueryWithoutFilter(): void
     {
         $collection = $this->client->collections()->get($this->testClassName);
-        
+
         $results = $collection->query()->fetchObjects();
-        
+
         $this->assertIsArray($results);
         $this->assertGreaterThan(0, count($results));
     }
@@ -105,11 +105,11 @@ class QueryIntegrationTest extends TestCase
     public function testQueryWithLimit(): void
     {
         $collection = $this->client->collections()->get($this->testClassName);
-        
+
         $results = $collection->query()
             ->limit(2)
             ->fetchObjects();
-        
+
         $this->assertIsArray($results);
         $this->assertLessThanOrEqual(2, count($results));
     }
@@ -195,9 +195,9 @@ class QueryIntegrationTest extends TestCase
     public function testFindOneByReturnsNullWhenNotFound(): void
     {
         $collection = $this->client->collections()->get($this->testClassName);
-        
+
         $result = $collection->data()->findOneBy(['name' => 'Non Existent']);
-        
+
         $this->assertNull($result);
     }
 
@@ -220,7 +220,7 @@ class QueryIntegrationTest extends TestCase
     private function insertTestData(): void
     {
         $collection = $this->client->collections()->get($this->testClassName);
-        
+
         $testData = [
             ['name' => 'John Doe', 'status' => 'active', 'age' => 30, 'email' => 'john@example.com'],
             ['name' => 'Jane Smith', 'status' => 'active', 'age' => 25, 'email' => 'jane@example.com'],
