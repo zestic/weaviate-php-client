@@ -349,6 +349,187 @@ try {
 }
 ```
 
+## Query Operations
+
+The PHP client provides a powerful query builder with comprehensive filtering capabilities, matching the Python client v4 API patterns.
+
+### Basic Queries
+
+```php
+<?php
+
+use Weaviate\WeaviateClient;
+use Weaviate\Query\Filter;
+
+$client = WeaviateClient::connectToLocal();
+$collection = $client->collections()->get('Article');
+
+// Simple query without filters
+$results = $collection->query()->fetchObjects();
+
+// Query with limit
+$results = $collection->query()
+    ->limit(10)
+    ->fetchObjects();
+
+// Query with custom properties
+$results = $collection->query()
+    ->returnProperties(['title', 'content', 'publishedAt'])
+    ->limit(5)
+    ->fetchObjects();
+```
+
+### Property Filtering
+
+```php
+// Simple property filters
+$results = $collection->query()
+    ->where(Filter::byProperty('status')->equal('published'))
+    ->fetchObjects();
+
+$results = $collection->query()
+    ->where(Filter::byProperty('viewCount')->greaterThan(1000))
+    ->fetchObjects();
+
+$results = $collection->query()
+    ->where(Filter::byProperty('title')->like('*AI*'))
+    ->fetchObjects();
+
+// Null checks
+$results = $collection->query()
+    ->where(Filter::byProperty('deletedAt')->isNull(true))
+    ->fetchObjects();
+
+// Array containment
+$results = $collection->query()
+    ->where(Filter::byProperty('tags')->containsAny(['php', 'javascript']))
+    ->fetchObjects();
+```
+
+### Complex Filtering
+
+```php
+// AND conditions
+$filter = Filter::allOf([
+    Filter::byProperty('status')->equal('published'),
+    Filter::byProperty('viewCount')->greaterThan(100),
+    Filter::byProperty('publishedAt')->greaterThan(new DateTime('-30 days'))
+]);
+
+$results = $collection->query()
+    ->where($filter)
+    ->fetchObjects();
+
+// OR conditions
+$filter = Filter::anyOf([
+    Filter::byProperty('status')->equal('published'),
+    Filter::byProperty('status')->equal('featured')
+]);
+
+$results = $collection->query()
+    ->where($filter)
+    ->fetchObjects();
+
+// Nested conditions
+$complexFilter = Filter::allOf([
+    Filter::byProperty('category')->equal('technology'),
+    Filter::anyOf([
+        Filter::byProperty('status')->equal('published'),
+        Filter::byProperty('status')->equal('featured')
+    ]),
+    Filter::byProperty('viewCount')->greaterThan(500)
+]);
+
+$results = $collection->query()
+    ->where($complexFilter)
+    ->limit(20)
+    ->fetchObjects();
+```
+
+### ID Filtering
+
+```php
+// Filter by specific ID
+$results = $collection->query()
+    ->where(Filter::byId()->equal('123e4567-e89b-12d3-a456-426614174000'))
+    ->fetchObjects();
+
+// Filter by multiple IDs
+$results = $collection->query()
+    ->where(Filter::byId()->containsAny([
+        '123e4567-e89b-12d3-a456-426614174000',
+        '987fcdeb-51a2-43d1-9f12-345678901234'
+    ]))
+    ->fetchObjects();
+```
+
+### Convenience Methods
+
+```php
+// Simple criteria-based queries
+$activeArticles = $collection->data()->findBy(['status' => 'active']);
+
+$publishedArticles = $collection->data()->findBy([
+    'status' => 'published',
+    'featured' => true
+], 10); // limit to 10 results
+
+// Find single object
+$article = $collection->data()->findOneBy(['slug' => 'my-article']);
+
+// Returns null if not found
+$article = $collection->data()->findOneBy(['title' => 'Non-existent']);
+```
+
+### Multi-Tenant Queries
+
+```php
+// Query within specific tenant
+$tenantCollection = $collection->withTenant('customer-123');
+
+$results = $tenantCollection->query()
+    ->where(Filter::byProperty('status')->equal('active'))
+    ->fetchObjects();
+
+// Convenience methods with tenants
+$customerArticles = $tenantCollection->data()->findBy(['published' => true]);
+```
+
+### Configurable Default Fields
+
+```php
+// Set default fields for efficient queries
+$collection = $client->collections()->get('Article')
+    ->setDefaultQueryFields('title content publishedAt viewCount status');
+
+// Queries without returnProperties() will use the configured defaults
+$results = $collection->query()
+    ->where(Filter::byProperty('status')->equal('published'))
+    ->fetchObjects(); // Returns title, content, publishedAt, viewCount, status + _additional.id
+```
+
+### Error Handling
+
+```php
+use Weaviate\Query\Exception\QueryException;
+
+try {
+    $results = $collection->query()
+        ->where(Filter::byProperty('invalidField')->equal('value'))
+        ->fetchObjects();
+} catch (QueryException $e) {
+    echo "Query failed: " . $e->getMessage();
+
+    // Get detailed GraphQL errors
+    foreach ($e->getGraphqlErrors() as $error) {
+        echo "GraphQL Error: " . $error['message'];
+    }
+
+    // Get formatted error details
+    echo "Details: " . $e->getDetailedErrorMessage();
+}
+```
+
 ## Development
 
 ### Running Tests
@@ -421,13 +602,15 @@ composer cs-fix
 - ✅ Connection layer with authentication
 - ✅ Collections API for basic CRUD operations
 - ✅ Data operations with tenant support
+- ✅ **Query builder with comprehensive filtering** (Python client v4 compatible)
+- ✅ **GraphQL query generation and execution**
+- ✅ **Advanced filtering with property, ID, and complex filters**
 
 ### Planned Features
 - Batch operations
-- Query builder with filters
-- GraphQL support
 - Vector operations
-- Advanced schema management
+- Hybrid search
+- Advanced aggregations
 
 ## Architecture
 
