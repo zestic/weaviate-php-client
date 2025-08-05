@@ -125,6 +125,9 @@ class QueryBuilder
     public function fetchObjects(): array
     {
         $query = $this->buildGraphQLQuery();
+
+        // For multi-tenant queries, we need to use a different approach
+        // Let's try passing tenant in the GraphQL query itself
         $response = $this->connection->post('/v1/graphql', $query);
 
         return $this->parseResponse($response);
@@ -143,8 +146,9 @@ class QueryBuilder
 
         $whereClause = $this->filter ? $this->buildWhereClause() : '';
         $limitClause = $this->limit ? "limit: {$this->limit}" : '';
+        $tenantClause = $this->tenant ? "tenant: \"{$this->tenant}\"" : '';
 
-        $arguments = array_filter([$whereClause, $limitClause]);
+        $arguments = array_filter([$whereClause, $limitClause, $tenantClause]);
         $argumentsStr = empty($arguments) ? '' : '(' . implode(', ', $arguments) . ')';
 
         $query = sprintf(
@@ -154,14 +158,7 @@ class QueryBuilder
             $fields
         );
 
-        $payload = ['query' => $query];
-
-        // Add tenant to variables if specified
-        if ($this->tenant) {
-            $payload['variables'] = ['tenant' => $this->tenant];
-        }
-
-        return $payload;
+        return ['query' => $query];
     }
 
     /**
@@ -197,6 +194,10 @@ class QueryBuilder
                     // Handle nested operands for complex filters
                     $operandParts = array_map(fn($operand) => $this->arrayToGraphQL($operand), $value);
                     $parts[] = $key . ': [' . implode(', ', $operandParts) . ']';
+                } elseif (in_array($key, ['valueText', 'valueInt', 'valueNumber']) && is_array($value)) {
+                    // Handle array values for containsAny operations
+                    $arrayValues = array_map(fn($v) => '"' . addslashes($v) . '"', $value);
+                    $parts[] = $key . ': [' . implode(', ', $arrayValues) . ']';
                 } else {
                     $parts[] = $key . ': ' . $this->arrayToGraphQL($value);
                 }

@@ -239,8 +239,7 @@ class QueryBuilderTest extends TestCase
     public function testFetchObjectsWithTenant(): void
     {
         $expectedQuery = [
-            'query' => 'query { Get { TestClass { _additional { id } } } }',
-            'variables' => ['tenant' => 'tenant1']
+            'query' => 'query { Get { TestClass(tenant: "tenant1") { _additional { id } } } }'
         ];
 
         $expectedResponse = [
