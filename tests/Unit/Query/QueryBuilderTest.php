@@ -239,8 +239,7 @@ class QueryBuilderTest extends TestCase
     public function testFetchObjectsWithTenant(): void
     {
         $expectedQuery = [
-            'query' => 'query { Get { TestClass { _additional { id } } } }',
-            'variables' => ['tenant' => 'tenant1']
+            'query' => 'query { Get { TestClass { _additional { id } } } }'
         ];
 
         $expectedResponse = [
@@ -255,7 +254,7 @@ class QueryBuilderTest extends TestCase
 
         $this->connection->expects($this->once())
             ->method('post')
-            ->with('/v1/graphql', $expectedQuery)
+            ->with('/v1/graphql?tenant=tenant1', $expectedQuery)
             ->willReturn($expectedResponse);
 
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass', 'tenant1');

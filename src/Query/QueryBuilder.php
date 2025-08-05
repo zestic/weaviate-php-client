@@ -125,7 +125,14 @@ class QueryBuilder
     public function fetchObjects(): array
     {
         $query = $this->buildGraphQLQuery();
-        $response = $this->connection->post('/v1/graphql', $query);
+        $endpoint = '/v1/graphql';
+
+        // Add tenant as query parameter if specified
+        if ($this->tenant) {
+            $endpoint .= '?tenant=' . urlencode($this->tenant);
+        }
+
+        $response = $this->connection->post($endpoint, $query);
 
         return $this->parseResponse($response);
     }
@@ -154,14 +161,7 @@ class QueryBuilder
             $fields
         );
 
-        $payload = ['query' => $query];
-
-        // Add tenant to variables if specified
-        if ($this->tenant) {
-            $payload['variables'] = ['tenant' => $this->tenant];
-        }
-
-        return $payload;
+        return ['query' => $query];
     }
 
     /**

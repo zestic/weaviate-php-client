@@ -86,7 +86,9 @@ class NestedFilterIntegrationTest extends TestCase
                 [
                     'name' => 'publishedAt',
                     'dataType' => ['date'],
-                    'indexNullState' => true
+                    'invertedIndexConfig' => [
+                        'indexNullState' => true
+                    ]
                 ],
                 ['name' => 'tags', 'dataType' => ['text[]']],
                 ['name' => 'author', 'dataType' => ['text']],
