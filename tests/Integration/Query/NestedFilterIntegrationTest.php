@@ -100,7 +100,7 @@ class NestedFilterIntegrationTest extends TestCase
     private function insertTestData(): void
     {
         $collection = $this->client->collections()->get($this->testClassName);
-        
+
         $testObjects = [
             [
                 'title' => 'Advanced AI Techniques',
@@ -256,11 +256,11 @@ class NestedFilterIntegrationTest extends TestCase
         foreach ($results as $result) {
             $this->assertTrue($result['active']);
             $this->assertGreaterThan(2, $result['priority']);
-            
+
             // Must match one of the OR conditions
             $matchesTechCondition = ($result['category'] === 'technology' && $result['viewCount'] > 500);
             $matchesLifestyleCondition = ($result['category'] === 'lifestyle' && $result['rating'] > 4.5);
-            
+
             $this->assertTrue(
                 $matchesTechCondition || $matchesLifestyleCondition,
                 'Result must match either technology or lifestyle condition'
@@ -433,7 +433,7 @@ class NestedFilterIntegrationTest extends TestCase
         $invalidFilter = Filter::byProperty('nonExistentProperty')->equal('value');
 
         $this->expectException(\Exception::class);
-        
+
         $collection->query()
             ->where($invalidFilter)
             ->fetchObjects();

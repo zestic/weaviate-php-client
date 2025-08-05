@@ -124,19 +124,46 @@ class MultipleClientsQueryTest extends TestCase
     {
         $testData = [
             'tenant1' => [
-                ['title' => 'Client1 Article 1', 'category' => 'tech', 'status' => 'published', 'clientId' => 'client1', 'priority' => 1, 'active' => true],
-                ['title' => 'Client1 Article 2', 'category' => 'science', 'status' => 'draft', 'clientId' => 'client1', 'priority' => 2, 'active' => false],
-                ['title' => 'Client1 Article 3', 'category' => 'tech', 'status' => 'published', 'clientId' => 'client1', 'priority' => 3, 'active' => true]
+                [
+                    'title' => 'Client1 Article 1', 'category' => 'tech', 'status' => 'published',
+                    'clientId' => 'client1', 'priority' => 1, 'active' => true
+                ],
+                [
+                    'title' => 'Client1 Article 2', 'category' => 'science', 'status' => 'draft',
+                    'clientId' => 'client1', 'priority' => 2, 'active' => false
+                ],
+                [
+                    'title' => 'Client1 Article 3', 'category' => 'tech', 'status' => 'published',
+                    'clientId' => 'client1', 'priority' => 3, 'active' => true
+                ]
             ],
             'tenant2' => [
-                ['title' => 'Client2 Article 1', 'category' => 'business', 'status' => 'published', 'clientId' => 'client2', 'priority' => 1, 'active' => true],
-                ['title' => 'Client2 Article 2', 'category' => 'tech', 'status' => 'published', 'clientId' => 'client2', 'priority' => 2, 'active' => true],
-                ['title' => 'Client2 Article 3', 'category' => 'business', 'status' => 'archived', 'clientId' => 'client2', 'priority' => 3, 'active' => false]
+                [
+                    'title' => 'Client2 Article 1', 'category' => 'business', 'status' => 'published',
+                    'clientId' => 'client2', 'priority' => 1, 'active' => true
+                ],
+                [
+                    'title' => 'Client2 Article 2', 'category' => 'tech', 'status' => 'published',
+                    'clientId' => 'client2', 'priority' => 2, 'active' => true
+                ],
+                [
+                    'title' => 'Client2 Article 3', 'category' => 'business', 'status' => 'archived',
+                    'clientId' => 'client2', 'priority' => 3, 'active' => false
+                ]
             ],
             'tenant3' => [
-                ['title' => 'Client3 Article 1', 'category' => 'lifestyle', 'status' => 'published', 'clientId' => 'client3', 'priority' => 1, 'active' => true],
-                ['title' => 'Client3 Article 2', 'category' => 'travel', 'status' => 'published', 'clientId' => 'client3', 'priority' => 2, 'active' => true],
-                ['title' => 'Client3 Article 3', 'category' => 'lifestyle', 'status' => 'draft', 'clientId' => 'client3', 'priority' => 3, 'active' => false]
+                [
+                    'title' => 'Client3 Article 1', 'category' => 'lifestyle', 'status' => 'published',
+                    'clientId' => 'client3', 'priority' => 1, 'active' => true
+                ],
+                [
+                    'title' => 'Client3 Article 2', 'category' => 'travel', 'status' => 'published',
+                    'clientId' => 'client3', 'priority' => 2, 'active' => true
+                ],
+                [
+                    'title' => 'Client3 Article 3', 'category' => 'lifestyle', 'status' => 'draft',
+                    'clientId' => 'client3', 'priority' => 3, 'active' => false
+                ]
             ]
         ];
 
@@ -432,7 +459,7 @@ class MultipleClientsQueryTest extends TestCase
 
         // Clean up results to test memory cleanup
         unset($results1, $results2, $results3);
-        
+
         // Force garbage collection
         if (function_exists('gc_collect_cycles')) {
             gc_collect_cycles();

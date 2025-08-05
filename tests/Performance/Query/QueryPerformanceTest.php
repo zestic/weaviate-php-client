@@ -100,7 +100,7 @@ class QueryPerformanceTest extends TestCase
     private function insertLargeTestDataset(): void
     {
         $collection = $this->client->collections()->get($this->testClassName);
-        
+
         $categories = ['technology', 'science', 'business', 'lifestyle', 'travel'];
         $statuses = ['active', 'inactive', 'pending', 'archived'];
         $tags = ['php', 'javascript', 'python', 'java', 'go', 'rust', 'ai', 'ml', 'web', 'mobile'];
@@ -244,14 +244,14 @@ class QueryPerformanceTest extends TestCase
         // Execute multiple queries in sequence (simulating concurrent load)
         foreach ($queries as $i => $filter) {
             $queryStart = microtime(true);
-            
+
             $queryResults = $collection->query()
                 ->where($filter)
                 ->limit(20)
                 ->fetchObjects();
-                
+
             $queryDuration = microtime(true) - $queryStart;
-            
+
             $results[] = [
                 'query' => $i,
                 'duration' => $queryDuration,
@@ -295,7 +295,9 @@ class QueryPerformanceTest extends TestCase
         // Test all fields
         $startTime = microtime(true);
         $fullResults = $collection->query()
-            ->returnProperties(['title', 'category', 'status', 'priority', 'score', 'active', 'tags', 'createdAt', 'metadata'])
+            ->returnProperties([
+                'title', 'category', 'status', 'priority', 'score', 'active', 'tags', 'createdAt', 'metadata'
+            ])
             ->where(Filter::byProperty('status')->equal('active'))
             ->limit(100)
             ->fetchObjects();
@@ -305,7 +307,11 @@ class QueryPerformanceTest extends TestCase
         $this->assertLessThan(3.0, $fullDuration, 'Full field query should complete within 3 seconds');
 
         // Minimal fields should generally be faster
-        $this->assertLessThanOrEqual($fullDuration * 1.5, $minimalDuration, 'Minimal fields should not be significantly slower');
+        $this->assertLessThanOrEqual(
+            $fullDuration * 1.5,
+            $minimalDuration,
+            'Minimal fields should not be significantly slower'
+        );
 
         echo "\nField Selection Performance:\n";
         echo "Minimal fields: {$minimalDuration}s (" . count($minimalResults) . " results)\n";
@@ -327,12 +333,12 @@ class QueryPerformanceTest extends TestCase
 
         foreach ($limits as $limit) {
             $startTime = microtime(true);
-            
+
             $queryResults = $collection->query()
                 ->where($filter)
                 ->limit($limit)
                 ->fetchObjects();
-                
+
             $duration = microtime(true) - $startTime;
             
             $results[] = [

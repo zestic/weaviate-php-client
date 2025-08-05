@@ -132,7 +132,7 @@ class MetadataFilterTest extends TestCase
     public function testLastUpdateFiltering(): void
     {
         $lastWeek = new DateTime('-7 days');
-        
+
         $recentlyUpdatedFilter = Filter::byProperty('_lastUpdateTimeUnix')->greaterThan($lastWeek);
         $result = $recentlyUpdatedFilter->toArray();
 
@@ -254,7 +254,7 @@ class MetadataFilterTest extends TestCase
     public function testTenantMetadataFiltering(): void
     {
         $tenantId = 'tenant-123';
-        
+
         // Note: In practice, tenant filtering is handled at the query level,
         // but we can test property-based tenant filtering for completeness
         $tenantFilter = Filter::byProperty('tenantId')->equal($tenantId);
@@ -341,8 +341,8 @@ class MetadataFilterTest extends TestCase
         $maxDate = new DateTime('2024-12-31T23:59:59Z');
 
         // Complex metadata query:
-        // (ID not in excludeIds) AND 
-        // (created between dates) AND 
+        // (ID not in excludeIds) AND
+        // (created between dates) AND
         // (high certainty OR recent update) AND
         // (version > 1)
         $comprehensiveFilter = Filter::allOf([
@@ -366,7 +366,7 @@ class MetadataFilterTest extends TestCase
         // Verify the structure contains all expected metadata filters
         $this->assertArrayHasKey('operator', $result['operands'][1]); // Date range AND
         $this->assertArrayHasKey('operator', $result['operands'][2]); // Certainty/Update OR
-        
+
         // Verify version filter
         $this->assertEquals([
             'path' => ['_version'],
