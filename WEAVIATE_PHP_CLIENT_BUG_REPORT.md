@@ -157,6 +157,10 @@ function tenantExists($tenants, $tenantName): bool {
 2. Verify response parsing in `Tenants::getByName()` method
 3. Ensure proper error handling for 404 vs other HTTP errors
 4. Add retry mechanism for eventual consistency issues
+5. Add version compatibility check to ensure Weaviate server supports tenant endpoints (requires 1.25.0+)
+6. Implement detailed logging for HTTP requests/responses and timing information to aid debugging
+7. Replace broad exception catching with more specific exception handling in both methods
+8. Consider implementing exponential backoff for retry logic to handle transient errors gracefully
 
 ## Additional Context
 This issue was discovered while implementing integration tests for a production application. The client's own integration tests may be passing due to different test environment setup or timing.
