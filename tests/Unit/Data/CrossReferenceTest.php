@@ -67,7 +67,6 @@ class CrossReferenceTest extends TestCase
     public function testCanAddCrossReferenceWithTenant(): void
     {
         $dataOperations = new DataOperations($this->connection, 'TestClass', 'tenant-123');
-        
         $fromUuid = '123e4567-e89b-12d3-a456-426614174000';
         $fromProperty = 'hasCategory';
         $to = '987fcdeb-51a2-43d1-9f12-345678901234';

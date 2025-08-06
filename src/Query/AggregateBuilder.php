@@ -51,7 +51,7 @@ use Weaviate\Query\Exception\QueryException;
 class AggregateBuilder
 {
     private ?string $groupBy = null;
-    
+
     /** @var array<string> */
     private array $metrics = [];
 

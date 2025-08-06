@@ -110,7 +110,8 @@ class QueryBuilder
     /**
      * Set cross-references to include in the query results
      *
-     * @param array<string, array<string>> $references Array mapping reference property names to arrays of properties to return
+     * @param array<string, array<string>> $references Array mapping reference property names to arrays of
+     *                                                  properties to return
      * @return $this
      */
     public function returnReferences(array $references): self

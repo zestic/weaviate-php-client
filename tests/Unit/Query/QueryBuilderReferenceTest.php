@@ -48,7 +48,8 @@ class QueryBuilderReferenceTest extends TestCase
     public function testCanIncludeCrossReferencesInQuery(): void
     {
         $expectedQuery = [
-            'query' => 'query { Get { TestClass { title content _additional { id } hasCategory { ... on TestClass { title description } } } } }'
+            'query' => 'query { Get { TestClass { title content _additional { id } ' .
+                      'hasCategory { ... on TestClass { title description } } } } }'
         ];
 
         $mockResponse = [
@@ -92,7 +93,9 @@ class QueryBuilderReferenceTest extends TestCase
     public function testCanIncludeMultipleCrossReferences(): void
     {
         $expectedQuery = [
-            'query' => 'query { Get { TestClass { title _additional { id } hasCategory { ... on TestClass { title } } hasAuthor { ... on TestClass { name email } } } } }'
+            'query' => 'query { Get { TestClass { title _additional { id } ' .
+                      'hasCategory { ... on TestClass { title } } ' .
+                      'hasAuthor { ... on TestClass { name email } } } } }'
         ];
 
         $mockResponse = [
@@ -128,7 +131,9 @@ class QueryBuilderReferenceTest extends TestCase
         $filter = Filter::byRef('hasCategory')->byProperty('title')->like('*Tech*');
 
         $expectedQuery = [
-            'query' => 'query { Get { TestClass(where: {path: ["hasCategory"], operator: Equal, valueObject: {path: ["title"], operator: Like, valueText: "*Tech*"}}) { title _additional { id } hasCategory { ... on TestClass { title description } } } } }'
+            'query' => 'query { Get { TestClass(where: {path: ["hasCategory"], operator: Equal, ' .
+                      'valueObject: {path: ["title"], operator: Like, valueText: "*Tech*"}}) { title ' .
+                      '_additional { id } hasCategory { ... on TestClass { title description } } } } }'
         ];
 
         $mockResponse = [
@@ -161,7 +166,8 @@ class QueryBuilderReferenceTest extends TestCase
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass', 'tenant-123');
 
         $expectedQuery = [
-            'query' => 'query { Get { TestClass(tenant: "tenant-123") { title _additional { id } hasCategory { ... on TestClass { title } } } } }'
+            'query' => 'query { Get { TestClass(tenant: "tenant-123") { title _additional { id } ' .
+                      'hasCategory { ... on TestClass { title } } } } }'
         ];
 
         $mockResponse = [
@@ -191,7 +197,8 @@ class QueryBuilderReferenceTest extends TestCase
     public function testCanIncludeCrossReferencesWithDefaultFields(): void
     {
         $expectedQuery = [
-            'query' => 'query { Get { TestClass { title content _additional { id } hasCategory { ... on TestClass { title } } } } }'
+            'query' => 'query { Get { TestClass { title content _additional { id } ' .
+                      'hasCategory { ... on TestClass { title } } } } }'
         ];
 
         $mockResponse = [
