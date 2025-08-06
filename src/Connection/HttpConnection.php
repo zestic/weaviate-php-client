@@ -158,7 +158,7 @@ class HttpConnection implements ConnectionInterface
     {
         $operation = "HEAD {$path}";
 
-        $executeRequest = function () use ($path): bool {
+        $executeRequest = function () use ($path, $operation): bool {
             $url = $this->baseUrl . $path;
             $request = $this->requestFactory->createRequest('HEAD', $url);
             $request = $this->applyHeaders($request);
