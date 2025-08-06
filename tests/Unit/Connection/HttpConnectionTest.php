@@ -1448,6 +1448,532 @@ class HttpConnectionTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Connection\HttpConnection::patch
+     */
+    public function testPatchRequestWithRetryHandler(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $retryHandler = $this->createMock(RetryHandler::class);
+
+        $retryHandler->expects($this->once())
+            ->method('execute')
+            ->with('PATCH /v1/objects/123', $this->isCallable())
+            ->willReturn(['patched' => true]);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            [],
+            $retryHandler
+        );
+
+        $result = $connection->patch('/v1/objects/123', ['name' => 'patched']);
+
+        $this->assertEquals(['patched' => true], $result);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::put
+     */
+    public function testPutRequestWithRetryHandler(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $retryHandler = $this->createMock(RetryHandler::class);
+
+        $retryHandler->expects($this->once())
+            ->method('execute')
+            ->with('PUT /v1/objects/123', $this->isCallable())
+            ->willReturn(['updated' => true]);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            [],
+            $retryHandler
+        );
+
+        $result = $connection->put('/v1/objects/123', ['name' => 'updated']);
+
+        $this->assertEquals(['updated' => true], $result);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::patch
+     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
+     */
+    public function testPatchRequestThrowsNotFoundExceptionFor404(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $requestStream = $this->createMock(StreamInterface::class);
+        $responseStream = $this->createMock(StreamInterface::class);
+
+        $response->method('getStatusCode')->willReturn(404);
+        $response->method('getBody')->willReturn($responseStream);
+        $response->method('getHeaderLine')->with('X-Request-URL')->willReturn('');
+        $responseStream->method('__toString')->willReturn('{"error": "not found"}');
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->willReturn($request);
+
+        $streamFactory->expects($this->once())
+            ->method('createStream')
+            ->willReturn($requestStream);
+
+        $request->method('withBody')->willReturnSelf();
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->willReturn($response);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $this->expectException(NotFoundException::class);
+        $connection->patch('/v1/objects/123', ['name' => 'patched']);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::patch
+     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
+     */
+    public function testPatchRequestThrowsInsufficientPermissionsExceptionFor403(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $requestStream = $this->createMock(StreamInterface::class);
+        $responseStream = $this->createMock(StreamInterface::class);
+
+        $response->method('getStatusCode')->willReturn(403);
+        $response->method('getBody')->willReturn($responseStream);
+        $response->method('getHeaderLine')->with('X-Request-URL')->willReturn('');
+        $responseStream->method('__toString')->willReturn('{"error": "forbidden"}');
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->willReturn($request);
+
+        $streamFactory->expects($this->once())
+            ->method('createStream')
+            ->willReturn($requestStream);
+
+        $request->method('withBody')->willReturnSelf();
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->willReturn($response);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $this->expectException(InsufficientPermissionsException::class);
+        $connection->patch('/v1/objects/123', ['name' => 'patched']);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::patch
+     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
+     */
+    public function testPatchRequestThrowsUnexpectedStatusCodeExceptionFor500(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $requestStream = $this->createMock(StreamInterface::class);
+        $responseStream = $this->createMock(StreamInterface::class);
+
+        $response->method('getStatusCode')->willReturn(500);
+        $response->method('getBody')->willReturn($responseStream);
+        $response->method('getHeaderLine')->with('X-Request-URL')->willReturn('');
+        $responseStream->method('__toString')->willReturn('{"error": "server error"}');
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->willReturn($request);
+
+        $streamFactory->expects($this->once())
+            ->method('createStream')
+            ->willReturn($requestStream);
+
+        $request->method('withBody')->willReturnSelf();
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->willReturn($response);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $this->expectException(UnexpectedStatusCodeException::class);
+        $connection->patch('/v1/objects/123', ['name' => 'patched']);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::patch
+     */
+    public function testPatchRequestThrowsWeaviateConnectionExceptionForNetworkError(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $requestStream = $this->createMock(StreamInterface::class);
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->willReturn($request);
+
+        $streamFactory->expects($this->once())
+            ->method('createStream')
+            ->willReturn($requestStream);
+
+        $request->method('withBody')->willReturnSelf();
+        $request->method('withHeader')->willReturnSelf();
+
+        $networkException = new class ('Network error') extends \Exception implements NetworkExceptionInterface {
+            public function getRequest(): \Psr\Http\Message\RequestInterface
+            {
+                throw new \RuntimeException('Not implemented');
+            }
+        };
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->willThrowException($networkException);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $this->expectException(WeaviateConnectionException::class);
+        $connection->patch('/v1/objects/123', ['name' => 'patched']);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::patch
+     */
+    public function testPatchRequestThrowsWeaviateConnectionExceptionForRequestError(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $requestStream = $this->createMock(StreamInterface::class);
+
+        $requestException = new class ('Request error') extends \Exception implements RequestExceptionInterface {
+            public function getRequest(): \Psr\Http\Message\RequestInterface
+            {
+                throw new \RuntimeException('Not implemented');
+            }
+        };
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->willReturn($request);
+
+        $streamFactory->expects($this->once())
+            ->method('createStream')
+            ->willReturn($requestStream);
+
+        $request->method('withBody')->willReturnSelf();
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->willThrowException($requestException);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $this->expectException(WeaviateConnectionException::class);
+        $connection->patch('/v1/objects/123', ['name' => 'patched']);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::put
+     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
+     */
+    public function testPutRequestThrowsNotFoundExceptionFor404(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $requestStream = $this->createMock(StreamInterface::class);
+        $responseStream = $this->createMock(StreamInterface::class);
+
+        $response->method('getStatusCode')->willReturn(404);
+        $response->method('getBody')->willReturn($responseStream);
+        $response->method('getHeaderLine')->with('X-Request-URL')->willReturn('');
+        $responseStream->method('__toString')->willReturn('{"error": "not found"}');
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->willReturn($request);
+
+        $streamFactory->expects($this->once())
+            ->method('createStream')
+            ->willReturn($requestStream);
+
+        $request->method('withBody')->willReturnSelf();
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->willReturn($response);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $this->expectException(NotFoundException::class);
+        $connection->put('/v1/objects/123', ['name' => 'updated']);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::put
+     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
+     */
+    public function testPutRequestThrowsInsufficientPermissionsExceptionFor403(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $requestStream = $this->createMock(StreamInterface::class);
+        $responseStream = $this->createMock(StreamInterface::class);
+
+        $response->method('getStatusCode')->willReturn(403);
+        $response->method('getBody')->willReturn($responseStream);
+        $response->method('getHeaderLine')->with('X-Request-URL')->willReturn('');
+        $responseStream->method('__toString')->willReturn('{"error": "forbidden"}');
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->willReturn($request);
+
+        $streamFactory->expects($this->once())
+            ->method('createStream')
+            ->willReturn($requestStream);
+
+        $request->method('withBody')->willReturnSelf();
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->willReturn($response);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $this->expectException(InsufficientPermissionsException::class);
+        $connection->put('/v1/objects/123', ['name' => 'updated']);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::put
+     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
+     */
+    public function testPutRequestThrowsUnexpectedStatusCodeExceptionFor500(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $requestStream = $this->createMock(StreamInterface::class);
+        $responseStream = $this->createMock(StreamInterface::class);
+
+        $response->method('getStatusCode')->willReturn(500);
+        $response->method('getBody')->willReturn($responseStream);
+        $response->method('getHeaderLine')->with('X-Request-URL')->willReturn('');
+        $responseStream->method('__toString')->willReturn('{"error": "server error"}');
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->willReturn($request);
+
+        $streamFactory->expects($this->once())
+            ->method('createStream')
+            ->willReturn($requestStream);
+
+        $request->method('withBody')->willReturnSelf();
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->willReturn($response);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $this->expectException(UnexpectedStatusCodeException::class);
+        $connection->put('/v1/objects/123', ['name' => 'updated']);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::put
+     */
+    public function testPutRequestThrowsWeaviateConnectionExceptionForNetworkError(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $requestStream = $this->createMock(StreamInterface::class);
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->willReturn($request);
+
+        $streamFactory->expects($this->once())
+            ->method('createStream')
+            ->willReturn($requestStream);
+
+        $request->method('withBody')->willReturnSelf();
+        $request->method('withHeader')->willReturnSelf();
+
+        $networkException = new class ('Network error') extends \Exception implements NetworkExceptionInterface {
+            public function getRequest(): \Psr\Http\Message\RequestInterface
+            {
+                throw new \RuntimeException('Not implemented');
+            }
+        };
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->willThrowException($networkException);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $this->expectException(WeaviateConnectionException::class);
+        $connection->put('/v1/objects/123', ['name' => 'updated']);
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::put
+     */
+    public function testPutRequestThrowsWeaviateConnectionExceptionForRequestError(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $requestStream = $this->createMock(StreamInterface::class);
+
+        $requestException = new class ('Request error') extends \Exception implements RequestExceptionInterface {
+            public function getRequest(): \Psr\Http\Message\RequestInterface
+            {
+                throw new \RuntimeException('Not implemented');
+            }
+        };
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->willReturn($request);
+
+        $streamFactory->expects($this->once())
+            ->method('createStream')
+            ->willReturn($requestStream);
+
+        $request->method('withBody')->willReturnSelf();
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->willThrowException($requestException);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $this->expectException(WeaviateConnectionException::class);
+        $connection->put('/v1/objects/123', ['name' => 'updated']);
+    }
+
+    /**
      * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
      */
     public function testHandleErrorResponseWithCustomUrl(): void
