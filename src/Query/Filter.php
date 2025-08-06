@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace Weaviate\Query;
 
+use Weaviate\Query\ReferenceFilter;
+
 /**
  * Base filter class for building Weaviate GraphQL queries
  *
@@ -89,6 +91,20 @@ class Filter
     public static function byId(): IdFilter
     {
         return new IdFilter();
+    }
+
+    /**
+     * Create a cross-reference filter
+     *
+     * This method creates a ReferenceFilter instance that allows filtering
+     * on properties of cross-referenced objects, matching Python client v4 patterns.
+     *
+     * @param string $linkOn The property name that contains the cross-reference
+     * @return ReferenceFilter A reference filter instance
+     */
+    public static function byRef(string $linkOn): ReferenceFilter
+    {
+        return new ReferenceFilter($linkOn);
     }
 
     /**

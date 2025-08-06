@@ -201,6 +201,119 @@ class DataOperations
     }
 
     /**
+     * Add a cross-reference between objects
+     *
+     * @param string $fromUuid The UUID of the source object
+     * @param string $fromProperty The property name that holds the reference
+     * @param string $to The UUID of the target object to reference
+     * @return bool Success status
+     */
+    public function referenceAdd(string $fromUuid, string $fromProperty, string $to): bool
+    {
+        $path = "/v1/objects/{$this->className}/{$fromUuid}/references/{$fromProperty}";
+
+        if ($this->tenant !== null) {
+            $path .= "?tenant={$this->tenant}";
+        }
+
+        $data = [
+            'beacon' => "weaviate://localhost/{$to}"
+        ];
+
+        try {
+            $this->connection->post($path, $data);
+            return true;
+        } catch (\Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * Delete a cross-reference between objects
+     *
+     * @param string $fromUuid The UUID of the source object
+     * @param string $fromProperty The property name that holds the reference
+     * @param string $to The UUID of the target object to unreference
+     * @return bool Success status
+     */
+    public function referenceDelete(string $fromUuid, string $fromProperty, string $to): bool
+    {
+        $path = "/v1/objects/{$this->className}/{$fromUuid}/references/{$fromProperty}";
+
+        if ($this->tenant !== null) {
+            $path .= "?tenant={$this->tenant}";
+        }
+
+        $data = [
+            'beacon' => "weaviate://localhost/{$to}"
+        ];
+
+        try {
+            $this->connection->deleteWithData($path, $data);
+            return true;
+        } catch (\Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * Replace cross-references for a property
+     *
+     * @param string $fromUuid The UUID of the source object
+     * @param string $fromProperty The property name that holds the reference
+     * @param string|array<string> $to The UUID(s) of the target object(s) to reference
+     * @return bool Success status
+     */
+    public function referenceReplace(string $fromUuid, string $fromProperty, string|array $to): bool
+    {
+        $path = "/v1/objects/{$this->className}/{$fromUuid}/references/{$fromProperty}";
+
+        if ($this->tenant !== null) {
+            $path .= "?tenant={$this->tenant}";
+        }
+
+        $beacons = is_array($to)
+            ? array_map(fn($uuid) => "weaviate://localhost/{$uuid}", $to)
+            : ["weaviate://localhost/{$to}"];
+
+        $data = $beacons;
+
+        try {
+            $this->connection->put($path, $data);
+            return true;
+        } catch (\Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * Add multiple cross-references in batch
+     *
+     * @param array<array{fromUuid: string, fromProperty: string, to: string}> $references
+     *        Array of reference definitions
+     * @return array<string, bool> Results indexed by a key combining fromUuid and fromProperty
+     */
+    public function referenceAddMany(array $references): array
+    {
+        $results = [];
+
+        foreach ($references as $ref) {
+            if (!isset($ref['fromUuid'], $ref['fromProperty'], $ref['to'])) {
+                continue;
+            }
+
+            $key = "{$ref['fromUuid']}.{$ref['fromProperty']}";
+            $results[$key] = $this->referenceAdd(
+                $ref['fromUuid'],
+                $ref['fromProperty'],
+                $ref['to']
+            );
+        }
+
+        return $results;
+    }
+
+    /**
      * Extract properties from input data, excluding special fields like 'id'
      *
      * @param array<string, mixed> $data Input data

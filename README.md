@@ -252,6 +252,13 @@ if ($tenants->exists('customer-123')) {
     echo "Tenant exists!";
 }
 
+// Bulk tenant operations
+$existsResults = $tenants->existsBatch(['customer-123', 'customer-456', 'customer-789']);
+// Returns: ['customer-123' => true, 'customer-456' => false, 'customer-789' => true]
+
+$tenants->createBatch(['new-tenant-1', 'new-tenant-2', 'new-tenant-3']);
+$tenants->activateBatch(['tenant-1', 'tenant-2']);
+
 // Remove tenants
 $tenants->remove('customer-123');                // Single tenant
 $tenants->remove(['customer-456', 'customer-789']); // Multiple tenants
@@ -377,6 +384,147 @@ $results = $collection->query()
     ->returnProperties(['title', 'content', 'publishedAt'])
     ->limit(5)
     ->fetchObjects();
+```
+
+## Cross-Reference Management
+
+The PHP client now supports full cross-reference management, achieving parity with Python client v4.
+
+### Adding Cross-References
+
+```php
+<?php
+
+use Weaviate\WeaviateClient;
+
+$client = WeaviateClient::connectToLocal();
+$collection = $client->collections()->get('Question');
+
+// Add a single cross-reference
+$success = $collection->data()->referenceAdd(
+    fromUuid: $questionId,
+    fromProperty: 'hasCategory',
+    to: $categoryId
+);
+
+// Add multiple cross-references in batch
+$references = [
+    ['fromUuid' => $questionId1, 'fromProperty' => 'hasCategory', 'to' => $categoryId1],
+    ['fromUuid' => $questionId2, 'fromProperty' => 'hasCategory', 'to' => $categoryId2]
+];
+$results = $collection->data()->referenceAddMany($references);
+```
+
+### Managing Cross-References
+
+```php
+<?php
+
+// Replace cross-references (overwrites existing)
+$success = $collection->data()->referenceReplace(
+    fromUuid: $questionId,
+    fromProperty: 'hasCategory',
+    to: $newCategoryId
+);
+
+// Replace with multiple targets
+$success = $collection->data()->referenceReplace(
+    fromUuid: $questionId,
+    fromProperty: 'hasCategories',
+    to: [$categoryId1, $categoryId2]
+);
+
+// Delete specific cross-reference
+$success = $collection->data()->referenceDelete(
+    fromUuid: $questionId,
+    fromProperty: 'hasCategory',
+    to: $categoryId
+);
+```
+
+## Cross-Reference Querying
+
+Query objects based on their cross-referenced properties, matching Python client v4 patterns.
+
+### Filtering by Cross-References
+
+```php
+<?php
+
+use Weaviate\Query\Filter;
+
+// Filter by cross-referenced property
+$results = $collection->query()
+    ->where(Filter::byRef('hasCategory')->byProperty('title')->like('*Sport*'))
+    ->fetchObjects();
+
+// Filter by cross-referenced ID
+$results = $collection->query()
+    ->where(Filter::byRef('hasAuthor')->byId()->equal($authorId))
+    ->fetchObjects();
+
+// Complex cross-reference filtering
+$results = $collection->query()
+    ->where(Filter::allOf([
+        Filter::byRef('hasCategory')->byProperty('status')->equal('active'),
+        Filter::byProperty('publishedAt')->greaterThan($date)
+    ]))
+    ->fetchObjects();
+```
+
+### Including Cross-References in Results
+
+```php
+<?php
+
+// Include cross-reference data in query results
+$results = $collection->query()
+    ->returnReferences(['hasCategory' => ['title', 'description']])
+    ->fetchObjects();
+
+// Include multiple cross-references
+$results = $collection->query()
+    ->returnReferences([
+        'hasCategory' => ['title', 'description'],
+        'hasAuthor' => ['name', 'email']
+    ])
+    ->fetchObjects();
+
+// Combine filtering and reference inclusion
+$results = $collection->query()
+    ->where(Filter::byRef('hasCategory')->byProperty('title')->like('*Tech*'))
+    ->returnReferences(['hasCategory' => ['title', 'description']])
+    ->fetchObjects();
+```
+
+## Aggregation Queries
+
+Perform aggregation operations with grouping and metrics, matching Python client v4 functionality.
+
+### Basic Aggregations
+
+```php
+<?php
+
+// Simple count aggregation
+$results = $collection->query()
+    ->aggregate()
+    ->metrics(['count'])
+    ->execute();
+
+// Group by property with count
+$results = $collection->query()
+    ->aggregate()
+    ->groupBy('category')
+    ->metrics(['count'])
+    ->execute();
+
+// Multiple metrics
+$results = $collection->query()
+    ->aggregate()
+    ->groupBy('status')
+    ->metrics(['count', 'sum', 'avg'])
+    ->execute();
 ```
 
 ### Property Filtering
