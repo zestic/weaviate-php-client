@@ -108,7 +108,7 @@ class ReferenceFilter
 /**
  * Property filter for cross-referenced objects
  */
-class ReferencePropertyFilter
+class ReferencePropertyFilter extends Filter
 {
     private string $linkOn;
     private PropertyFilter $propertyFilter;
@@ -192,7 +192,7 @@ class ReferencePropertyFilter
 /**
  * ID filter for cross-referenced objects
  */
-class ReferenceIdFilter
+class ReferenceIdFilter extends Filter
 {
     private string $linkOn;
     private IdFilter $idFilter;

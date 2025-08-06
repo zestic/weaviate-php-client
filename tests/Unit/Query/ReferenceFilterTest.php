@@ -138,7 +138,7 @@ class ReferenceFilterTest extends TestCase
             'valueObject' => [
                 'path' => ['id'],
                 'operator' => 'ContainsAny',
-                'valueTextArray' => $uuids
+                'valueText' => $uuids
             ]
         ];
 
@@ -194,7 +194,7 @@ class ReferenceFilterTest extends TestCase
             'valueObject' => [
                 'path' => ['tags'],
                 'operator' => 'ContainsAny',
-                'valueTextArray' => ['php', 'javascript']
+                'valueText' => ['php', 'javascript']
             ]
         ];
 
