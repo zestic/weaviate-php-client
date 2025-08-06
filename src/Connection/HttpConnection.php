@@ -156,18 +156,47 @@ class HttpConnection implements ConnectionInterface
 
     public function head(string $path): bool
     {
-        $url = $this->baseUrl . $path;
-        $request = $this->requestFactory->createRequest('HEAD', $url);
-        $request = $this->applyHeaders($request);
-        $request = $this->applyAuth($request);
+        $operation = "HEAD {$path}";
 
-        try {
-            $response = $this->httpClient->sendRequest($request);
-            return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
-        } catch (\Exception) {
-            // HEAD requests should return false for any error (including 404)
+        $executeRequest = function () use ($path, $operation): bool {
+            $url = $this->baseUrl . $path;
+            $request = $this->requestFactory->createRequest('HEAD', $url);
+            $request = $this->applyHeaders($request);
+            $request = $this->applyAuth($request);
+
+            try {
+                $response = $this->httpClient->sendRequest($request);
+            } catch (NetworkExceptionInterface $e) {
+                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
+            } catch (RequestExceptionInterface $e) {
+                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            // Return true for successful status codes
+            if ($statusCode >= 200 && $statusCode < 300) {
+                return true;
+            }
+
+            // Return false for 404 Not Found (resource doesn't exist)
+            if ($statusCode === 404) {
+                return false;
+            }
+
+            // For other HTTP error status codes, throw appropriate exceptions
+            $this->handleErrorResponse($response, $operation);
+
+            // This line should never be reached due to handleErrorResponse throwing
             return false;
+        };
+
+        // Use retry handler if available
+        if ($this->retryHandler !== null) {
+            return $this->retryHandler->execute($operation, $executeRequest);
         }
+
+        return $executeRequest();
     }
 
     public function patch(string $path, array $data = []): array

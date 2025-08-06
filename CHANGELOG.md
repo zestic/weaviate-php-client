@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **🔧 Tenant exists() and getByName() Methods**: Fixed critical bug where these methods returned false/null even after successful tenant creation
+- **HTTP HEAD Request Handling**: Improved HttpConnection::head() method to properly distinguish between "not found" (404) and actual errors (network, auth, etc.)
+- **Exception Handling**: Enhanced error handling in tenant operations to properly propagate network and authentication errors instead of masking them
+- **Retry Support**: Added retry mechanism support for tenant existence checks and retrieval operations
+- **Documentation**: Updated method documentation to clearly specify which exceptions can be thrown
+
+### Enhanced
+- **Error Differentiation**: Tenant methods now properly distinguish between "tenant doesn't exist" and actual system errors
+- **Performance**: Tenant exists() method now uses efficient HEAD requests with proper error handling
+- **Test Coverage**: Added comprehensive tests for tenant error handling scenarios
+
 ## [0.4.0] - 2025-01-30
 
 ### Added
