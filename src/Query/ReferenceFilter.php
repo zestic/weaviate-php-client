@@ -20,9 +20,6 @@ declare(strict_types=1);
 
 namespace Weaviate\Query;
 
-use Weaviate\Query\PropertyFilter;
-use Weaviate\Query\IdFilter;
-
 /**
  * Cross-reference filter for Weaviate GraphQL queries
  *
