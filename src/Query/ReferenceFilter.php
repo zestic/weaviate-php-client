@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 namespace Weaviate\Query;
 
+use Weaviate\Query\ReferencePropertyFilter;
+use Weaviate\Query\ReferenceIdFilter;
+
 /**
  * Cross-reference filter for Weaviate GraphQL queries
  *
@@ -101,138 +104,6 @@ class ReferenceFilter
             'path' => [$this->linkOn],
             'operator' => 'Equal',
             'valueObject' => []
-        ];
-    }
-}
-
-/**
- * Property filter for cross-referenced objects
- */
-class ReferencePropertyFilter extends Filter
-{
-    private string $linkOn;
-    private PropertyFilter $propertyFilter;
-
-    public function __construct(string $linkOn, string $property)
-    {
-        $this->linkOn = $linkOn;
-        $this->propertyFilter = new PropertyFilter($property);
-    }
-
-    public function equal(mixed $value): self
-    {
-        $this->propertyFilter->equal($value);
-        return $this;
-    }
-
-    public function notEqual(mixed $value): self
-    {
-        $this->propertyFilter->notEqual($value);
-        return $this;
-    }
-
-    public function like(string $value): self
-    {
-        $this->propertyFilter->like($value);
-        return $this;
-    }
-
-    public function greaterThan(int|float $value): self
-    {
-        $this->propertyFilter->greaterThan($value);
-        return $this;
-    }
-
-    public function greaterThanEqual(int|float $value): self
-    {
-        $this->propertyFilter->greaterThanEqual($value);
-        return $this;
-    }
-
-    public function lessThan(int|float $value): self
-    {
-        $this->propertyFilter->lessThan($value);
-        return $this;
-    }
-
-    public function lessThanEqual(int|float $value): self
-    {
-        $this->propertyFilter->lessThanEqual($value);
-        return $this;
-    }
-
-    public function isNull(bool $value): self
-    {
-        $this->propertyFilter->isNull($value);
-        return $this;
-    }
-
-    public function containsAny(array $values): self
-    {
-        $this->propertyFilter->containsAny($values);
-        return $this;
-    }
-
-    public function containsAll(array $values): self
-    {
-        $this->propertyFilter->containsAll($values);
-        return $this;
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'path' => [$this->linkOn],
-            'operator' => 'Equal',
-            'valueObject' => $this->propertyFilter->toArray()
-        ];
-    }
-}
-
-/**
- * ID filter for cross-referenced objects
- */
-class ReferenceIdFilter extends Filter
-{
-    private string $linkOn;
-    private IdFilter $idFilter;
-
-    public function __construct(string $linkOn)
-    {
-        $this->linkOn = $linkOn;
-        $this->idFilter = new IdFilter();
-    }
-
-    public function equal(string $value): self
-    {
-        $this->idFilter->equal($value);
-        return $this;
-    }
-
-    public function notEqual(string $value): self
-    {
-        $this->idFilter->notEqual($value);
-        return $this;
-    }
-
-    public function containsAny(array $values): self
-    {
-        $this->idFilter->containsAny($values);
-        return $this;
-    }
-
-    public function containsAll(array $values): self
-    {
-        $this->idFilter->containsAll($values);
-        return $this;
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'path' => [$this->linkOn],
-            'operator' => 'Equal',
-            'valueObject' => $this->idFilter->toArray()
         ];
     }
 }
