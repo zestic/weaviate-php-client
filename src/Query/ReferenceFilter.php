@@ -54,23 +54,21 @@ class ReferenceFilter
      * Filter by a property of the referenced object
      *
      * @param string $property The property name in the referenced object
-     * @return PropertyFilter A property filter for the referenced object
+     * @return ReferencePropertyFilter A property filter for the referenced object
      */
-    public function byProperty(string $property): PropertyFilter
+    public function byProperty(string $property): ReferencePropertyFilter
     {
-        $this->propertyFilter = new PropertyFilter($property);
-        return $this->propertyFilter;
+        return new ReferencePropertyFilter($this->linkOn, $property);
     }
 
     /**
      * Filter by the ID of the referenced object
      *
-     * @return IdFilter An ID filter for the referenced object
+     * @return ReferenceIdFilter An ID filter for the referenced object
      */
-    public function byId(): IdFilter
+    public function byId(): ReferenceIdFilter
     {
-        $this->idFilter = new IdFilter();
-        return $this->idFilter;
+        return new ReferenceIdFilter($this->linkOn);
     }
 
     /**
@@ -103,6 +101,138 @@ class ReferenceFilter
             'path' => [$this->linkOn],
             'operator' => 'Equal',
             'valueObject' => []
+        ];
+    }
+}
+
+/**
+ * Property filter for cross-referenced objects
+ */
+class ReferencePropertyFilter
+{
+    private string $linkOn;
+    private PropertyFilter $propertyFilter;
+
+    public function __construct(string $linkOn, string $property)
+    {
+        $this->linkOn = $linkOn;
+        $this->propertyFilter = new PropertyFilter($property);
+    }
+
+    public function equal(mixed $value): self
+    {
+        $this->propertyFilter->equal($value);
+        return $this;
+    }
+
+    public function notEqual(mixed $value): self
+    {
+        $this->propertyFilter->notEqual($value);
+        return $this;
+    }
+
+    public function like(string $value): self
+    {
+        $this->propertyFilter->like($value);
+        return $this;
+    }
+
+    public function greaterThan(int|float $value): self
+    {
+        $this->propertyFilter->greaterThan($value);
+        return $this;
+    }
+
+    public function greaterThanEqual(int|float $value): self
+    {
+        $this->propertyFilter->greaterThanEqual($value);
+        return $this;
+    }
+
+    public function lessThan(int|float $value): self
+    {
+        $this->propertyFilter->lessThan($value);
+        return $this;
+    }
+
+    public function lessThanEqual(int|float $value): self
+    {
+        $this->propertyFilter->lessThanEqual($value);
+        return $this;
+    }
+
+    public function isNull(bool $value): self
+    {
+        $this->propertyFilter->isNull($value);
+        return $this;
+    }
+
+    public function containsAny(array $values): self
+    {
+        $this->propertyFilter->containsAny($values);
+        return $this;
+    }
+
+    public function containsAll(array $values): self
+    {
+        $this->propertyFilter->containsAll($values);
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'path' => [$this->linkOn],
+            'operator' => 'Equal',
+            'valueObject' => $this->propertyFilter->toArray()
+        ];
+    }
+}
+
+/**
+ * ID filter for cross-referenced objects
+ */
+class ReferenceIdFilter
+{
+    private string $linkOn;
+    private IdFilter $idFilter;
+
+    public function __construct(string $linkOn)
+    {
+        $this->linkOn = $linkOn;
+        $this->idFilter = new IdFilter();
+    }
+
+    public function equal(string $value): self
+    {
+        $this->idFilter->equal($value);
+        return $this;
+    }
+
+    public function notEqual(string $value): self
+    {
+        $this->idFilter->notEqual($value);
+        return $this;
+    }
+
+    public function containsAny(array $values): self
+    {
+        $this->idFilter->containsAny($values);
+        return $this;
+    }
+
+    public function containsAll(array $values): self
+    {
+        $this->idFilter->containsAll($values);
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'path' => [$this->linkOn],
+            'operator' => 'Equal',
+            'valueObject' => $this->idFilter->toArray()
         ];
     }
 }
