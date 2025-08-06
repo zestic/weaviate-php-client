@@ -59,6 +59,9 @@ class QueryBuilder
     /** @var array<string> */
     private array $returnProperties = [];
 
+    /** @var array<string, array<string>> */
+    private array $returnReferences = [];
+
     private ?string $defaultFields = null;
 
     public function __construct(
@@ -105,6 +108,19 @@ class QueryBuilder
     }
 
     /**
+     * Set cross-references to include in the query results
+     *
+     * @param array<string, array<string>> $references Array mapping reference property names to arrays of
+     *                                                  properties to return
+     * @return $this
+     */
+    public function returnReferences(array $references): self
+    {
+        $this->returnReferences = $references;
+        return $this;
+    }
+
+    /**
      * Set default fields for queries when no specific properties are requested
      *
      * @param string $fields Space-separated list of default fields
@@ -114,6 +130,16 @@ class QueryBuilder
     {
         $this->defaultFields = $fields;
         return $this;
+    }
+
+    /**
+     * Create an aggregation query builder
+     *
+     * @return AggregateBuilder An aggregation query builder instance
+     */
+    public function aggregate(): AggregateBuilder
+    {
+        return new AggregateBuilder($this->connection, $this->className, $this->tenant);
     }
 
     /**
@@ -144,6 +170,12 @@ class QueryBuilder
             ? $this->getDefaultFields()
             : implode(' ', $this->returnProperties) . ' _additional { id }';
 
+        // Add cross-references to fields
+        if (!empty($this->returnReferences)) {
+            $referenceFields = $this->buildReferenceFields();
+            $fields .= ' ' . $referenceFields;
+        }
+
         $whereClause = $this->filter ? $this->buildWhereClause() : '';
         $limitClause = $this->limit ? "limit: {$this->limit}" : '';
         $tenantClause = $this->tenant ? "tenant: \"{$this->tenant}\"" : '';
@@ -159,6 +191,23 @@ class QueryBuilder
         );
 
         return ['query' => $query];
+    }
+
+    /**
+     * Build the reference fields for GraphQL
+     *
+     * @return string The formatted reference fields
+     */
+    private function buildReferenceFields(): string
+    {
+        $referenceFields = [];
+
+        foreach ($this->returnReferences as $linkOn => $properties) {
+            $propertyList = implode(' ', $properties);
+            $referenceFields[] = "{$linkOn} { ... on {$this->className} { {$propertyList} } }";
+        }
+
+        return implode(' ', $referenceFields);
     }
 
     /**

@@ -721,4 +721,73 @@ class TenantsTest extends TestCase
         $this->assertArrayHasKey('tenant1', $result);
         $this->assertArrayNotHasKey('tenant2', $result);
     }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::existsBatch
+     */
+    public function testCanCheckMultipleTenantsExist(): void
+    {
+        $this->connection
+            ->expects($this->exactly(3))
+            ->method('head')
+            ->willReturnMap([
+                ['/v1/schema/TestCollection/tenants/tenant1', true],
+                ['/v1/schema/TestCollection/tenants/tenant2', false],
+                ['/v1/schema/TestCollection/tenants/tenant3', true]
+            ]);
+
+        $result = $this->tenants->existsBatch(['tenant1', 'tenant2', 'tenant3']);
+
+        $expected = [
+            'tenant1' => true,
+            'tenant2' => false,
+            'tenant3' => true
+        ];
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::createBatch
+     */
+    public function testCanCreateMultipleTenantsInBatch(): void
+    {
+        $tenantNames = ['tenant1', 'tenant2', 'tenant3'];
+
+        $this->connection
+            ->expects($this->once())
+            ->method('post')
+            ->with(
+                '/v1/schema/TestCollection/tenants',
+                [
+                    ['name' => 'tenant1', 'activityStatus' => 'HOT'],
+                    ['name' => 'tenant2', 'activityStatus' => 'HOT'],
+                    ['name' => 'tenant3', 'activityStatus' => 'HOT']
+                ]
+            );
+
+        $this->tenants->createBatch($tenantNames);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::activateBatch
+     */
+    public function testCanActivateMultipleTenantsInBatch(): void
+    {
+        $tenantNames = ['tenant1', 'tenant2', 'tenant3'];
+
+        $this->connection
+            ->expects($this->once())
+            ->method('put')
+            ->with(
+                '/v1/schema/TestCollection/tenants',
+                [
+                    ['name' => 'tenant1', 'activityStatus' => 'HOT'],
+                    ['name' => 'tenant2', 'activityStatus' => 'HOT'],
+                    ['name' => 'tenant3', 'activityStatus' => 'HOT']
+                ]
+            );
+
+        $this->tenants->activateBatch($tenantNames);
+    }
 }

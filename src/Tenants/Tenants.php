@@ -184,6 +184,51 @@ class Tenants
     }
 
     /**
+     * Check if multiple tenants exist
+     *
+     * @param array<string|Tenant> $tenants Array of tenant names or Tenant objects
+     * @return array<string, bool> Array mapping tenant names to existence status
+     */
+    public function existsBatch(array $tenants): array
+    {
+        $results = [];
+
+        foreach ($tenants as $tenant) {
+            $tenantName = $tenant instanceof Tenant ? $tenant->getName() : $tenant;
+            $results[$tenantName] = $this->exists($tenantName);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Create multiple tenants in batch
+     *
+     * @param array<string> $tenantNames Array of tenant names to create
+     * @return void
+     */
+    public function createBatch(array $tenantNames): void
+    {
+        $this->create($tenantNames);
+    }
+
+    /**
+     * Activate multiple tenants in batch
+     *
+     * @param array<string> $tenantNames Array of tenant names to activate
+     * @return void
+     */
+    public function activateBatch(array $tenantNames): void
+    {
+        $tenants = [];
+        foreach ($tenantNames as $name) {
+            $tenants[] = new TenantUpdate($name, TenantActivityStatus::ACTIVE);
+        }
+
+        $this->update($tenants);
+    }
+
+    /**
      * Update one or more tenants
      *
      * @param Tenant|TenantUpdate|array<Tenant|TenantUpdate> $tenants
