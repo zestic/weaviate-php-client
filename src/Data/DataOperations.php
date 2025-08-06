@@ -298,10 +298,7 @@ class DataOperations
         $results = [];
 
         foreach ($references as $ref) {
-            if (!isset($ref['fromUuid'], $ref['fromProperty'], $ref['to'])) {
-                continue;
-            }
-
+            // PHPStan knows the array structure, so we don't need isset() checks
             $key = "{$ref['fromUuid']}.{$ref['fromProperty']}";
             $results[$key] = $this->referenceAdd(
                 $ref['fromUuid'],

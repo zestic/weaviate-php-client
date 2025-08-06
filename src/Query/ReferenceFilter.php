@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 namespace Weaviate\Query;
 
+use Weaviate\Query\PropertyFilter;
+use Weaviate\Query\IdFilter;
+
 /**
  * Cross-reference filter for Weaviate GraphQL queries
  *
@@ -39,7 +42,7 @@ namespace Weaviate\Query;
  * $filter = Filter::byRef('hasCategory')->byProperty('status')->equal('active');
  * ```
  */
-class ReferenceFilter extends Filter
+class ReferenceFilter
 {
     private string $linkOn;
     private ?PropertyFilter $propertyFilter = null;

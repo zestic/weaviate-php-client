@@ -216,9 +216,13 @@ class CrossReferenceIntegrationTest extends TestCase
             ->execute();
         
         $this->assertNotEmpty($countResult);
-        $this->assertArrayHasKey('meta', $countResult[0]);
-        $this->assertArrayHasKey('count', $countResult[0]['meta']);
-        $this->assertGreaterThan(0, $countResult[0]['meta']['count']);
+        $this->assertIsArray($countResult);
+
+        $firstResult = reset($countResult);
+        $this->assertIsArray($firstResult);
+        $this->assertArrayHasKey('meta', $firstResult);
+        $this->assertArrayHasKey('count', $firstResult['meta']);
+        $this->assertGreaterThan(0, $firstResult['meta']['count']);
     }
 
     private function createTestCollections(): void
