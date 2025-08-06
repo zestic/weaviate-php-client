@@ -287,7 +287,7 @@ class HttpConnectionTest extends TestCase
     /**
      * @covers \Weaviate\Connection\HttpConnection::head
      */
-    public function testHeadRequestReturnsFalseOnException(): void
+    public function testHeadRequestThrowsExceptionOnNetworkError(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
         $requestFactory = $this->createMock(RequestFactoryInterface::class);
@@ -301,10 +301,17 @@ class HttpConnectionTest extends TestCase
 
         $request->method('withHeader')->willReturnSelf();
 
+        $networkException = new class ('Network error') extends \Exception implements NetworkExceptionInterface {
+            public function getRequest(): \Psr\Http\Message\RequestInterface
+            {
+                throw new \RuntimeException('Not implemented');
+            }
+        };
+
         $httpClient->expects($this->once())
             ->method('sendRequest')
             ->with($request)
-            ->willThrowException(new \Exception('Network error'));
+            ->willThrowException($networkException);
 
         $connection = new HttpConnection(
             'http://localhost:8080',
@@ -315,9 +322,53 @@ class HttpConnectionTest extends TestCase
             []
         );
 
-        $result = $connection->head('/v1/objects/Organization/123');
+        $this->expectException(WeaviateConnectionException::class);
+        $this->expectExceptionMessage('Network error');
 
-        $this->assertFalse($result);
+        $connection->head('/v1/objects/Organization/123');
+    }
+
+    /**
+     * @covers \Weaviate\Connection\HttpConnection::head
+     */
+    public function testHeadRequestThrowsExceptionForHttpErrors(): void
+    {
+        $httpClient = $this->createMock(ClientInterface::class);
+        $requestFactory = $this->createMock(RequestFactoryInterface::class);
+        $streamFactory = $this->createMock(StreamFactoryInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $request = $this->createMock(RequestInterface::class);
+        $stream = $this->createMock(StreamInterface::class);
+
+        $response->method('getStatusCode')->willReturn(403);
+        $response->method('getBody')->willReturn($stream);
+        $response->method('getHeaderLine')->with('X-Request-URL')->willReturn('');
+        $stream->method('__toString')->willReturn('{"error": "forbidden"}');
+
+        $requestFactory->expects($this->once())
+            ->method('createRequest')
+            ->with('HEAD', 'http://localhost:8080/v1/objects/Organization/123')
+            ->willReturn($request);
+
+        $request->method('withHeader')->willReturnSelf();
+
+        $httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->with($request)
+            ->willReturn($response);
+
+        $connection = new HttpConnection(
+            'http://localhost:8080',
+            $httpClient,
+            $requestFactory,
+            $streamFactory,
+            null,
+            []
+        );
+
+        $this->expectException(InsufficientPermissionsException::class);
+
+        $connection->head('/v1/objects/Organization/123');
     }
 
     /**

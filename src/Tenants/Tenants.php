@@ -22,6 +22,9 @@ namespace Weaviate\Tenants;
 
 use Weaviate\Connection\ConnectionInterface;
 use Weaviate\Exceptions\NotFoundException;
+use Weaviate\Exceptions\WeaviateConnectionException;
+use Weaviate\Exceptions\UnexpectedStatusCodeException;
+use Weaviate\Exceptions\InsufficientPermissionsException;
 
 /**
  * Tenant management API for Weaviate collections
@@ -131,6 +134,9 @@ class Tenants
      *
      * @param string|Tenant $tenant The tenant name or Tenant object
      * @return Tenant|null The tenant if found, null otherwise
+     * @throws WeaviateConnectionException For network or connection errors
+     * @throws UnexpectedStatusCodeException For HTTP errors other than 404
+     * @throws InsufficientPermissionsException For permission errors
      */
     public function getByName(string|Tenant $tenant): ?Tenant
     {
@@ -140,8 +146,11 @@ class Tenants
             $response = $this->connection->get("/v1/schema/{$this->collectionName}/tenants/{$tenantName}");
             return Tenant::fromArray($response);
         } catch (NotFoundException) {
+            // Return null for 404 Not Found - tenant doesn't exist
             return null;
         }
+        // Let other exceptions (network errors, permission errors, etc.) bubble up
+        // as they indicate actual problems that should be handled by the caller
     }
 
     /**
@@ -162,7 +171,10 @@ class Tenants
      * Check if a tenant exists
      *
      * @param string|Tenant $tenant The tenant name or Tenant object
-     * @return bool True if the tenant exists, false otherwise
+     * @return bool True if the tenant exists, false if it doesn't exist
+     * @throws WeaviateConnectionException For network or connection errors
+     * @throws UnexpectedStatusCodeException For HTTP errors other than 404
+     * @throws InsufficientPermissionsException For permission errors
      */
     public function exists(string|Tenant $tenant): bool
     {

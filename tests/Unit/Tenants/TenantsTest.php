@@ -243,6 +243,23 @@ class TenantsTest extends TestCase
     }
 
     /**
+     * @covers \Weaviate\Tenants\Tenants::getByName
+     */
+    public function testGetByNameThrowsExceptionOnConnectionError(): void
+    {
+        $this->connection
+            ->expects($this->once())
+            ->method('get')
+            ->with('/v1/schema/TestCollection/tenants/tenant1')
+            ->willThrowException(new \Weaviate\Exceptions\WeaviateConnectionException('Network error'));
+
+        $this->expectException(\Weaviate\Exceptions\WeaviateConnectionException::class);
+        $this->expectExceptionMessage('Network error');
+
+        $this->tenants->getByName('tenant1');
+    }
+
+    /**
      * @covers \Weaviate\Tenants\Tenants::exists
      */
     public function testCanCheckIfTenantExists(): void
@@ -290,6 +307,23 @@ class TenantsTest extends TestCase
         $result = $this->tenants->exists($tenant);
 
         $this->assertTrue($result);
+    }
+
+    /**
+     * @covers \Weaviate\Tenants\Tenants::exists
+     */
+    public function testExistsThrowsExceptionOnConnectionError(): void
+    {
+        $this->connection
+            ->expects($this->once())
+            ->method('head')
+            ->with('/v1/schema/TestCollection/tenants/tenant1')
+            ->willThrowException(new \Weaviate\Exceptions\WeaviateConnectionException('Network error'));
+
+        $this->expectException(\Weaviate\Exceptions\WeaviateConnectionException::class);
+        $this->expectExceptionMessage('Network error');
+
+        $this->tenants->exists('tenant1');
     }
 
     /**
