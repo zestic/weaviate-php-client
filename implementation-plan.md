@@ -574,3 +574,105 @@ function connect_to_custom(
 - **Method Signatures**: Similar behavior and naming ✅
 - **Feature Parity**: Multi-tenancy fully compatible ✅
 
+---
+
+## 🧪 Test-Driven Development Methodology
+
+### TDD Approach Used
+
+The implementation followed strict Test-Driven Development principles:
+
+1. **Test Behavior, Not Implementation**: Focused on what the code should do, not how it does it
+2. **Mocks for External Dependencies**: Used mocks for HTTP clients, authentication, etc.
+3. **Integration Tests for Real Scenarios**: Verified complete workflow against real Weaviate instance
+4. **Comprehensive Error Testing**: Ensured proper error handling for all edge cases
+5. **Multi-Tenancy Verification**: Verified tenant isolation and proper parameter passing
+
+### TDD Implementation Process
+
+#### Step 1: Write Failing Tests
+Start by writing tests for the interfaces and expected behavior. All tests should fail initially since no implementation exists.
+
+#### Step 2: Create Minimal Implementation
+Create just enough code to make the tests pass. Focus on:
+- Interface contracts
+- Method signatures
+- Basic return types
+
+#### Step 3: Refactor and Improve
+Once tests pass, refactor the implementation while keeping tests green:
+- Add error handling
+- Improve performance
+- Add validation
+
+#### Step 4: Add More Tests
+As you discover edge cases and requirements, add more tests:
+- Error conditions
+- Edge cases
+- Performance requirements
+
+### Key Testing Principles
+
+1. **Test Behavior, Not Implementation**: Focus on what the code should do, not how it does it.
+
+2. **Use Mocks for External Dependencies**: Mock HTTP clients, authentication, etc. to isolate units under test.
+
+3. **Integration Tests for Real Scenarios**: Use integration tests to verify the complete workflow against a real Weaviate instance.
+
+4. **Test Error Conditions**: Ensure proper error handling for network failures, authentication errors, etc.
+
+5. **Test Multi-Tenancy**: Verify tenant isolation and proper tenant parameter passing.
+
+### Test Structure
+
+The testing framework follows this directory structure:
+
+```
+tests/
+├── Unit/
+│   ├── Connection/
+│   ├── Collections/
+│   ├── Data/
+│   └── Auth/
+├── Integration/
+│   ├── Collections/
+│   └── Data/
+└── TestCase.php
+```
+
+### Running Tests
+
+```bash
+# Unit tests only
+./vendor/bin/phpunit tests/Unit
+
+# Integration tests (requires running Weaviate)
+./vendor/bin/phpunit tests/Integration
+
+# All tests
+./vendor/bin/phpunit
+
+# With coverage
+./vendor/bin/phpunit --coverage-html coverage
+```
+
+### Historical Implementation Record
+
+#### Key Lessons Learned
+- **Tenant Isolation Critical**: The original `withTenant()` method modified the original instance, breaking isolation
+- **API Compatibility Important**: Weaviate uses legacy status names (HOT/COLD/FROZEN) that need mapping
+- **Connection Interface Limitations**: Need for `deleteWithData()` method revealed interface gaps
+- **PHPStan Strictness**: Type annotations need to match actual usage patterns
+
+#### TDD Benefits Achieved
+This TDD approach ensured that:
+- ✅ We built exactly what was needed
+- ✅ The API is usable and intuitive
+- ✅ We have comprehensive test coverage from day one
+- ✅ Refactoring is safe and confident
+- ✅ Production-ready code with verified tenant isolation
+
+---
+
+This implementation plan provides a clear roadmap for evolving the Weaviate PHP client from its current multi-tenancy foundation to a comprehensive, production-ready client that matches the Python client's capabilities while maintaining PHP's strengths and conventions.
+
