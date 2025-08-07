@@ -307,4 +307,338 @@ class QueryBuilderTest extends TestCase
 
         $this->assertEquals([], $result);
     }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::setDefaultFields
+     */
+    public function testSetDefaultFields(): void
+    {
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+        $result = $queryBuilder->setDefaultFields('title content author');
+
+        $this->assertSame($queryBuilder, $result);
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
+     */
+    public function testFetchObjectsWithDefaultFields(): void
+    {
+        $response = [
+            'data' => [
+                'Get' => [
+                    'TestClass' => [
+                        ['title' => 'Test Article', '_additional' => ['id' => '123']]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->connection->expects($this->once())
+            ->method('post')
+            ->willReturn($response);
+
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+        $queryBuilder->setDefaultFields('title content author');
+        $result = $queryBuilder->fetchObjects();
+
+        $this->assertEquals([['title' => 'Test Article', '_additional' => ['id' => '123']]], $result);
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::aggregate
+     */
+    public function testAggregate(): void
+    {
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+        $aggregateBuilder = $queryBuilder->aggregate();
+
+        $this->assertInstanceOf(\Weaviate\Query\AggregateBuilder::class, $aggregateBuilder);
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
+     */
+    public function testFetchObjectsWithComplexFilter(): void
+    {
+        $response = [
+            'data' => [
+                'Get' => [
+                    'TestClass' => []
+                ]
+            ]
+        ];
+
+        // Test complex filter that exercises arrayToGraphQL method
+        $complexFilter = Filter::allOf([
+            Filter::byProperty('status')->equal('published'),
+            Filter::byProperty('featured')->equal(true)
+        ]);
+
+        $this->connection->expects($this->once())
+            ->method('post')
+            ->willReturn($response);
+
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+        $result = $queryBuilder->where($complexFilter)->fetchObjects();
+
+        $this->assertEquals([], $result);
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
+     */
+    public function testFetchObjectsWithDifferentFilterTypes(): void
+    {
+        $response = [
+            'data' => [
+                'Get' => [
+                    'TestClass' => []
+                ]
+            ]
+        ];
+
+        $this->connection->expects($this->exactly(4))
+            ->method('post')
+            ->willReturn($response);
+
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+
+        // Test with null value
+        $queryBuilder->where(Filter::byProperty('deletedAt')->equal(null))->fetchObjects();
+
+        // Test with boolean value
+        $queryBuilder->where(Filter::byProperty('featured')->equal(true))->fetchObjects();
+
+        // Test with numeric value
+        $queryBuilder->where(Filter::byProperty('count')->greaterThan(10))->fetchObjects();
+
+        // Test with string value
+        $queryBuilder->where(Filter::byProperty('status')->equal('published'))->fetchObjects();
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
+     */
+    public function testFetchObjectsWithTenantReturnsEmptyArray(): void
+    {
+        $response = [
+            'data' => [
+                'Get' => [
+                    'TestClass' => []
+                ]
+            ]
+        ];
+
+        $this->connection->expects($this->once())
+            ->method('post')
+            ->willReturn($response);
+
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass', 'tenant-123');
+        $result = $queryBuilder->fetchObjects();
+
+        $this->assertEquals([], $result);
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::returnReferences
+     */
+    public function testReturnReferences(): void
+    {
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+        $result = $queryBuilder->returnReferences([
+            'hasCategory' => ['title', 'description'],
+            'hasAuthor' => ['name', 'email']
+        ]);
+
+        $this->assertSame($queryBuilder, $result);
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
+     */
+    public function testFetchObjectsWithReferences(): void
+    {
+        $response = [
+            'data' => [
+                'Get' => [
+                    'TestClass' => [
+                        [
+                            'title' => 'Test Article',
+                            '_additional' => ['id' => '123'],
+                            'hasCategory' => [
+                                'title' => 'Technology',
+                                'description' => 'Tech articles'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->connection->expects($this->once())
+            ->method('post')
+            ->willReturn($response);
+
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+        $result = $queryBuilder
+            ->returnReferences(['hasCategory' => ['title', 'description']])
+            ->fetchObjects();
+
+        $expected = [
+            [
+                'title' => 'Test Article',
+                '_additional' => ['id' => '123'],
+                'hasCategory' => [
+                    'title' => 'Technology',
+                    'description' => 'Tech articles'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
+     */
+    public function testFetchObjectsWithMultipleReferences(): void
+    {
+        $response = [
+            'data' => [
+                'Get' => [
+                    'TestClass' => []
+                ]
+            ]
+        ];
+
+        $this->connection->expects($this->once())
+            ->method('post')
+            ->willReturn($response);
+
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+        $result = $queryBuilder
+            ->returnReferences([
+                'hasCategory' => ['title', 'description'],
+                'hasAuthor' => ['name', 'email'],
+                'hasTags' => ['name']
+            ])
+            ->fetchObjects();
+
+        $this->assertEquals([], $result);
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
+     */
+    public function testFetchObjectsWithFilterAndReferences(): void
+    {
+        $response = [
+            'data' => [
+                'Get' => [
+                    'TestClass' => []
+                ]
+            ]
+        ];
+
+        $this->connection->expects($this->once())
+            ->method('post')
+            ->willReturn($response);
+
+        $filter = Filter::byProperty('status')->equal('published');
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+        $result = $queryBuilder
+            ->where($filter)
+            ->returnReferences(['hasCategory' => ['title']])
+            ->returnProperties(['title', 'content'])
+            ->limit(10)
+            ->fetchObjects();
+
+        $this->assertEquals([], $result);
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
+     */
+    public function testFetchObjectsWithComplexNestedFilter(): void
+    {
+        $response = [
+            'data' => [
+                'Get' => [
+                    'TestClass' => []
+                ]
+            ]
+        ];
+
+        $this->connection->expects($this->once())
+            ->method('post')
+            ->willReturn($response);
+
+        // Create a complex nested filter to exercise arrayToGraphQL method thoroughly
+        $complexFilter = Filter::allOf([
+            Filter::anyOf([
+                Filter::byProperty('status')->equal('published'),
+                Filter::byProperty('status')->equal('featured')
+            ]),
+            Filter::byProperty('viewCount')->greaterThan(100),
+            Filter::byRef('hasCategory')->byProperty('active')->equal(true)
+        ]);
+
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+        $result = $queryBuilder->where($complexFilter)->fetchObjects();
+
+        $this->assertEquals([], $result);
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
+     */
+    public function testFetchObjectsWithArrayContainsAnyFilter(): void
+    {
+        $response = [
+            'data' => [
+                'Get' => [
+                    'TestClass' => []
+                ]
+            ]
+        ];
+
+        $this->connection->expects($this->once())
+            ->method('post')
+            ->willReturn($response);
+
+        // Test containsAny filter to exercise array value handling in arrayToGraphQL
+        $filter = Filter::byProperty('tags')->containsAny(['php', 'javascript', 'python']);
+
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+        $result = $queryBuilder->where($filter)->fetchObjects();
+
+        $this->assertEquals([], $result);
+    }
+
+    /**
+     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
+     */
+    public function testFetchObjectsWithStringArrayFilter(): void
+    {
+        $response = [
+            'data' => [
+                'Get' => [
+                    'TestClass' => []
+                ]
+            ]
+        ];
+
+        $this->connection->expects($this->once())
+            ->method('post')
+            ->willReturn($response);
+
+        // Test string array with special characters to exercise escaping
+        $filter = Filter::byProperty('categories')->containsAny(['tech & science', 'art "quotes"']);
+
+        $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
+        $result = $queryBuilder->where($filter)->fetchObjects();
+
+        $this->assertEquals([], $result);
+    }
 }

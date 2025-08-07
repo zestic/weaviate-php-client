@@ -24,6 +24,13 @@ This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE
 composer require zestic/weaviate-php-client
 ```
 
+## Examples
+
+For comprehensive examples, see the [examples directory](examples/):
+- [Getting Started](examples/getting_started.php) - Complete end-to-end example with multi-tenancy
+- [Error Handling](examples/error_handling_examples.php) - Comprehensive error handling patterns
+- [Schema Management](examples/schema_management.php) - Collection and schema operations
+
 ## Basic Usage
 
 ### Quick Start with connectToLocal

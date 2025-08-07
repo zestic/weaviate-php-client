@@ -200,4 +200,148 @@ class ReferenceFilterTest extends TestCase
 
         $this->assertEquals($expected, $filter->toArray());
     }
+
+    /**
+     * @covers \Weaviate\Query\ReferenceFilter::__construct
+     */
+    public function testConstructorSetsLinkOn(): void
+    {
+        $filter = new ReferenceFilter('hasAuthor');
+
+        // Test that the linkOn is properly set by checking toArray output
+        $result = $filter->toArray();
+        $this->assertEquals(['hasAuthor'], $result['path']);
+    }
+
+    /**
+     * @covers \Weaviate\Query\ReferenceFilter::byProperty
+     * @covers \Weaviate\Query\ReferenceFilter::toArray
+     */
+    public function testToArrayWithPropertyFilter(): void
+    {
+        $filter = new ReferenceFilter('hasCategory');
+        $propertyFilter = $filter->byProperty('title');
+        $propertyFilter->equal('Technology');
+
+        // The ReferenceFilter itself should return the default case
+        // since it doesn't store the property filter internally
+        $expected = [
+            'path' => ['hasCategory'],
+            'operator' => 'Equal',
+            'valueObject' => []
+        ];
+
+        $this->assertEquals($expected, $filter->toArray());
+    }
+
+    /**
+     * @covers \Weaviate\Query\ReferenceFilter::byId
+     * @covers \Weaviate\Query\ReferenceFilter::toArray
+     */
+    public function testToArrayWithIdFilter(): void
+    {
+        $filter = new ReferenceFilter('hasCategory');
+        $idFilter = $filter->byId();
+        $idFilter->equal('123e4567-e89b-12d3-a456-426614174000');
+
+        // The ReferenceFilter itself should return the default case
+        // since it doesn't store the id filter internally
+        $expected = [
+            'path' => ['hasCategory'],
+            'operator' => 'Equal',
+            'valueObject' => []
+        ];
+
+        $this->assertEquals($expected, $filter->toArray());
+    }
+
+    /**
+     * @covers \Weaviate\Query\ReferenceFilter::byProperty
+     */
+    public function testByPropertyReturnsReferencePropertyFilter(): void
+    {
+        $filter = new ReferenceFilter('hasCategory');
+        $propertyFilter = $filter->byProperty('title');
+
+        $this->assertInstanceOf(\Weaviate\Query\ReferencePropertyFilter::class, $propertyFilter);
+    }
+
+    /**
+     * @covers \Weaviate\Query\ReferenceFilter::byId
+     */
+    public function testByIdReturnsReferenceIdFilter(): void
+    {
+        $filter = new ReferenceFilter('hasCategory');
+        $idFilter = $filter->byId();
+
+        $this->assertInstanceOf(\Weaviate\Query\ReferenceIdFilter::class, $idFilter);
+    }
+
+    /**
+     * @covers \Weaviate\Query\ReferenceFilter::toArray
+     */
+    public function testToArrayWithPropertyFilterSet(): void
+    {
+        $filter = new ReferenceFilter('hasCategory');
+
+        // Use reflection to set the private propertyFilter property
+        $reflection = new \ReflectionClass($filter);
+        $propertyFilterProperty = $reflection->getProperty('propertyFilter');
+        $propertyFilterProperty->setAccessible(true);
+
+        $mockPropertyFilter = $this->createMock(\Weaviate\Query\PropertyFilter::class);
+        $mockPropertyFilter->method('toArray')->willReturn([
+            'path' => ['title'],
+            'operator' => 'Equal',
+            'valueText' => 'Technology'
+        ]);
+
+        $propertyFilterProperty->setValue($filter, $mockPropertyFilter);
+
+        $expected = [
+            'path' => ['hasCategory'],
+            'operator' => 'Equal',
+            'valueObject' => [
+                'path' => ['title'],
+                'operator' => 'Equal',
+                'valueText' => 'Technology'
+            ]
+        ];
+
+        $this->assertEquals($expected, $filter->toArray());
+    }
+
+    /**
+     * @covers \Weaviate\Query\ReferenceFilter::toArray
+     */
+    public function testToArrayWithIdFilterSet(): void
+    {
+        $filter = new ReferenceFilter('hasCategory');
+
+        // Use reflection to set the private idFilter property
+        $reflection = new \ReflectionClass($filter);
+        $idFilterProperty = $reflection->getProperty('idFilter');
+        $idFilterProperty->setAccessible(true);
+
+        $mockIdFilter = $this->createMock(\Weaviate\Query\IdFilter::class);
+        $mockIdFilter->method('toArray')->willReturn([
+            'path' => ['id'],
+            'operator' => 'Equal',
+            'valueText' => '123e4567-e89b-12d3-a456-426614174000'
+        ]);
+
+        $idFilterProperty->setValue($filter, $mockIdFilter);
+
+        $expected = [
+            'path' => ['hasCategory'],
+            'operator' => 'Equal',
+            'valueObject' => [
+                'path' => ['id'],
+                'operator' => 'Equal',
+                'valueText' => '123e4567-e89b-12d3-a456-426614174000'
+            ]
+        ];
+
+        $this->assertEquals($expected, $filter->toArray());
+    }
 }

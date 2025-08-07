@@ -415,7 +415,7 @@ echo "Title: " . $post['title'] . "\n";
 If you encounter issues during migration:
 
 1. Check the [API Documentation](API.md) for detailed method signatures
-2. Review the [examples](../example_usage.php) for common patterns
+2. Review the [examples](../examples/) for common patterns
 3. Run the test suite to see working examples
 4. Open an issue on GitHub for specific migration questions
 

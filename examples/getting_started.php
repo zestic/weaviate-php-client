@@ -1,9 +1,32 @@
 <?php
 
-require_once 'vendor/autoload.php';
+declare(strict_types=1);
+
+/*
+ * Getting Started Example for Weaviate PHP Client
+ *
+ * This comprehensive example demonstrates the core features of the Weaviate PHP
+ * client including connection methods, multi-tenancy, and basic CRUD operations.
+ *
+ * Run this example to see the client in action:
+ * php examples/getting_started.php
+ */
+
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Weaviate\WeaviateClient;
-use Weaviate\Auth\ApiKey;
+
+/**
+ * Getting Started Example
+ *
+ * This comprehensive example demonstrates the core features of the Weaviate PHP
+ * client including connection methods, multi-tenancy, and basic CRUD operations.
+ *
+ * Run this example to see the client in action:
+ * php examples/getting_started.php
+ */
+
+echo "=== Weaviate PHP Client - Getting Started Example ===\n\n";
 
 // Easy way: Connect to local Weaviate instance
 $client = WeaviateClient::connectToLocal();
@@ -12,13 +35,25 @@ $client = WeaviateClient::connectToLocal();
 // $client = WeaviateClient::connectToLocal('localhost:18080');
 
 // Connect with authentication
-// $client = WeaviateClient::connectToLocal('localhost:8080', new ApiKey('your-api-key'));
+// $client = WeaviateClient::connectToLocal(
+//     'localhost:8080',
+//     new ApiKey('your-api-key')
+// );
 
 // Connect to Weaviate Cloud
-// $client = WeaviateClient::connectToWeaviateCloud('my-cluster.weaviate.network', new ApiKey('your-wcd-api-key'));
+// $client = WeaviateClient::connectToWeaviateCloud(
+//     'my-cluster.weaviate.network',
+//     new ApiKey('your-wcd-api-key')
+// );
 
 // Connect to custom Weaviate instance
-// $client = WeaviateClient::connectToCustom('my-server.com', 9200, true, new ApiKey('api-key'), ['X-Custom-Header' => 'value']);
+// $client = WeaviateClient::connectToCustom(
+//     'my-server.com',
+//     9200,
+//     true,
+//     new ApiKey('api-key'),
+//     ['X-Custom-Header' => 'value']
+// );
 
 // Advanced way: Manual connection setup
 /*
@@ -49,13 +84,16 @@ try {
     // Example 2: Create a collection with multi-tenancy
     if (!$exists) {
         echo "Creating 'Organization' collection...\n";
-        $result = $client->collections()->create('Organization', [
-            'properties' => [
-                ['name' => 'name', 'dataType' => ['text']],
-                ['name' => 'createdAt', 'dataType' => ['date']]
-            ],
-            'multiTenancyConfig' => ['enabled' => true]
-        ]);
+        $result = $client->collections()->create(
+            'Organization',
+            [
+                'properties' => [
+                    ['name' => 'name', 'dataType' => ['text']],
+                    ['name' => 'createdAt', 'dataType' => ['date']]
+                ],
+                'multiTenancyConfig' => ['enabled' => true]
+            ]
+        );
         echo "Collection created: " . $result['class'] . "\n";
     }
 
@@ -71,11 +109,13 @@ try {
     $result = $client->collections()->get('Organization')
         ->withTenant('example-tenant')
         ->data()
-        ->create([
-            'id' => $orgId,
-            'name' => 'Example Organization',
-            'createdAt' => '2024-01-01T00:00:00Z'
-        ]);
+        ->create(
+            [
+                'id' => $orgId,
+                'name' => 'Example Organization',
+                'createdAt' => '2024-01-01T00:00:00Z'
+            ]
+        );
     echo "Object created with ID: " . $result['id'] . "\n";
 
     // Example 5: Retrieve the object
@@ -91,9 +131,12 @@ try {
     $updated = $client->collections()->get('Organization')
         ->withTenant('example-tenant')
         ->data()
-        ->update($orgId, [
-            'name' => 'Updated Organization'
-        ]);
+        ->update(
+            $orgId,
+            [
+                'name' => 'Updated Organization'
+            ]
+        );
     echo "Updated object: " . $updated['properties']['name'] . "\n";
 
     // Example 7: Delete the object
