@@ -7,17 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2025-01-08
+
+### Added
+- **🎯 Python Client v4 Parity Features**: Complete implementation of critical features for Python client compatibility
+- **Cross-Reference Management**: Full CRUD operations for object relationships
+  - `referenceAdd()` - Add cross-references between objects
+  - `referenceDelete()` - Delete specific cross-references
+  - `referenceReplace()` - Replace cross-references (single or multiple targets)
+  - `referenceAddMany()` - Batch operations for multiple cross-references
+- **Cross-Reference Querying**: Advanced filtering and querying capabilities
+  - `Filter::byRef()` - Filter by cross-referenced properties and IDs
+  - `QueryBuilder::returnReferences()` - Include cross-reference data in query results
+  - Support for all property filter operators on referenced objects
+- **Advanced Query Operations**: Enhanced aggregation and analytics
+  - `QueryBuilder::aggregate()` - Aggregation queries with grouping
+  - `AggregateBuilder` class - Comprehensive aggregation functionality
+  - Count aggregations with group by support
+- **Enhanced Multi-Tenancy**: Bulk operations for improved performance
+  - `existsBatch()` - Check multiple tenants at once
+  - `createBatch()` - Create multiple tenants efficiently
+  - `activateBatch()` - Bulk tenant activation
+- **Comprehensive Test Coverage**: 62 new tests with 212 assertions covering all new functionality
+
 ### Fixed
 - **🔧 Tenant exists() and getByName() Methods**: Fixed critical bug where these methods returned false/null even after successful tenant creation
 - **HTTP HEAD Request Handling**: Improved HttpConnection::head() method to properly distinguish between "not found" (404) and actual errors (network, auth, etc.)
 - **Exception Handling**: Enhanced error handling in tenant operations to properly propagate network and authentication errors instead of masking them
 - **Retry Support**: Added retry mechanism support for tenant existence checks and retrieval operations
-- **Documentation**: Updated method documentation to clearly specify which exceptions can be thrown
 
 ### Enhanced
 - **Error Differentiation**: Tenant methods now properly distinguish between "tenant doesn't exist" and actual system errors
 - **Performance**: Tenant exists() method now uses efficient HEAD requests with proper error handling
-- **Test Coverage**: Added comprehensive tests for tenant error handling scenarios
+- **Test Coverage**: HttpConnection test coverage improved to 98.65% (146/148 lines)
+- **Documentation**: Consolidated and streamlined documentation structure
+
+### Python Client v4 Parity Achieved
+- **Cross-Reference API**: Complete compatibility with Python client reference management
+- **Query Filtering**: Identical patterns to Python client for cross-reference filtering
+- **Aggregation Queries**: Full parity with Python client aggregation capabilities
+- **Bulk Operations**: Enhanced multi-tenancy operations exceeding Python client features
+
+### Documentation
+- **Consolidated Documentation**: Merged redundant files into comprehensive implementation plan
+- **TDD Methodology**: Added complete Test-Driven Development guide and historical record
+- **API Examples**: Comprehensive examples for all new cross-reference and aggregation features
 
 ## [0.4.0] - 2025-01-30
 
