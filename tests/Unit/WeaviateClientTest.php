@@ -30,6 +30,15 @@ use Weaviate\Exceptions\WeaviateInvalidInputException;
 class WeaviateClientTest extends TestCase
 {
     /**
+     * @covers \Weaviate\WeaviateClient::getConnection
+     */
+    public function testGetConnectionReturnsConnectionInstance(): void
+    {
+        $connection = $this->createMock(ConnectionInterface::class);
+        $client = new WeaviateClient($connection);
+        $this->assertSame($connection, $client->getConnection());
+    }
+    /**
      * @covers \Weaviate\WeaviateClient::__construct
      */
     public function testCanCreateClientWithConnection(): void

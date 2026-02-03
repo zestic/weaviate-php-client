@@ -240,25 +240,21 @@ class WeaviateClient
         return $clusterUrl;
     }
 
-    /**
-     * Get the authentication instance
-     */
     public function getAuth(): ?AuthInterface
     {
         return $this->auth;
     }
 
-    /**
-     * Get collections API
-     */
+    public function getConnection(): ConnectionInterface
+    {
+        return $this->connection;
+    }
+
     public function collections(): Collections
     {
         return new Collections($this->connection);
     }
 
-    /**
-     * Get schema API
-     */
     public function schema(): Schema
     {
         return new Schema($this->connection);

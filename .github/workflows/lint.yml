@@ -13,7 +13,7 @@ jobs:
     
     strategy:
       matrix:
-        php-version: ['8.3', '8.4']
+        php-version: ['8.4', '8.5']
     
     steps:
     - uses: actions/checkout@v4
@@ -53,7 +53,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.3'
+        php-version: '8.4'
         extensions: json, curl
         tools: composer:v2
     
@@ -82,7 +82,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.3'
+        php-version: '8.5'
         extensions: json, curl
         tools: composer:v2
     
@@ -91,9 +91,9 @@ jobs:
       uses: actions/cache@v3
       with:
         path: vendor
-        key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-php-8.5-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
-          ${{ runner.os }}-php-8.3-
+          ${{ runner.os }}-php-8.5-
     
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
@@ -111,7 +111,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.3'
+        php-version: '8.5'
         tools: composer:v2
 
     - name: Cache Composer packages
@@ -119,9 +119,9 @@ jobs:
       uses: actions/cache@v3
       with:
         path: vendor
-        key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-php-8.5-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
-          ${{ runner.os }}-php-8.3-
+          ${{ runner.os }}-php-8.5-
 
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
