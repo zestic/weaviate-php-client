@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Weaviate\Tests\Integration;
 
-use Weaviate\Tests\TestCase;
-use Weaviate\WeaviateClient;
 use Weaviate\Exceptions\WeaviateBaseException;
 use Weaviate\Exceptions\WeaviateRetryException;
 use Weaviate\Exceptions\UnexpectedStatusCodeException;
 use Weaviate\Exceptions\WeaviateInvalidInputException;
+use Weaviate\Factory\WeaviateClientFactory;
+use Weaviate\Tests\TestCase;
+use Weaviate\WeaviateClient;
 
 class ErrorHandlingTest extends TestCase
 {
@@ -26,13 +27,13 @@ class ErrorHandlingTest extends TestCase
         $scheme = $parsedUrl['scheme'] ?? 'http';
         $secure = $scheme === 'https';
 
-        $this->client = WeaviateClient::connectToCustom($host, $port, $secure);
+        $this->client = WeaviateClientFactory::connectToCustom($host, $port, $secure);
     }
 
     public function testConnectionErrorHandling(): void
     {
         // Test connection to non-existent server
-        $client = WeaviateClient::connectToCustom('non-existent-server.invalid', 8080);
+        $client = WeaviateClientFactory::connectToCustom('non-existent-server.invalid', 8080);
 
         $this->expectException(WeaviateRetryException::class);
         $this->expectExceptionMessage('The request to Weaviate failed after');
@@ -62,7 +63,7 @@ class ErrorHandlingTest extends TestCase
         $this->expectException(WeaviateInvalidInputException::class);
         $this->expectExceptionMessage('Port must be between 1 and 65535');
 
-        WeaviateClient::connectToCustom('localhost', 99999);
+        WeaviateClientFactory::connectToCustom('localhost', 99999);
     }
 
     public function testSchemaValidationErrorHandling(): void

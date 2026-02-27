@@ -25,16 +25,8 @@ use Weaviate\Tenants\Tenant;
 use Weaviate\Tenants\TenantActivityStatus;
 use Weaviate\Tenants\TenantCreate;
 
-/**
- * @covers \Weaviate\Tenants\TenantCreate
- */
 class TenantCreateTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::__construct
-     * @covers \Weaviate\Tenants\TenantCreate::getName
-     * @covers \Weaviate\Tenants\TenantCreate::getActivityStatus
-     */
     public function testCanCreateTenantCreateWithDefaults(): void
     {
         $tenantCreate = new TenantCreate('tenant1');
@@ -43,11 +35,6 @@ class TenantCreateTest extends TestCase
         $this->assertEquals(TenantActivityStatus::ACTIVE, $tenantCreate->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::__construct
-     * @covers \Weaviate\Tenants\TenantCreate::getName
-     * @covers \Weaviate\Tenants\TenantCreate::getActivityStatus
-     */
     public function testCanCreateTenantCreateWithActiveStatus(): void
     {
         $tenantCreate = new TenantCreate('tenant1', TenantActivityStatus::ACTIVE);
@@ -56,11 +43,6 @@ class TenantCreateTest extends TestCase
         $this->assertEquals(TenantActivityStatus::ACTIVE, $tenantCreate->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::__construct
-     * @covers \Weaviate\Tenants\TenantCreate::getName
-     * @covers \Weaviate\Tenants\TenantCreate::getActivityStatus
-     */
     public function testCanCreateTenantCreateWithInactiveStatus(): void
     {
         $tenantCreate = new TenantCreate('tenant1', TenantActivityStatus::INACTIVE);
@@ -69,9 +51,6 @@ class TenantCreateTest extends TestCase
         $this->assertEquals(TenantActivityStatus::INACTIVE, $tenantCreate->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::__construct
-     */
     public function testThrowsExceptionForEmptyName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -80,9 +59,6 @@ class TenantCreateTest extends TestCase
         new TenantCreate('');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::__construct
-     */
     public function testThrowsExceptionForWhitespaceName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -91,9 +67,6 @@ class TenantCreateTest extends TestCase
         new TenantCreate('   ');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::__construct
-     */
     public function testThrowsExceptionForOffloadedStatus(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -102,9 +75,6 @@ class TenantCreateTest extends TestCase
         new TenantCreate('tenant1', TenantActivityStatus::OFFLOADED);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::__construct
-     */
     public function testThrowsExceptionForOffloadingStatus(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -113,9 +83,6 @@ class TenantCreateTest extends TestCase
         new TenantCreate('tenant1', TenantActivityStatus::OFFLOADING);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::__construct
-     */
     public function testThrowsExceptionForOnloadingStatus(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -124,10 +91,6 @@ class TenantCreateTest extends TestCase
         new TenantCreate('tenant1', TenantActivityStatus::ONLOADING);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::toArray
-     * @covers \Weaviate\Tenants\TenantCreate::getApiStatusValue
-     */
     public function testCanConvertToArrayWithActiveStatus(): void
     {
         $tenantCreate = new TenantCreate('tenant1', TenantActivityStatus::ACTIVE);
@@ -139,10 +102,6 @@ class TenantCreateTest extends TestCase
         ], $array);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::toArray
-     * @covers \Weaviate\Tenants\TenantCreate::getApiStatusValue
-     */
     public function testCanConvertToArrayWithInactiveStatus(): void
     {
         $tenantCreate = new TenantCreate('tenant1', TenantActivityStatus::INACTIVE);
@@ -154,9 +113,6 @@ class TenantCreateTest extends TestCase
         ], $array);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::fromTenant
-     */
     public function testCanCreateFromTenantWithActiveStatus(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
@@ -166,9 +122,6 @@ class TenantCreateTest extends TestCase
         $this->assertEquals(TenantActivityStatus::ACTIVE, $tenantCreate->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::fromTenant
-     */
     public function testCanCreateFromTenantWithInactiveStatus(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
@@ -178,9 +131,6 @@ class TenantCreateTest extends TestCase
         $this->assertEquals(TenantActivityStatus::INACTIVE, $tenantCreate->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantCreate::fromTenant
-     */
     public function testFromTenantThrowsExceptionForInvalidStatus(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::OFFLOADED);

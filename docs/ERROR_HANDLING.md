@@ -58,7 +58,7 @@ Thrown when connection to Weaviate fails.
 use Weaviate\Exceptions\WeaviateConnectionException;
 
 try {
-    $client = WeaviateClient::connectToCustom('unreachable-server.com');
+    $client = WeaviateClientFactory::connectToCustom('unreachable-server.com');
     $client->collections()->exists('Test');
 } catch (WeaviateConnectionException $e) {
     echo "Connection failed: " . $e->getMessage();
@@ -210,7 +210,7 @@ Thrown for client-side validation errors.
 use Weaviate\Exceptions\WeaviateInvalidInputException;
 
 try {
-    $client = WeaviateClient::connectToCustom('localhost', 99999); // Invalid port
+    $client = WeaviateClientFactory::connectToCustom('localhost', 99999); // Invalid port
 } catch (WeaviateInvalidInputException $e) {
     echo "Invalid input: " . $e->getMessage();
     

@@ -26,9 +26,6 @@ use Weaviate\Exceptions\WeaviateBaseException;
 
 class WeaviateQueryExceptionTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::__construct
-     */
     public function testCanCreateQueryException(): void
     {
         $exception = new WeaviateQueryException('Query failed');
@@ -45,9 +42,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('query_failure', $context['error_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::__construct
-     */
     public function testCanCreateWithQueryType(): void
     {
         $exception = new WeaviateQueryException('GraphQL error', 'GraphQL');
@@ -58,9 +52,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('GraphQL', $context['query_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::__construct
-     */
     public function testCanCreateWithContext(): void
     {
         $context = ['collection' => 'Article', 'operation' => 'create'];
@@ -73,9 +64,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('query_failure', $resultContext['error_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::getQueryType
-     */
     public function testGetQueryType(): void
     {
         $exception = new WeaviateQueryException('Error', 'Custom');
@@ -83,9 +71,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('Custom', $exception->getQueryType());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::forRestQuery
-     */
     public function testForRestQuery(): void
     {
         $method = 'POST';
@@ -109,9 +94,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('REST', $resultContext['query_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::forGraphQLQuery
-     */
     public function testForGraphQLQuery(): void
     {
         $query = '{ Get { Article { title } } }';
@@ -133,9 +115,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('GraphQL', $resultContext['query_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::forValidation
-     */
     public function testForValidation(): void
     {
         $operation = 'create_object';
@@ -164,9 +143,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('validation', $resultContext['query_subtype']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::forSchema
-     */
     public function testForSchema(): void
     {
         $collection = 'Article';
@@ -189,9 +165,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('schema', $resultContext['query_subtype']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::__construct
-     */
     public function testExceptionChaining(): void
     {
         $previous = new \RuntimeException('Network error');
@@ -200,9 +173,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::forRestQuery
-     */
     public function testForRestQueryWithPreviousException(): void
     {
         $previous = new \Exception('Connection lost');
@@ -211,9 +181,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::forRestQuery
-     */
     public function testForRestQueryWithEmptyContext(): void
     {
         $exception = WeaviateQueryException::forRestQuery('GET', '/test', 'Error');
@@ -224,9 +191,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('rest_api', $context['query_subtype']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::forGraphQLQuery
-     */
     public function testForGraphQLQueryWithEmptyQuery(): void
     {
         $exception = WeaviateQueryException::forGraphQLQuery('', 'Empty query');
@@ -236,9 +200,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('graphql', $context['query_subtype']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::forValidation
-     */
     public function testForValidationWithEmptyErrors(): void
     {
         $exception = WeaviateQueryException::forValidation('test_operation', []);
@@ -249,9 +210,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('validation', $context['query_subtype']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::forSchema
-     */
     public function testForSchemaWithEmptyContext(): void
     {
         $exception = WeaviateQueryException::forSchema('TestCollection', 'update', 'Schema error');
@@ -262,9 +220,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertSame('schema', $context['query_subtype']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::__construct
-     */
     public function testWithEmptyQueryType(): void
     {
         $exception = new WeaviateQueryException('Error', '');
@@ -273,9 +228,6 @@ class WeaviateQueryExceptionTest extends TestCase
         $this->assertStringContainsString('Query call with protocol  failed', $exception->getMessage());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::forValidation
-     */
     public function testForValidationMessageIncludesJsonEncodedErrors(): void
     {
         $validationErrors = ['field1' => 'error1', 'field2' => 'error2'];
@@ -289,9 +241,6 @@ class WeaviateQueryExceptionTest extends TestCase
         }
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateQueryException::forRestQuery
-     */
     public function testForRestQueryWithSpecialCharacters(): void
     {
         $method = 'POST';

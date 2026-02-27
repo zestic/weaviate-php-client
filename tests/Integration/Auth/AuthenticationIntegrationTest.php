@@ -29,12 +29,6 @@ use GuzzleHttp\Psr7\HttpFactory;
 
 class AuthenticationIntegrationTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Auth\ApiKey::__construct
-     * @covers \Weaviate\Auth\ApiKey::apply
-     * @covers \Weaviate\WeaviateClient::__construct
-     * @covers \Weaviate\WeaviateClient::getAuth
-     */
     public function testCanCreateClientWithApiKeyAuth(): void
     {
         $this->skipIfWeaviateNotAvailable();
@@ -63,9 +57,6 @@ class AuthenticationIntegrationTest extends TestCase
         $this->assertInstanceOf(ApiKey::class, $client->getAuth());
     }
 
-    /**
-     * @covers \Weaviate\WeaviateClient::__construct
-     */
     public function testCanCreateClientWithoutAuth(): void
     {
         $this->skipIfWeaviateNotAvailable();
@@ -89,12 +80,6 @@ class AuthenticationIntegrationTest extends TestCase
         $this->assertNull($client->getAuth());
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::__construct
-     * @covers \Weaviate\Connection\HttpConnection::get
-     * @covers \Weaviate\Connection\HttpConnection::applyAuth
-     * @covers \Weaviate\Auth\ApiKey::apply
-     */
     public function testHttpConnectionAppliesAuthenticationToRequests(): void
     {
         $this->skipIfWeaviateNotAvailable();
@@ -123,11 +108,6 @@ class AuthenticationIntegrationTest extends TestCase
         $this->assertArrayHasKey('version', $result);
     }
 
-    /**
-     * @covers \Weaviate\WeaviateClient::__construct
-     * @covers \Weaviate\WeaviateClient::collections
-     * @covers \Weaviate\Collections\Collections::exists
-     */
     public function testWeaviateClientWorksEndToEndWithAuth(): void
     {
         $this->skipIfWeaviateNotAvailable();

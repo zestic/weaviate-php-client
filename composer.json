@@ -68,7 +68,6 @@
         "docker-reset": "./scripts/test-setup.sh reset",
         "docker-start": "./scripts/test-setup.sh start",
         "docker-stop": "./scripts/test-setup.sh stop",
-        "normalize": "@composer normalize",
         "normalize-check": "@composer normalize --dry-run",
         "phpstan": "phpstan analyse src --level=8",
         "security-audit": "composer audit --format=table",

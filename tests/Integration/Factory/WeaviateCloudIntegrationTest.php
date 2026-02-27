@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * Copyright 2025 Zestic
+ * Copyright 2025-2026 Zestic
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@ declare(strict_types=1);
  * limitations under the License.
  */
 
-namespace Weaviate\Tests\Integration;
+namespace Weaviate\Tests\Integration\Factory;
 
+use Weaviate\Auth\ApiKey;
+use Weaviate\Factory\WeaviateClientFactory;
 use Weaviate\Tests\TestCase;
 use Weaviate\WeaviateClient;
-use Weaviate\Auth\ApiKey;
 
 class WeaviateCloudIntegrationTest extends TestCase
 {
@@ -30,11 +31,6 @@ class WeaviateCloudIntegrationTest extends TestCase
      * Test connecting to a real Weaviate Cloud instance
      * This test only runs when WEAVIATE_CLOUD_URL and WEAVIATE_CLOUD_API_KEY are set
      *
-     * @covers \Weaviate\WeaviateClient::connectToWeaviateCloud
-     * @covers \Weaviate\WeaviateClient::parseWeaviateCloudUrl
-     * @covers \Weaviate\WeaviateClient::__construct
-     * @covers \Weaviate\WeaviateClient::getAuth
-     * @covers \Weaviate\WeaviateClient::collections
      */
     public function testConnectToWeaviateCloudReal(): void
     {
@@ -48,7 +44,7 @@ class WeaviateCloudIntegrationTest extends TestCase
             );
         }
 
-        $client = WeaviateClient::connectToWeaviateCloud($clusterUrl, new ApiKey($apiKey));
+        $client = WeaviateClientFactory::connectToWeaviateCloud($clusterUrl, new ApiKey($apiKey));
 
         $this->assertInstanceOf(WeaviateClient::class, $client);
         $this->assertInstanceOf(ApiKey::class, $client->getAuth());
@@ -65,8 +61,6 @@ class WeaviateCloudIntegrationTest extends TestCase
     /**
      * Test connecting to Weaviate Cloud with different URL formats
      *
-     * @covers \Weaviate\WeaviateClient::connectToWeaviateCloud
-     * @covers \Weaviate\WeaviateClient::parseWeaviateCloudUrl
      */
     public function testConnectToWeaviateCloudWithDifferentUrlFormats(): void
     {
@@ -83,15 +77,15 @@ class WeaviateCloudIntegrationTest extends TestCase
         $auth = new ApiKey($apiKey);
 
         // Test with hostname only
-        $client1 = WeaviateClient::connectToWeaviateCloud($clusterUrl, $auth);
+        $client1 = WeaviateClientFactory::connectToWeaviateCloud($clusterUrl, $auth);
         $this->assertInstanceOf(WeaviateClient::class, $client1);
 
         // Test with https:// prefix
-        $client2 = WeaviateClient::connectToWeaviateCloud('https://' . $clusterUrl, $auth);
+        $client2 = WeaviateClientFactory::connectToWeaviateCloud('https://' . $clusterUrl, $auth);
         $this->assertInstanceOf(WeaviateClient::class, $client2);
 
         // Test with trailing slash
-        $client3 = WeaviateClient::connectToWeaviateCloud($clusterUrl . '/', $auth);
+        $client3 = WeaviateClientFactory::connectToWeaviateCloud($clusterUrl . '/', $auth);
         $this->assertInstanceOf(WeaviateClient::class, $client3);
 
         // All should be able to make API calls
@@ -103,10 +97,6 @@ class WeaviateCloudIntegrationTest extends TestCase
     /**
      * Test end-to-end workflow with Weaviate Cloud
      *
-     * @covers \Weaviate\WeaviateClient::connectToWeaviateCloud
-     * @covers \Weaviate\Collections\Collections::create
-     * @covers \Weaviate\Collections\Collections::exists
-     * @covers \Weaviate\Collections\Collections::delete
      */
     public function testConnectToWeaviateCloudEndToEndWorkflow(): void
     {
@@ -120,7 +110,7 @@ class WeaviateCloudIntegrationTest extends TestCase
             );
         }
 
-        $client = WeaviateClient::connectToWeaviateCloud($clusterUrl, new ApiKey($apiKey));
+        $client = WeaviateClientFactory::connectToWeaviateCloud($clusterUrl, new ApiKey($apiKey));
         $testCollectionName = 'TestWeaviateCloud_' . uniqid();
 
         try {
@@ -152,14 +142,13 @@ class WeaviateCloudIntegrationTest extends TestCase
      * Test that connectToWeaviateCloud requires authentication
      * This is a mock test since we can't test auth failure without valid credentials
      *
-     * @covers \Weaviate\WeaviateClient::connectToWeaviateCloud
      */
     public function testConnectToWeaviateCloudRequiresAuth(): void
     {
         // This test verifies that auth is required (not null)
         // We can't easily test auth failure without a real endpoint
         $auth = new ApiKey('required-api-key');
-        $client = WeaviateClient::connectToWeaviateCloud('test-cluster.weaviate.network', $auth);
+        $client = WeaviateClientFactory::connectToWeaviateCloud('test-cluster.weaviate.network', $auth);
 
         $this->assertInstanceOf(WeaviateClient::class, $client);
         $this->assertNotNull($client->getAuth());

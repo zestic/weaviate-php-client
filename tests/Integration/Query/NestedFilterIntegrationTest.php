@@ -32,9 +32,6 @@ use GuzzleHttp\Psr7\HttpFactory;
  * Integration tests for complex nested filters against real Weaviate instance
  *
  * @group integration
- * @covers \Weaviate\Query\Filter
- * @covers \Weaviate\Query\PropertyFilter
- * @covers \Weaviate\Query\QueryBuilder
  */
 class NestedFilterIntegrationTest extends TestCase
 {

@@ -26,9 +26,6 @@ use Weaviate\Exceptions\WeaviateBaseException;
 
 class WeaviateRetryExceptionTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::__construct
-     */
     public function testCanCreateRetryException(): void
     {
         $exception = new WeaviateRetryException('Connection failed', 3);
@@ -44,9 +41,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertIsArray($context['suggestions']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::__construct
-     */
     public function testCanCreateWithContext(): void
     {
         $context = ['operation' => 'get_object', 'url' => 'http://localhost:8080'];
@@ -59,9 +53,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame('retry_exhausted', $resultContext['error_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::getRetryCount
-     */
     public function testGetRetryCount(): void
     {
         $exception = new WeaviateRetryException('Error', 7);
@@ -69,9 +60,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame(7, $exception->getRetryCount());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::getRetryAttempts
-     */
     public function testGetRetryAttempts(): void
     {
         $attempts = [
@@ -84,9 +72,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame($attempts, $exception->getRetryAttempts());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::getRetryAttempts
-     */
     public function testGetRetryAttemptsReturnsNullWhenNotSet(): void
     {
         $exception = new WeaviateRetryException('Failed', 1);
@@ -94,9 +79,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertNull($exception->getRetryAttempts());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::withAttempts
-     */
     public function testWithAttempts(): void
     {
         $operation = 'create_object';
@@ -120,9 +102,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame($finalError, $context['final_error']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::forConnection
-     */
     public function testForConnection(): void
     {
         $url = 'http://localhost:8080';
@@ -141,9 +120,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame($finalError, $context['final_error']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::forQuery
-     */
     public function testForQuery(): void
     {
         $query = 'GET /v1/objects';
@@ -162,9 +138,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame($finalError, $context['final_error']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::__construct
-     */
     public function testExceptionChaining(): void
     {
         $previous = new \RuntimeException('Network error');
@@ -173,9 +146,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::withAttempts
-     */
     public function testWithAttemptsWithPreviousException(): void
     {
         $previous = new \Exception('Final failure');
@@ -184,9 +154,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::forConnection
-     */
     public function testForConnectionWithPreviousException(): void
     {
         $previous = new \Exception('Connection error');
@@ -195,9 +162,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::forQuery
-     */
     public function testForQueryWithPreviousException(): void
     {
         $previous = new \Exception('Query error');
@@ -206,9 +170,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::__construct
-     */
     public function testWithZeroRetries(): void
     {
         $exception = new WeaviateRetryException('Immediate failure', 0);
@@ -217,9 +178,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame(0, $exception->getRetryCount());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::withAttempts
-     */
     public function testWithAttemptsWithEmptyAttempts(): void
     {
         $exception = WeaviateRetryException::withAttempts('operation', 0, [], 'No attempts made');
@@ -229,9 +187,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame(0, $exception->getRetryCount());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::forConnection
-     */
     public function testForConnectionWithEmptyUrl(): void
     {
         $exception = WeaviateRetryException::forConnection('', 1, 'Connection failed');
@@ -241,9 +196,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame('connection', $context['retry_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::forQuery
-     */
     public function testForQueryWithEmptyQuery(): void
     {
         $exception = WeaviateRetryException::forQuery('', 1, 'Query failed');
@@ -253,9 +205,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertSame('query', $context['retry_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::__construct
-     */
     public function testSuggestionsAreIncluded(): void
     {
         $exception = new WeaviateRetryException('Failed', 3);
@@ -268,9 +217,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertContains('Check if the operation is valid and properly formatted', $context['suggestions']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::__construct
-     */
     public function testWithEmptyMessage(): void
     {
         $exception = new WeaviateRetryException('', 2);
@@ -279,9 +225,6 @@ class WeaviateRetryExceptionTest extends TestCase
         $this->assertStringContainsString('Final error:', $exception->getMessage());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateRetryException::withAttempts
-     */
     public function testWithAttemptsWithEmptyOperation(): void
     {
         $exception = WeaviateRetryException::withAttempts('', 1, [], 'Error');

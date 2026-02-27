@@ -18,17 +18,18 @@ declare(strict_types=1);
  * limitations under the License.
  */
 
-namespace Weaviate\Tests\Integration;
+namespace Weaviate\Tests\Integration\Factory;
 
-use PHPUnit\Framework\TestCase;
-use Weaviate\WeaviateClient;
-use Weaviate\Auth\ApiKey;
-use Weaviate\Connection\HttpConnection;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\HttpFactory;
+use PHPUnit\Framework\TestCase;
+use Weaviate\WeaviateClient;
+use Weaviate\Auth\ApiKey;
+use Weaviate\Connection\HttpConnection;
+use Weaviate\Factory\WeaviateClientFactory;
 
 /**
  * Mock integration tests for connectToCustom functionality
@@ -36,13 +37,6 @@ use GuzzleHttp\Psr7\HttpFactory;
  */
 class WeaviateCustomMockIntegrationTest extends TestCase
 {
-    /**
-     * Test connectToCustom with mocked HTTP responses
-     *
-     * @covers \Weaviate\WeaviateClient::connectToCustom
-     * @covers \Weaviate\Connection\HttpConnection::get
-     * @covers \Weaviate\Connection\HttpConnection::applyHeaders
-     */
     public function testConnectToCustomWithMockResponses(): void
     {
         // Create a mock HTTP handler
@@ -72,34 +66,23 @@ class WeaviateCustomMockIntegrationTest extends TestCase
         $this->assertFalse($exists);
     }
 
-    /**
-     * Test URL construction for different schemes and ports
-     *
-     * @covers \Weaviate\WeaviateClient::connectToCustom
-     */
     public function testConnectToCustomUrlConstruction(): void
     {
         $auth = new ApiKey('test-key');
 
         // Test HTTP with default port
-        $client1 = WeaviateClient::connectToCustom('localhost', 8080, false, $auth);
+        $client1 = WeaviateClientFactory::connectToCustom('localhost', 8080, false, $auth);
         $this->assertInstanceOf(WeaviateClient::class, $client1);
 
         // Test HTTPS with custom port
-        $client2 = WeaviateClient::connectToCustom('secure-server.com', 9200, true, $auth);
+        $client2 = WeaviateClientFactory::connectToCustom('secure-server.com', 9200, true, $auth);
         $this->assertInstanceOf(WeaviateClient::class, $client2);
 
         // Test with custom domain
-        $client3 = WeaviateClient::connectToCustom('my-weaviate.example.com', 443, true, $auth);
+        $client3 = WeaviateClientFactory::connectToCustom('my-weaviate.example.com', 443, true, $auth);
         $this->assertInstanceOf(WeaviateClient::class, $client3);
     }
 
-    /**
-     * Test that custom headers are included in requests
-     *
-     * @covers \Weaviate\WeaviateClient::connectToCustom
-     * @covers \Weaviate\Connection\HttpConnection::applyHeaders
-     */
     public function testConnectToCustomIncludesCustomHeaders(): void
     {
         $capturedHeaders = [];
@@ -159,11 +142,6 @@ class WeaviateCustomMockIntegrationTest extends TestCase
         $this->assertStringContainsString('Bearer mock-api-key', $capturedHeaders['Authorization'][0]);
     }
 
-    /**
-     * Test port validation
-     *
-     * @covers \Weaviate\WeaviateClient::connectToCustom
-     */
     public function testConnectToCustomPortValidation(): void
     {
         $auth = new ApiKey('test-key');
@@ -171,7 +149,7 @@ class WeaviateCustomMockIntegrationTest extends TestCase
         // Test valid ports
         $validPorts = [1, 80, 443, 8080, 9200, 65535];
         foreach ($validPorts as $port) {
-            $client = WeaviateClient::connectToCustom('localhost', $port, false, $auth);
+            $client = WeaviateClientFactory::connectToCustom('localhost', $port, false, $auth);
             $this->assertInstanceOf(WeaviateClient::class, $client);
         }
 
@@ -180,15 +158,10 @@ class WeaviateCustomMockIntegrationTest extends TestCase
         foreach ($invalidPorts as $port) {
             $this->expectException(\Weaviate\Exceptions\WeaviateInvalidInputException::class);
             $this->expectExceptionMessage('Port must be between 1 and 65535');
-            WeaviateClient::connectToCustom('localhost', $port, false, $auth);
+            WeaviateClientFactory::connectToCustom('localhost', $port, false, $auth);
         }
     }
 
-    /**
-     * Test scheme handling (HTTP vs HTTPS)
-     *
-     * @covers \Weaviate\WeaviateClient::connectToCustom
-     */
     public function testConnectToCustomSchemeHandling(): void
     {
         $capturedUrls = [];

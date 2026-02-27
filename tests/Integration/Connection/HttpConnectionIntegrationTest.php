@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * Copyright 2024 Zestic
+ * Copyright 2025-2026 Zestic
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,10 +49,6 @@ class HttpConnectionIntegrationTest extends TestCase
         );
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::__construct
-     * @covers \Weaviate\Connection\HttpConnection::get
-     */
     public function testCanMakeGetRequestToMeta(): void
     {
         $result = $this->connection->get('/v1/meta');
@@ -62,10 +58,6 @@ class HttpConnectionIntegrationTest extends TestCase
         $this->assertArrayHasKey('version', $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::__construct
-     * @covers \Weaviate\Connection\HttpConnection::get
-     */
     public function testCanMakeGetRequestToSchema(): void
     {
         $result = $this->connection->get('/v1/schema');
@@ -74,10 +66,6 @@ class HttpConnectionIntegrationTest extends TestCase
         $this->assertArrayHasKey('classes', $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::__construct
-     * @covers \Weaviate\Connection\HttpConnection::get
-     */
     public function testGetRequestWithQueryParameters(): void
     {
         // Test with query parameters - using nodes endpoint which accepts parameters
@@ -87,10 +75,6 @@ class HttpConnectionIntegrationTest extends TestCase
         $this->assertArrayHasKey('nodes', $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::__construct
-     * @covers \Weaviate\Connection\HttpConnection::get
-     */
     public function testGetRequestThrowsNotFoundExceptionFor404(): void
     {
         $this->expectException(NotFoundException::class);
@@ -98,12 +82,6 @@ class HttpConnectionIntegrationTest extends TestCase
         $this->connection->get('/v1/non-existent-endpoint');
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::__construct
-     * @covers \Weaviate\Connection\HttpConnection::post
-     * @covers \Weaviate\Connection\HttpConnection::get
-     * @covers \Weaviate\Connection\HttpConnection::delete
-     */
     public function testCanCreateAndDeleteCollection(): void
     {
         $collectionName = 'TestHttpConnection';
@@ -145,13 +123,6 @@ class HttpConnectionIntegrationTest extends TestCase
         $this->connection->get("/v1/schema/{$collectionName}");
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::__construct
-     * @covers \Weaviate\Connection\HttpConnection::post
-     * @covers \Weaviate\Connection\HttpConnection::get
-     * @covers \Weaviate\Connection\HttpConnection::patch
-     * @covers \Weaviate\Connection\HttpConnection::delete
-     */
     public function testCanCreateUpdateAndDeleteObject(): void
     {
         $collectionName = 'TestHttpConnectionObjects';
@@ -225,11 +196,6 @@ class HttpConnectionIntegrationTest extends TestCase
         $this->connection->get("/v1/objects/{$collectionName}/{$objectId}");
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::put
-     * @covers \Weaviate\Connection\HttpConnection::get
-     * @covers \Weaviate\Connection\HttpConnection::delete
-     */
     public function testCanUpdateObjectWithPut(): void
     {
         $collectionName = 'TestHttpConnectionPut';
@@ -297,9 +263,6 @@ class HttpConnectionIntegrationTest extends TestCase
         $this->connection->delete("/v1/schema/{$collectionName}");
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::head
-     */
     public function testCanMakeHeadRequest(): void
     {
         // Test HEAD request to ready endpoint (should exist and support HEAD)
@@ -311,9 +274,6 @@ class HttpConnectionIntegrationTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::deleteWithData
-     */
     public function testCanDeleteWithData(): void
     {
         $collectionName = 'TestHttpConnectionDeleteWithData';

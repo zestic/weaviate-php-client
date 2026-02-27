@@ -25,9 +25,6 @@ use Weaviate\Tenants\TenantActivityStatus;
 
 class TenantActivityStatusTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Tenants\TenantActivityStatus
-     */
     public function testHasAllRequiredStatuses(): void
     {
         $this->assertEquals('ACTIVE', TenantActivityStatus::ACTIVE->value);
@@ -37,9 +34,6 @@ class TenantActivityStatusTest extends TestCase
         $this->assertEquals('ONLOADING', TenantActivityStatus::ONLOADING->value);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantActivityStatus::fromString
-     */
     public function testCanCreateFromString(): void
     {
         $this->assertEquals(TenantActivityStatus::ACTIVE, TenantActivityStatus::fromString('ACTIVE'));
@@ -49,9 +43,6 @@ class TenantActivityStatusTest extends TestCase
         $this->assertEquals(TenantActivityStatus::ONLOADING, TenantActivityStatus::fromString('ONLOADING'));
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantActivityStatus::fromString
-     */
     public function testCanCreateFromLegacyNames(): void
     {
         // Test legacy HOT -> ACTIVE mapping
@@ -64,9 +55,6 @@ class TenantActivityStatusTest extends TestCase
         $this->assertEquals(TenantActivityStatus::OFFLOADED, TenantActivityStatus::fromString('FROZEN'));
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantActivityStatus::fromString
-     */
     public function testFromStringIsCaseInsensitive(): void
     {
         $this->assertEquals(TenantActivityStatus::ACTIVE, TenantActivityStatus::fromString('active'));
@@ -79,9 +67,6 @@ class TenantActivityStatusTest extends TestCase
         $this->assertEquals(TenantActivityStatus::ONLOADING, TenantActivityStatus::fromString('onloading'));
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantActivityStatus::fromString
-     */
     public function testFromStringThrowsExceptionForInvalidStatus(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -90,9 +75,6 @@ class TenantActivityStatusTest extends TestCase
         TenantActivityStatus::fromString('INVALID');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantActivityStatus::isWritable
-     */
     public function testCanIdentifyWritableStatuses(): void
     {
         $this->assertTrue(TenantActivityStatus::ACTIVE->isWritable());
@@ -102,9 +84,6 @@ class TenantActivityStatusTest extends TestCase
         $this->assertFalse(TenantActivityStatus::ONLOADING->isWritable());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\TenantActivityStatus::isTransitional
-     */
     public function testCanIdentifyTransitionalStatuses(): void
     {
         $this->assertFalse(TenantActivityStatus::ACTIVE->isTransitional());

@@ -26,9 +26,6 @@ use Weaviate\Exceptions\UnexpectedStatusCodeException;
 
 class InsufficientPermissionsExceptionTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::__construct
-     */
     public function testCanCreateInsufficientPermissionsException(): void
     {
         $exception = new InsufficientPermissionsException();
@@ -42,9 +39,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertSame(403, $context['status_code']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::__construct
-     */
     public function testCanCreateWithCustomMessage(): void
     {
         $message = 'Access denied to collection';
@@ -54,9 +48,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertSame(403, $exception->getStatusCode());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::__construct
-     */
     public function testCanCreateWithResponse(): void
     {
         $response = [
@@ -71,9 +62,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertSame($response, $context['response']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::__construct
-     */
     public function testCanCreateWithContext(): void
     {
         $context = ['user_id' => 'user123', 'resource' => 'collection'];
@@ -85,9 +73,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertSame('insufficient_permissions', $resultContext['error_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::__construct
-     */
     public function testCanCreateWithCustomContext(): void
     {
         $message = 'Access denied to resource';
@@ -103,9 +88,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertSame('insufficient_permissions', $resultContext['error_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::fromResponse
-     */
     public function testFromResponse(): void
     {
         $message = 'Access denied';
@@ -129,9 +111,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertSame('insufficient_permissions', $resultContext['error_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forRbacRestriction
-     */
     public function testForRbacRestrictionWithDifferentOperation(): void
     {
         $operation = 'delete';
@@ -151,9 +130,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertSame('rbac_restriction', $resultContext['error_subtype']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::__construct
-     */
     public function testExceptionChaining(): void
     {
         $previous = new \RuntimeException('Auth error');
@@ -162,9 +138,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forRbacRestriction
-     */
     public function testForRbacRestrictionWithPreviousException(): void
     {
         $previous = new \Exception('Token expired');
@@ -173,9 +146,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forRbacRestriction
-     */
     public function testForRbacRestrictionWithEmptyContext(): void
     {
         $exception = InsufficientPermissionsException::forRbacRestriction('create', 'schemas');
@@ -186,9 +156,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertSame('rbac_restriction', $context['error_subtype']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::__construct
-     */
     public function testSuggestionsAreIncluded(): void
     {
         $exception = new InsufficientPermissionsException();
@@ -199,9 +166,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertContains('Contact your Weaviate administrator for access', $context['suggestions']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::forRbacRestriction
-     */
     public function testForRbacRestrictionWithEmptyOperation(): void
     {
         $exception = InsufficientPermissionsException::forRbacRestriction('', 'collections');
@@ -213,9 +177,6 @@ class InsufficientPermissionsExceptionTest extends TestCase
         $this->assertSame('collections', $context['resource']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\InsufficientPermissionsException::__construct
-     */
     public function testDefaultStatusCodeIs403(): void
     {
         $exception = new InsufficientPermissionsException('Test message');

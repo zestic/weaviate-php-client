@@ -75,23 +75,36 @@ reset_weaviate() {
 }
 
 # Function to run tests
+# first argument is the type (unit|integration|all), remaining args are
+# passed directly to phpunit. This allows using all phpunit options (e.g.
+# --filter) while still providing a convenient shorthand for common suites.
 run_tests() {
     echo "🧪 Running tests..."
     cd "$PROJECT_DIR"
-    
-    case "${1:-all}" in
+
+    # if first argument is not one of the recognized suites, treat all
+    # arguments as phpunit parameters so callers can run an individual file
+    if [[ "$1" != "unit" && "$1" != "integration" && "$1" != "all" && -n "$1" ]]; then
+        ./vendor/bin/phpunit "$@"
+        return
+    fi
+
+    type="${1:-all}"
+    shift || true
+
+    case "$type" in
         "unit")
-            ./vendor/bin/phpunit tests/Unit
+            ./vendor/bin/phpunit tests/Unit "$@"
             ;;
         "integration")
-            ./vendor/bin/phpunit tests/Integration
+            ./vendor/bin/phpunit tests/Integration "$@"
             ;;
         "all")
-            ./vendor/bin/phpunit
+            ./vendor/bin/phpunit "$@"
             ;;
         *)
-            echo "❌ Unknown test type: $1"
-            echo "Usage: $0 test [unit|integration|all]"
+            echo "❌ Unknown test type: $type"
+            echo "Usage: $0 test [unit|integration|all] [phpunit options]"
             exit 1
             ;;
     esac
@@ -113,7 +126,9 @@ case "${1:-help}" in
     "test")
         check_docker
         start_weaviate
-        run_tests "$2"
+        # $2 is either the desired suite or (if not a recognised suite)
+        # the first phpunit argument. Pass everything along to run_tests.
+        run_tests "${@:2}"
         ;;
     "help"|*)
         echo "Weaviate PHP Client Test Setup"

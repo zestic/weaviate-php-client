@@ -29,25 +29,25 @@ use Weaviate\WeaviateClient;
 echo "=== Weaviate PHP Client - Getting Started Example ===\n\n";
 
 // Easy way: Connect to local Weaviate instance
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 
 // Connect to Docker container on custom port
-// $client = WeaviateClient::connectToLocal('localhost:18080');
+// $client = WeaviateClientFactory::connectToLocal('localhost:18080');
 
 // Connect with authentication
-// $client = WeaviateClient::connectToLocal(
+// $client = WeaviateClientFactory::connectToLocal(
 //     'localhost:8080',
 //     new ApiKey('your-api-key')
 // );
 
 // Connect to Weaviate Cloud
-// $client = WeaviateClient::connectToWeaviateCloud(
+// $client = WeaviateClientFactory::connectToWeaviateCloud(
 //     'my-cluster.weaviate.network',
 //     new ApiKey('your-wcd-api-key')
 // );
 
 // Connect to custom Weaviate instance
-// $client = WeaviateClient::connectToCustom(
+// $client = WeaviateClientFactory::connectToCustom(
 //     'my-server.com',
 //     9200,
 //     true,

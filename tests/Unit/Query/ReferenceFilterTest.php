@@ -24,15 +24,8 @@ use PHPUnit\Framework\TestCase;
 use Weaviate\Query\Filter;
 use Weaviate\Query\ReferenceFilter;
 
-/**
- * @covers \Weaviate\Query\ReferenceFilter
- * @covers \Weaviate\Query\Filter::byRef
- */
 class ReferenceFilterTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Query\Filter::byRef
-     */
     public function testCanCreateReferenceFilter(): void
     {
         $filter = Filter::byRef('hasCategory');
@@ -40,9 +33,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertInstanceOf(ReferenceFilter::class, $filter);
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::byProperty
-     */
     public function testCanFilterByReferencedProperty(): void
     {
         $filter = Filter::byRef('hasCategory')->byProperty('title')->equal('Technology');
@@ -60,9 +50,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::byProperty
-     */
     public function testCanFilterByReferencedPropertyWithLike(): void
     {
         $filter = Filter::byRef('hasCategory')->byProperty('title')->like('*Sport*');
@@ -80,9 +67,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::byProperty
-     */
     public function testCanFilterByReferencedPropertyWithNumericComparison(): void
     {
         $filter = Filter::byRef('hasAuthor')->byProperty('age')->greaterThan(25);
@@ -100,9 +84,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::byId
-     */
     public function testCanFilterByReferencedId(): void
     {
         $uuid = '123e4567-e89b-12d3-a456-426614174000';
@@ -121,9 +102,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::byId
-     */
     public function testCanFilterByReferencedIdWithMultipleValues(): void
     {
         $uuids = [
@@ -145,9 +123,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::toArray
-     */
     public function testToArrayWithoutFilterReturnsEmptyValueObject(): void
     {
         $filter = new ReferenceFilter('hasCategory');
@@ -161,9 +136,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::byProperty
-     */
     public function testCanFilterByReferencedPropertyWithNullCheck(): void
     {
         $filter = Filter::byRef('hasCategory')->byProperty('deletedAt')->isNull(true);
@@ -181,9 +153,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::byProperty
-     */
     public function testCanFilterByReferencedPropertyWithArrayContainment(): void
     {
         $filter = Filter::byRef('hasCategory')->byProperty('tags')->containsAny(['php', 'javascript']);
@@ -201,9 +170,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::__construct
-     */
     public function testConstructorSetsLinkOn(): void
     {
         $filter = new ReferenceFilter('hasAuthor');
@@ -213,10 +179,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals(['hasAuthor'], $result['path']);
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::byProperty
-     * @covers \Weaviate\Query\ReferenceFilter::toArray
-     */
     public function testToArrayWithPropertyFilter(): void
     {
         $filter = new ReferenceFilter('hasCategory');
@@ -234,10 +196,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::byId
-     * @covers \Weaviate\Query\ReferenceFilter::toArray
-     */
     public function testToArrayWithIdFilter(): void
     {
         $filter = new ReferenceFilter('hasCategory');
@@ -255,9 +213,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::byProperty
-     */
     public function testByPropertyReturnsReferencePropertyFilter(): void
     {
         $filter = new ReferenceFilter('hasCategory');
@@ -266,9 +221,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertInstanceOf(\Weaviate\Query\ReferencePropertyFilter::class, $propertyFilter);
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::byId
-     */
     public function testByIdReturnsReferenceIdFilter(): void
     {
         $filter = new ReferenceFilter('hasCategory');
@@ -277,9 +229,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertInstanceOf(\Weaviate\Query\ReferenceIdFilter::class, $idFilter);
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::toArray
-     */
     public function testToArrayWithPropertyFilterSet(): void
     {
         $filter = new ReferenceFilter('hasCategory');
@@ -311,9 +260,6 @@ class ReferenceFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceFilter::toArray
-     */
     public function testToArrayWithIdFilterSet(): void
     {
         $filter = new ReferenceFilter('hasCategory');

@@ -14,7 +14,7 @@
 
 The Weaviate PHP client provides three convenient static methods for connecting to different Weaviate deployments:
 
-### `WeaviateClient::connectToLocal()`
+### `WeaviateClientFactory::connectToLocal()`
 
 Connect to a local Weaviate instance (development, Docker containers).
 
@@ -32,16 +32,16 @@ public static function connectToLocal(
 **Examples:**
 ```php
 // Default local connection
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 
 // Docker container
-$client = WeaviateClient::connectToLocal('localhost:18080');
+$client = WeaviateClientFactory::connectToLocal('localhost:18080');
 
 // With authentication
-$client = WeaviateClient::connectToLocal('localhost:8080', new ApiKey('key'));
+$client = WeaviateClientFactory::connectToLocal('localhost:8080', new ApiKey('key'));
 ```
 
-### `WeaviateClient::connectToWeaviateCloud()`
+### `WeaviateClientFactory::connectToWeaviateCloud()`
 
 Connect to a Weaviate Cloud (WCD) instance.
 
@@ -59,19 +59,19 @@ public static function connectToWeaviateCloud(
 **Examples:**
 ```php
 // Basic cloud connection
-$client = WeaviateClient::connectToWeaviateCloud(
+$client = WeaviateClientFactory::connectToWeaviateCloud(
     'my-cluster.weaviate.network',
     new ApiKey('your-wcd-api-key')
 );
 
 // Works with various URL formats
-$client = WeaviateClient::connectToWeaviateCloud(
+$client = WeaviateClientFactory::connectToWeaviateCloud(
     'https://my-cluster.weaviate.network/some/path',
     new ApiKey('your-wcd-api-key')
 );
 ```
 
-### `WeaviateClient::connectToCustom()`
+### `WeaviateClientFactory::connectToCustom()`
 
 Connect to a custom Weaviate deployment with full control over connection parameters.
 
@@ -95,10 +95,10 @@ public static function connectToCustom(
 **Examples:**
 ```php
 // Basic custom connection
-$client = WeaviateClient::connectToCustom('my-server.com');
+$client = WeaviateClientFactory::connectToCustom('my-server.com');
 
 // Full configuration
-$client = WeaviateClient::connectToCustom(
+$client = WeaviateClientFactory::connectToCustom(
     'my-server.com',
     9200,
     true, // HTTPS
@@ -138,7 +138,7 @@ Comprehensive schema management for Weaviate collections.
 
 **Example:**
 ```php
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 $schema = $client->schema();
 
 // Create collection
@@ -183,7 +183,7 @@ Represents a specific collection and provides data operations.
 ### Creating Collections
 
 ```php
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 $collections = $client->collections();
 
 // Basic collection
@@ -279,9 +279,9 @@ use Weaviate\Auth\ApiKey;
 $auth = new ApiKey('your-api-key-here');
 
 // Use with any connection method
-$client = WeaviateClient::connectToLocal('localhost:8080', $auth);
-$client = WeaviateClient::connectToWeaviateCloud('cluster.weaviate.network', $auth);
-$client = WeaviateClient::connectToCustom('server.com', 443, true, $auth);
+$client = WeaviateClientFactory::connectToLocal('localhost:8080', $auth);
+$client = WeaviateClientFactory::connectToWeaviateCloud('cluster.weaviate.network', $auth);
+$client = WeaviateClientFactory::connectToCustom('server.com', 443, true, $auth);
 ```
 
 ### Custom Authentication
@@ -301,7 +301,7 @@ class CustomAuth implements AuthInterface
 }
 
 $auth = new CustomAuth('custom-token');
-$client = WeaviateClient::connectToCustom('server.com', 8080, false, $auth);
+$client = WeaviateClientFactory::connectToCustom('server.com', 8080, false, $auth);
 ```
 
 ## Error Handling
@@ -332,7 +332,7 @@ use Weaviate\WeaviateClient;
 use Weaviate\Auth\ApiKey;
 
 // Connect to Weaviate
-$client = WeaviateClient::connectToLocal('localhost:18080');
+$client = WeaviateClientFactory::connectToLocal('localhost:18080');
 
 // Create collection if it doesn't exist
 $collections = $client->collections();

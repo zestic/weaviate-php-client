@@ -20,11 +20,12 @@ declare(strict_types=1);
 
 namespace Weaviate\Tests\Integration\Tenants;
 
-use Weaviate\Tests\TestCase;
-use Weaviate\WeaviateClient;
+use Weaviate\Exceptions\NotFoundException;
+use Weaviate\Factory\WeaviateClientFactory;
 use Weaviate\Tenants\Tenant;
 use Weaviate\Tenants\TenantActivityStatus;
-use Weaviate\Exceptions\NotFoundException;
+use Weaviate\Tests\TestCase;
+use Weaviate\WeaviateClient;
 
 class TenantsIntegrationTest extends TestCase
 {
@@ -42,7 +43,7 @@ class TenantsIntegrationTest extends TestCase
         }
         $host = $url['host'] . ':' . $url['port'];
 
-        $this->client = WeaviateClient::connectToLocal($host);
+        $this->client = WeaviateClientFactory::connectToLocal($host);
         $this->collectionName = 'TestTenantCollection_' . uniqid();
 
         // Create a multi-tenant collection for testing
@@ -66,10 +67,6 @@ class TenantsIntegrationTest extends TestCase
         }
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::create
-     * @covers \Weaviate\Tenants\Tenants::get
-     */
     public function testCanCreateAndRetrieveTenants(): void
     {
         $collection = $this->client->collections()->get($this->collectionName);
@@ -88,10 +85,6 @@ class TenantsIntegrationTest extends TestCase
         $this->assertEquals(TenantActivityStatus::ACTIVE, $allTenants['tenant2']->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::create
-     * @covers \Weaviate\Tenants\Tenants::getByName
-     */
     public function testCanCreateTenantWithSpecificActivityStatus(): void
     {
         $collection = $this->client->collections()->get($this->collectionName);
@@ -111,10 +104,6 @@ class TenantsIntegrationTest extends TestCase
         }
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::create
-     * @covers \Weaviate\Tenants\Tenants::exists
-     */
     public function testCanCheckTenantExists(): void
     {
         $collection = $this->client->collections()->get($this->collectionName);
@@ -128,12 +117,6 @@ class TenantsIntegrationTest extends TestCase
         $this->assertFalse($tenants->exists('non_existent_tenant'));
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::create
-     * @covers \Weaviate\Tenants\Tenants::activate
-     * @covers \Weaviate\Tenants\Tenants::deactivate
-     * @covers \Weaviate\Tenants\Tenants::getByName
-     */
     public function testCanActivateAndDeactivateTenant(): void
     {
         $collection = $this->client->collections()->get($this->collectionName);
@@ -158,11 +141,6 @@ class TenantsIntegrationTest extends TestCase
         }
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::create
-     * @covers \Weaviate\Tenants\Tenants::remove
-     * @covers \Weaviate\Tenants\Tenants::exists
-     */
     public function testCanRemoveTenant(): void
     {
         $collection = $this->client->collections()->get($this->collectionName);
@@ -177,10 +155,6 @@ class TenantsIntegrationTest extends TestCase
         $this->assertFalse($tenants->exists('removable_tenant'));
     }
 
-    /**
-     * @covers \Weaviate\Collections\Collection::withTenant
-     * @covers \Weaviate\Data\DataOperations::create
-     */
     public function testTenantDataIsolation(): void
     {
         $collection = $this->client->collections()->get($this->collectionName);

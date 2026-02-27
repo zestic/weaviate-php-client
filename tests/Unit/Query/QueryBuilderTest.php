@@ -27,9 +27,6 @@ use Weaviate\Query\Filter;
 use Weaviate\Query\QueryBuilder;
 use Weaviate\Query\Exception\QueryException;
 
-/**
- * @covers \Weaviate\Query\QueryBuilder
- */
 class QueryBuilderTest extends TestCase
 {
     /** @var ConnectionInterface&MockObject */
@@ -40,9 +37,6 @@ class QueryBuilderTest extends TestCase
         $this->connection = $this->createMock(ConnectionInterface::class);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::__construct
-     */
     public function testCanBeConstructed(): void
     {
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
@@ -50,9 +44,6 @@ class QueryBuilderTest extends TestCase
         $this->assertInstanceOf(QueryBuilder::class, $queryBuilder);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::__construct
-     */
     public function testCanBeConstructedWithTenant(): void
     {
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass', 'tenant1');
@@ -60,9 +51,6 @@ class QueryBuilderTest extends TestCase
         $this->assertInstanceOf(QueryBuilder::class, $queryBuilder);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::where
-     */
     public function testWhereReturnsQueryBuilder(): void
     {
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
@@ -73,9 +61,6 @@ class QueryBuilderTest extends TestCase
         $this->assertSame($queryBuilder, $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::limit
-     */
     public function testLimitReturnsQueryBuilder(): void
     {
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
@@ -85,9 +70,6 @@ class QueryBuilderTest extends TestCase
         $this->assertSame($queryBuilder, $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::returnProperties
-     */
     public function testReturnPropertiesReturnsQueryBuilder(): void
     {
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
@@ -97,9 +79,6 @@ class QueryBuilderTest extends TestCase
         $this->assertSame($queryBuilder, $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::setDefaultFields
-     */
     public function testSetDefaultFieldsReturnsQueryBuilder(): void
     {
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
@@ -109,9 +88,6 @@ class QueryBuilderTest extends TestCase
         $this->assertSame($queryBuilder, $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithoutFilters(): void
     {
         $expectedQuery = [
@@ -140,9 +116,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals($expectedResponse['data']['Get']['TestClass'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithFilter(): void
     {
         $filter = Filter::byProperty('name')->equal('John');
@@ -173,9 +146,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals($expectedResponse['data']['Get']['TestClass'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithLimit(): void
     {
         $expectedQuery = [
@@ -203,9 +173,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals($expectedResponse['data']['Get']['TestClass'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithCustomProperties(): void
     {
         $expectedQuery = [
@@ -233,9 +200,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals($expectedResponse['data']['Get']['TestClass'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithTenant(): void
     {
         $expectedQuery = [
@@ -263,9 +227,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals($expectedResponse['data']['Get']['TestClass'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsThrowsExceptionOnGraphQLError(): void
     {
         $errorResponse = [
@@ -287,9 +248,6 @@ class QueryBuilderTest extends TestCase
         $queryBuilder->fetchObjects();
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsReturnsEmptyArrayWhenNoData(): void
     {
         $response = [
@@ -308,9 +266,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::setDefaultFields
-     */
     public function testSetDefaultFields(): void
     {
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
@@ -319,9 +274,6 @@ class QueryBuilderTest extends TestCase
         $this->assertSame($queryBuilder, $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithDefaultFields(): void
     {
         $response = [
@@ -345,9 +297,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals([['title' => 'Test Article', '_additional' => ['id' => '123']]], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::aggregate
-     */
     public function testAggregate(): void
     {
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
@@ -356,9 +305,6 @@ class QueryBuilderTest extends TestCase
         $this->assertInstanceOf(\Weaviate\Query\AggregateBuilder::class, $aggregateBuilder);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithComplexFilter(): void
     {
         $response = [
@@ -385,9 +331,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithDifferentFilterTypes(): void
     {
         $response = [
@@ -417,9 +360,6 @@ class QueryBuilderTest extends TestCase
         $queryBuilder->where(Filter::byProperty('status')->equal('published'))->fetchObjects();
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithTenantReturnsEmptyArray(): void
     {
         $response = [
@@ -440,9 +380,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::returnReferences
-     */
     public function testReturnReferences(): void
     {
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass');
@@ -454,9 +391,6 @@ class QueryBuilderTest extends TestCase
         $this->assertSame($queryBuilder, $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithReferences(): void
     {
         $response = [
@@ -499,9 +433,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithMultipleReferences(): void
     {
         $response = [
@@ -528,9 +459,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithFilterAndReferences(): void
     {
         $response = [
@@ -557,9 +485,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithComplexNestedFilter(): void
     {
         $response = [
@@ -590,9 +515,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithArrayContainsAnyFilter(): void
     {
         $response = [
@@ -616,9 +538,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testFetchObjectsWithStringArrayFilter(): void
     {
         $response = [

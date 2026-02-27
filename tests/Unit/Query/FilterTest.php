@@ -25,14 +25,8 @@ use Weaviate\Query\Filter;
 use Weaviate\Query\PropertyFilter;
 use Weaviate\Query\IdFilter;
 
-/**
- * @covers \Weaviate\Query\Filter
- */
 class FilterTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Query\Filter::byProperty
-     */
     public function testByPropertyReturnsPropertyFilter(): void
     {
         $filter = Filter::byProperty('name');
@@ -40,9 +34,6 @@ class FilterTest extends TestCase
         $this->assertInstanceOf(PropertyFilter::class, $filter);
     }
 
-    /**
-     * @covers \Weaviate\Query\Filter::byId
-     */
     public function testByIdReturnsIdFilter(): void
     {
         $filter = Filter::byId();
@@ -50,9 +41,6 @@ class FilterTest extends TestCase
         $this->assertInstanceOf(IdFilter::class, $filter);
     }
 
-    /**
-     * @covers \Weaviate\Query\Filter::allOf
-     */
     public function testAllOfCombinesFiltersWithAndOperator(): void
     {
         $filter1 = Filter::byProperty('name')->equal('John');
@@ -79,9 +67,6 @@ class FilterTest extends TestCase
         $this->assertEquals($expected, $combinedFilter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\Filter::anyOf
-     */
     public function testAnyOfCombinesFiltersWithOrOperator(): void
     {
         $filter1 = Filter::byProperty('status')->equal('active');
@@ -108,9 +93,6 @@ class FilterTest extends TestCase
         $this->assertEquals($expected, $combinedFilter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\Filter::allOf
-     */
     public function testAllOfWithSingleFilter(): void
     {
         $filter = Filter::byProperty('name')->equal('John');
@@ -130,9 +112,6 @@ class FilterTest extends TestCase
         $this->assertEquals($expected, $combinedFilter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\Filter::anyOf
-     */
     public function testAnyOfWithSingleFilter(): void
     {
         $filter = Filter::byProperty('name')->equal('John');
@@ -152,9 +131,6 @@ class FilterTest extends TestCase
         $this->assertEquals($expected, $combinedFilter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\Filter::allOf
-     */
     public function testNestedFilters(): void
     {
         $innerFilter = Filter::anyOf([

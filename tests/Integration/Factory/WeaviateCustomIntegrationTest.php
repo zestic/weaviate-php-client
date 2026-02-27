@@ -18,20 +18,18 @@ declare(strict_types=1);
  * limitations under the License.
  */
 
-namespace Weaviate\Tests\Integration;
+namespace Weaviate\Tests\Integration\Factory;
 
+use Weaviate\Auth\ApiKey;
+use Weaviate\Factory\WeaviateClientFactory;
 use Weaviate\Tests\TestCase;
 use Weaviate\WeaviateClient;
-use Weaviate\Auth\ApiKey;
 
 class WeaviateCustomIntegrationTest extends TestCase
 {
     /**
      * Test connecting to local Weaviate using connectToCustom
      *
-     * @covers \Weaviate\WeaviateClient::connectToCustom
-     * @covers \Weaviate\WeaviateClient::__construct
-     * @covers \Weaviate\WeaviateClient::collections
      */
     public function testConnectToCustomWithLocalWeaviate(): void
     {
@@ -46,7 +44,7 @@ class WeaviateCustomIntegrationTest extends TestCase
         $port = $url['port'];
         $secure = $url['scheme'] === 'https';
 
-        $client = WeaviateClient::connectToCustom($host, $port, $secure);
+        $client = WeaviateClientFactory::connectToCustom($host, $port, $secure);
 
         $this->assertInstanceOf(WeaviateClient::class, $client);
         $this->assertNull($client->getAuth());
@@ -59,9 +57,6 @@ class WeaviateCustomIntegrationTest extends TestCase
     /**
      * Test connecting with authentication
      *
-     * @covers \Weaviate\WeaviateClient::connectToCustom
-     * @covers \Weaviate\WeaviateClient::__construct
-     * @covers \Weaviate\WeaviateClient::getAuth
      */
     public function testConnectToCustomWithAuth(): void
     {
@@ -81,7 +76,7 @@ class WeaviateCustomIntegrationTest extends TestCase
         }
 
         $auth = new ApiKey($apiKey);
-        $client = WeaviateClient::connectToCustom($host, $port, $secure, $auth);
+        $client = WeaviateClientFactory::connectToCustom($host, $port, $secure, $auth);
 
         $this->assertInstanceOf(WeaviateClient::class, $client);
         $this->assertSame($auth, $client->getAuth());
@@ -94,8 +89,6 @@ class WeaviateCustomIntegrationTest extends TestCase
     /**
      * Test connecting with custom headers
      *
-     * @covers \Weaviate\WeaviateClient::connectToCustom
-     * @covers \Weaviate\WeaviateClient::__construct
      */
     public function testConnectToCustomWithHeaders(): void
     {
@@ -114,7 +107,7 @@ class WeaviateCustomIntegrationTest extends TestCase
             'X-Another-Header' => 'another-value',
         ];
 
-        $client = WeaviateClient::connectToCustom($host, $port, $secure, null, $headers);
+        $client = WeaviateClientFactory::connectToCustom($host, $port, $secure, null, $headers);
 
         $this->assertInstanceOf(WeaviateClient::class, $client);
 
@@ -126,10 +119,6 @@ class WeaviateCustomIntegrationTest extends TestCase
     /**
      * Test end-to-end workflow with connectToCustom
      *
-     * @covers \Weaviate\WeaviateClient::connectToCustom
-     * @covers \Weaviate\Collections\Collections::create
-     * @covers \Weaviate\Collections\Collections::exists
-     * @covers \Weaviate\Collections\Collections::delete
      */
     public function testConnectToCustomEndToEndWorkflow(): void
     {
@@ -143,7 +132,7 @@ class WeaviateCustomIntegrationTest extends TestCase
         $port = $url['port'];
         $secure = $url['scheme'] === 'https';
 
-        $client = WeaviateClient::connectToCustom($host, $port, $secure);
+        $client = WeaviateClientFactory::connectToCustom($host, $port, $secure);
         $testCollectionName = 'TestCustomConnect_' . uniqid();
 
         try {
@@ -174,7 +163,6 @@ class WeaviateCustomIntegrationTest extends TestCase
     /**
      * Test different parameter combinations
      *
-     * @covers \Weaviate\WeaviateClient::connectToCustom
      */
     public function testConnectToCustomParameterCombinations(): void
     {
@@ -189,22 +177,22 @@ class WeaviateCustomIntegrationTest extends TestCase
         $secure = $url['scheme'] === 'https';
 
         // Test with minimal parameters
-        $client1 = WeaviateClient::connectToCustom($host, $port, $secure);
+        $client1 = WeaviateClientFactory::connectToCustom($host, $port, $secure);
         $this->assertInstanceOf(WeaviateClient::class, $client1);
 
         // Test with auth
         $auth = new ApiKey('test-key');
-        $client2 = WeaviateClient::connectToCustom($host, $port, $secure, $auth);
+        $client2 = WeaviateClientFactory::connectToCustom($host, $port, $secure, $auth);
         $this->assertInstanceOf(WeaviateClient::class, $client2);
         $this->assertSame($auth, $client2->getAuth());
 
         // Test with headers
         $headers = ['X-Test' => 'value'];
-        $client3 = WeaviateClient::connectToCustom($host, $port, $secure, null, $headers);
+        $client3 = WeaviateClientFactory::connectToCustom($host, $port, $secure, null, $headers);
         $this->assertInstanceOf(WeaviateClient::class, $client3);
 
         // Test with both auth and headers
-        $client4 = WeaviateClient::connectToCustom($host, $port, $secure, $auth, $headers);
+        $client4 = WeaviateClientFactory::connectToCustom($host, $port, $secure, $auth, $headers);
         $this->assertInstanceOf(WeaviateClient::class, $client4);
         $this->assertSame($auth, $client4->getAuth());
 
@@ -218,7 +206,6 @@ class WeaviateCustomIntegrationTest extends TestCase
     /**
      * Test HTTPS vs HTTP scheme handling
      *
-     * @covers \Weaviate\WeaviateClient::connectToCustom
      */
     public function testConnectToCustomSchemeHandling(): void
     {
@@ -233,7 +220,7 @@ class WeaviateCustomIntegrationTest extends TestCase
         $isHttps = $url['scheme'] === 'https';
 
         // Test with correct scheme
-        $client = WeaviateClient::connectToCustom($host, $port, $isHttps);
+        $client = WeaviateClientFactory::connectToCustom($host, $port, $isHttps);
         $this->assertInstanceOf(WeaviateClient::class, $client);
 
         // Should be able to make API calls

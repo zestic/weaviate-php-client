@@ -24,17 +24,11 @@ use DateTime;
 use PHPUnit\Framework\TestCase;
 use Weaviate\Query\Filter;
 
-/**
- * @covers \Weaviate\Query\Filter
- * @covers \Weaviate\Query\PropertyFilter
- */
 class ComplexFilterTest extends TestCase
 {
     /**
      * Test deeply nested filters with multiple levels of AND/OR combinations
      *
-     * @covers \Weaviate\Query\Filter::allOf
-     * @covers \Weaviate\Query\Filter::anyOf
      */
     public function testDeeplyNestedFilters(): void
     {
@@ -77,8 +71,6 @@ class ComplexFilterTest extends TestCase
     /**
      * Test mixed AND/OR filters with various data types
      *
-     * @covers \Weaviate\Query\Filter::allOf
-     * @covers \Weaviate\Query\Filter::anyOf
      */
     public function testMixedAndOrFilters(): void
     {
@@ -113,8 +105,6 @@ class ComplexFilterTest extends TestCase
     /**
      * Test special character handling in filter values
      *
-     * @covers \Weaviate\Query\PropertyFilter::equal
-     * @covers \Weaviate\Query\PropertyFilter::like
      */
     public function testSpecialCharacterHandling(): void
     {
@@ -143,9 +133,6 @@ class ComplexFilterTest extends TestCase
     /**
      * Test DateTime filters with various date operations
      *
-     * @covers \Weaviate\Query\PropertyFilter::equal
-     * @covers \Weaviate\Query\PropertyFilter::greaterThan
-     * @covers \Weaviate\Query\PropertyFilter::lessThan
      */
     public function testDateTimeFilters(): void
     {
@@ -190,8 +177,6 @@ class ComplexFilterTest extends TestCase
     /**
      * Test numeric range filters with integers and floats
      *
-     * @covers \Weaviate\Query\PropertyFilter::greaterThan
-     * @covers \Weaviate\Query\PropertyFilter::lessThan
      */
     public function testNumericRangeFilters(): void
     {
@@ -241,7 +226,6 @@ class ComplexFilterTest extends TestCase
     /**
      * Test array containment with complex values
      *
-     * @covers \Weaviate\Query\PropertyFilter::containsAny
      */
     public function testComplexArrayContainment(): void
     {
@@ -271,7 +255,6 @@ class ComplexFilterTest extends TestCase
     /**
      * Test null handling in complex filters
      *
-     * @covers \Weaviate\Query\PropertyFilter::isNull
      */
     public function testNullHandlingInComplexFilters(): void
     {
@@ -311,8 +294,6 @@ class ComplexFilterTest extends TestCase
     /**
      * Test extremely deep nesting (5+ levels)
      *
-     * @covers \Weaviate\Query\Filter::allOf
-     * @covers \Weaviate\Query\Filter::anyOf
      */
     public function testExtremelyDeepNesting(): void
     {

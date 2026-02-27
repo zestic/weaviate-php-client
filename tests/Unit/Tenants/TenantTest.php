@@ -26,11 +26,6 @@ use Weaviate\Tenants\TenantActivityStatus;
 
 class TenantTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Tenants\Tenant::__construct
-     * @covers \Weaviate\Tenants\Tenant::getName
-     * @covers \Weaviate\Tenants\Tenant::getActivityStatus
-     */
     public function testCanCreateTenantWithDefaults(): void
     {
         $tenant = new Tenant('tenant1');
@@ -39,11 +34,6 @@ class TenantTest extends TestCase
         $this->assertEquals(TenantActivityStatus::ACTIVE, $tenant->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenant::__construct
-     * @covers \Weaviate\Tenants\Tenant::getName
-     * @covers \Weaviate\Tenants\Tenant::getActivityStatus
-     */
     public function testCanCreateTenantWithActivityStatus(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
@@ -52,9 +42,6 @@ class TenantTest extends TestCase
         $this->assertEquals(TenantActivityStatus::INACTIVE, $tenant->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenant::withActivityStatus
-     */
     public function testCanCreateTenantWithDifferentActivityStatus(): void
     {
         $tenant = new Tenant('tenant1');
@@ -67,9 +54,6 @@ class TenantTest extends TestCase
         $this->assertEquals(TenantActivityStatus::ACTIVE, $tenant->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenant::toArray
-     */
     public function testCanConvertToArray(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
@@ -82,8 +66,6 @@ class TenantTest extends TestCase
     }
 
     /**
-     * @covers \Weaviate\Tenants\Tenant::toArray
-     * @covers \Weaviate\Tenants\Tenant::getApiStatusValue
      * @dataProvider statusMappingProvider
      */
     public function testToArrayMapsAllStatusValuesCorrectly(
@@ -115,9 +97,6 @@ class TenantTest extends TestCase
         ];
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenant::fromArray
-     */
     public function testCanCreateFromArray(): void
     {
         $array = [
@@ -131,9 +110,6 @@ class TenantTest extends TestCase
         $this->assertEquals(TenantActivityStatus::OFFLOADED, $tenant->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenant::fromArray
-     */
     public function testCanCreateFromArrayWithDefaults(): void
     {
         $array = ['name' => 'tenant1'];
@@ -144,9 +120,6 @@ class TenantTest extends TestCase
         $this->assertEquals(TenantActivityStatus::ACTIVE, $tenant->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenant::__construct
-     */
     public function testThrowsExceptionForEmptyName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -155,9 +128,6 @@ class TenantTest extends TestCase
         new Tenant('');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenant::fromArray
-     */
     public function testFromArrayThrowsExceptionForMissingName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -166,9 +136,6 @@ class TenantTest extends TestCase
         Tenant::fromArray([]);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenant::withActivityStatus
-     */
     public function testCanCreateNewTenantWithDifferentStatus(): void
     {
         $originalTenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
@@ -185,9 +152,6 @@ class TenantTest extends TestCase
         $this->assertNotSame($originalTenant, $newTenant);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenant::fromArray
-     */
     public function testFromArrayThrowsExceptionForNonStringName(): void
     {
         $this->expectException(\InvalidArgumentException::class);

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * Copyright 2025 Zestic
+ * Copyright 2025-2026 Zestic
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ declare(strict_types=1);
 
 namespace Weaviate\Tests\Integration\Schema;
 
-use Weaviate\Tests\TestCase;
 use Weaviate\WeaviateClient;
+use Weaviate\Factory\WeaviateClientFactory;
+use Weaviate\Tests\TestCase;
 
 /**
  * Integration tests for Schema management functionality.
@@ -47,7 +48,7 @@ class SchemaIntegrationTest extends TestCase
         }
         $host = $url['host'] . ':' . $url['port'];
 
-        $this->client = WeaviateClient::connectToLocal($host);
+        $this->client = WeaviateClientFactory::connectToLocal($host);
 
         // Clean up any existing test collection
         if ($this->client->schema()->exists(self::TEST_CLASS_NAME)) {

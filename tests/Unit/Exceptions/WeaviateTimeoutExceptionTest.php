@@ -26,9 +26,6 @@ use Weaviate\Exceptions\WeaviateBaseException;
 
 class WeaviateTimeoutExceptionTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::__construct
-     */
     public function testCanCreateTimeoutException(): void
     {
         $exception = new WeaviateTimeoutException('Operation timed out', 30.0);
@@ -42,9 +39,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame('timeout', $context['error_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::__construct
-     */
     public function testCanCreateWithContext(): void
     {
         $context = ['operation' => 'query', 'retry_count' => 3];
@@ -57,9 +51,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame('timeout', $resultContext['error_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::forConnection
-     */
     public function testForConnection(): void
     {
         $url = 'http://localhost:8080';
@@ -77,9 +68,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame('connection', $resultContext['timeout_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::forQuery
-     */
     public function testForQuery(): void
     {
         $query = 'SELECT * FROM Article';
@@ -100,9 +88,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame('Article', $resultContext['collection']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::forBatch
-     */
     public function testForBatch(): void
     {
         $batchSize = 100;
@@ -120,9 +105,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame('insert', $resultContext['operation_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::getTimeoutSeconds
-     */
     public function testGetTimeoutSeconds(): void
     {
         $exception = new WeaviateTimeoutException('Timeout', 25.5);
@@ -130,9 +112,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame(25.5, $exception->getTimeoutSeconds());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::getTimeoutSeconds
-     */
     public function testGetTimeoutSecondsReturnsNullWhenNotSet(): void
     {
         $exception = new WeaviateTimeoutException('Timeout');
@@ -140,9 +119,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertNull($exception->getTimeoutSeconds());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::__construct
-     */
     public function testExceptionChaining(): void
     {
         $previous = new \RuntimeException('Network error');
@@ -151,9 +127,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::forConnection
-     */
     public function testForConnectionWithPreviousException(): void
     {
         $previous = new \Exception('Connection refused');
@@ -162,9 +135,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::__construct
-     */
     public function testWithZeroTimeout(): void
     {
         $exception = new WeaviateTimeoutException('Immediate timeout', 0.0);
@@ -173,9 +143,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame(0.0, $exception->getTimeoutSeconds());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::__construct
-     */
     public function testWithNegativeTimeout(): void
     {
         $exception = new WeaviateTimeoutException('Invalid timeout', -5.0);
@@ -184,9 +151,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame(-5.0, $exception->getTimeoutSeconds());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::forQuery
-     */
     public function testForQueryWithEmptyQuery(): void
     {
         $exception = WeaviateTimeoutException::forQuery('', 30.0);
@@ -196,9 +160,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame('query', $context['timeout_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::forBatch
-     */
     public function testForBatchWithZeroSize(): void
     {
         $exception = WeaviateTimeoutException::forBatch(0, 30.0);
@@ -209,9 +170,6 @@ class WeaviateTimeoutExceptionTest extends TestCase
         $this->assertSame(0, $context['batch_size']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateTimeoutException::__construct
-     */
     public function testTimeoutSuggestionsAreIncluded(): void
     {
         $exception = new WeaviateTimeoutException('Timeout', 30.0);

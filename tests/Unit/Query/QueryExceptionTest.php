@@ -23,14 +23,8 @@ namespace Weaviate\Tests\Unit\Query;
 use PHPUnit\Framework\TestCase;
 use Weaviate\Query\Exception\QueryException;
 
-/**
- * @covers \Weaviate\Query\Exception\QueryException
- */
 class QueryExceptionTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Query\Exception\QueryException::__construct
-     */
     public function testCanBeConstructedWithMessage(): void
     {
         $exception = new QueryException('Test message');
@@ -39,10 +33,6 @@ class QueryExceptionTest extends TestCase
         $this->assertEquals([], $exception->getGraphqlErrors());
     }
 
-    /**
-     * @covers \Weaviate\Query\Exception\QueryException::__construct
-     * @covers \Weaviate\Query\Exception\QueryException::getGraphqlErrors
-     */
     public function testCanBeConstructedWithGraphQLErrors(): void
     {
         $graphqlErrors = [
@@ -56,9 +46,6 @@ class QueryExceptionTest extends TestCase
         $this->assertEquals($graphqlErrors, $exception->getGraphqlErrors());
     }
 
-    /**
-     * @covers \Weaviate\Query\Exception\QueryException::__construct
-     */
     public function testCanBeConstructedWithCodeAndPrevious(): void
     {
         $previous = new \Exception('Previous exception');
@@ -69,9 +56,6 @@ class QueryExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Query\Exception\QueryException::getDetailedErrorMessage
-     */
     public function testGetDetailedErrorMessageWithNoErrors(): void
     {
         $exception = new QueryException('Test message');
@@ -79,9 +63,6 @@ class QueryExceptionTest extends TestCase
         $this->assertEquals('', $exception->getDetailedErrorMessage());
     }
 
-    /**
-     * @covers \Weaviate\Query\Exception\QueryException::getDetailedErrorMessage
-     */
     public function testGetDetailedErrorMessageWithSingleError(): void
     {
         $graphqlErrors = [
@@ -100,9 +81,6 @@ class QueryExceptionTest extends TestCase
         $this->assertStringContainsString('Locations: [{"line":1,"column":5}]', $detailedMessage);
     }
 
-    /**
-     * @covers \Weaviate\Query\Exception\QueryException::getDetailedErrorMessage
-     */
     public function testGetDetailedErrorMessageWithMultipleErrors(): void
     {
         $graphqlErrors = [
@@ -125,9 +103,6 @@ class QueryExceptionTest extends TestCase
         $this->assertStringContainsString('Locations: [{"line":2,"column":10}]', $detailedMessage);
     }
 
-    /**
-     * @covers \Weaviate\Query\Exception\QueryException::getDetailedErrorMessage
-     */
     public function testGetDetailedErrorMessageWithMissingFields(): void
     {
         $graphqlErrors = [

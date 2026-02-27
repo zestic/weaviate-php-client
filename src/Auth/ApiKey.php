@@ -38,7 +38,7 @@ use Psr\Http\Message\RequestInterface;
  * use Weaviate\WeaviateClient;
  *
  * $auth = new ApiKey('your-api-key-here');
- * $client = WeaviateClient::connectToWeaviateCloud(
+ * $client = WeaviateClientFactory::connectToWeaviateCloud(
  *     'my-cluster.weaviate.network',
  *     $auth
  * );

@@ -26,9 +26,6 @@ use Weaviate\Connection\ConnectionInterface;
 use Weaviate\Query\QueryBuilder;
 use Weaviate\Query\Filter;
 
-/**
- * @covers \Weaviate\Query\QueryBuilder
- */
 class QueryBuilderReferenceTest extends TestCase
 {
     private ConnectionInterface&MockObject $connection;
@@ -40,11 +37,6 @@ class QueryBuilderReferenceTest extends TestCase
         $this->queryBuilder = new QueryBuilder($this->connection, 'TestClass');
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::returnReferences
-     * @covers \Weaviate\Query\QueryBuilder::buildReferenceFields
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testCanIncludeCrossReferencesInQuery(): void
     {
         $expectedQuery = [
@@ -86,10 +78,6 @@ class QueryBuilderReferenceTest extends TestCase
         $this->assertArrayHasKey('hasCategory', $result[0]);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::returnReferences
-     * @covers \Weaviate\Query\QueryBuilder::buildReferenceFields
-     */
     public function testCanIncludeMultipleCrossReferences(): void
     {
         $expectedQuery = [
@@ -121,11 +109,6 @@ class QueryBuilderReferenceTest extends TestCase
             ->fetchObjects();
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::where
-     * @covers \Weaviate\Query\QueryBuilder::returnReferences
-     * @covers \Weaviate\Query\QueryBuilder::fetchObjects
-     */
     public function testCanCombineCrossReferenceFilterWithReturnReferences(): void
     {
         $filter = Filter::byRef('hasCategory')->byProperty('title')->like('*Tech*');
@@ -157,10 +140,6 @@ class QueryBuilderReferenceTest extends TestCase
             ->fetchObjects();
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::returnReferences
-     * @covers \Weaviate\Query\QueryBuilder::buildReferenceFields
-     */
     public function testCanIncludeCrossReferencesWithTenant(): void
     {
         $queryBuilder = new QueryBuilder($this->connection, 'TestClass', 'tenant-123');
@@ -190,10 +169,6 @@ class QueryBuilderReferenceTest extends TestCase
             ->fetchObjects();
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::returnReferences
-     * @covers \Weaviate\Query\QueryBuilder::buildReferenceFields
-     */
     public function testCanIncludeCrossReferencesWithDefaultFields(): void
     {
         $expectedQuery = [
@@ -221,9 +196,6 @@ class QueryBuilderReferenceTest extends TestCase
             ->fetchObjects();
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::aggregate
-     */
     public function testCanCreateAggregateBuilder(): void
     {
         $aggregateBuilder = $this->queryBuilder->aggregate();
@@ -231,10 +203,6 @@ class QueryBuilderReferenceTest extends TestCase
         $this->assertInstanceOf(\Weaviate\Query\AggregateBuilder::class, $aggregateBuilder);
     }
 
-    /**
-     * @covers \Weaviate\Query\QueryBuilder::returnReferences
-     * @covers \Weaviate\Query\QueryBuilder::buildReferenceFields
-     */
     public function testEmptyReferencesDoesNotAddReferenceFields(): void
     {
         $expectedQuery = [

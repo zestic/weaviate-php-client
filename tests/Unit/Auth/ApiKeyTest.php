@@ -26,9 +26,6 @@ use Psr\Http\Message\RequestInterface;
 
 class ApiKeyTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Auth\ApiKey::__construct
-     */
     public function testCanCreateApiKeyAuth(): void
     {
         $auth = new ApiKey('my-secret-key');
@@ -36,10 +33,6 @@ class ApiKeyTest extends TestCase
         $this->assertInstanceOf(ApiKey::class, $auth);
     }
 
-    /**
-     * @covers \Weaviate\Auth\ApiKey::__construct
-     * @covers \Weaviate\Auth\ApiKey::apply
-     */
     public function testAppliesAuthorizationHeader(): void
     {
         $auth = new ApiKey('my-secret-key');

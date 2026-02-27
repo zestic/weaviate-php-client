@@ -25,9 +25,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Weaviate\Connection\ConnectionInterface;
 use Weaviate\Data\DataOperations;
 
-/**
- * @covers \Weaviate\Data\DataOperations
- */
 class CrossReferenceTest extends TestCase
 {
     private ConnectionInterface&MockObject $connection;
@@ -39,9 +36,6 @@ class CrossReferenceTest extends TestCase
         $this->dataOperations = new DataOperations($this->connection, 'TestClass');
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::referenceAdd
-     */
     public function testCanAddCrossReference(): void
     {
         $fromUuid = '123e4567-e89b-12d3-a456-426614174000';
@@ -61,9 +55,6 @@ class CrossReferenceTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::referenceAdd
-     */
     public function testCanAddCrossReferenceWithTenant(): void
     {
         $dataOperations = new DataOperations($this->connection, 'TestClass', 'tenant-123');
@@ -84,9 +75,6 @@ class CrossReferenceTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::referenceDelete
-     */
     public function testCanDeleteCrossReference(): void
     {
         $fromUuid = '123e4567-e89b-12d3-a456-426614174000';
@@ -106,9 +94,6 @@ class CrossReferenceTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::referenceReplace
-     */
     public function testCanReplaceCrossReferenceWithSingleTarget(): void
     {
         $fromUuid = '123e4567-e89b-12d3-a456-426614174000';
@@ -128,9 +113,6 @@ class CrossReferenceTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::referenceReplace
-     */
     public function testCanReplaceCrossReferenceWithMultipleTargets(): void
     {
         $fromUuid = '123e4567-e89b-12d3-a456-426614174000';
@@ -156,9 +138,6 @@ class CrossReferenceTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::referenceAddMany
-     */
     public function testCanAddMultipleCrossReferences(): void
     {
         $references = [
@@ -185,9 +164,6 @@ class CrossReferenceTest extends TestCase
         $this->assertArrayHasKey('456e7890-a12b-34c5-d678-901234567890.hasAuthor', $results);
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::referenceAdd
-     */
     public function testReferenceAddReturnsFalseOnException(): void
     {
         $this->connection
@@ -200,9 +176,6 @@ class CrossReferenceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::referenceDelete
-     */
     public function testReferenceDeleteReturnsFalseOnException(): void
     {
         $this->connection
@@ -215,9 +188,6 @@ class CrossReferenceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::referenceReplace
-     */
     public function testReferenceReplaceReturnsFalseOnException(): void
     {
         $this->connection

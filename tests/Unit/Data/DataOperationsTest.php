@@ -26,11 +26,6 @@ use Weaviate\Connection\ConnectionInterface;
 
 class DataOperationsTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Data\DataOperations::__construct
-     * @covers \Weaviate\Data\DataOperations::create
-     * @covers \Weaviate\Data\DataOperations::extractProperties
-     */
     public function testCanCreateObject(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
@@ -61,10 +56,6 @@ class DataOperationsTest extends TestCase
         $this->assertEquals('123e4567-e89b-12d3-a456-426614174000', $result['id']);
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::__construct
-     * @covers \Weaviate\Data\DataOperations::get
-     */
     public function testCanGetObject(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
@@ -84,11 +75,6 @@ class DataOperationsTest extends TestCase
         $this->assertEquals('ACME Corp', $result['properties']['name']);
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::__construct
-     * @covers \Weaviate\Data\DataOperations::update
-     * @covers \Weaviate\Data\DataOperations::get
-     */
     public function testCanUpdateObject(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
@@ -121,10 +107,6 @@ class DataOperationsTest extends TestCase
         $this->assertEquals('Updated Corp', $result['properties']['name']);
     }
 
-    /**
-     * @covers \Weaviate\Data\DataOperations::__construct
-     * @covers \Weaviate\Data\DataOperations::delete
-     */
     public function testCanDeleteObject(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);

@@ -23,14 +23,8 @@ namespace Weaviate\Tests\Unit\Query;
 use PHPUnit\Framework\TestCase;
 use Weaviate\Query\IdFilter;
 
-/**
- * @covers \Weaviate\Query\IdFilter
- */
 class IdFilterTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Query\IdFilter::equal
-     */
     public function testEqual(): void
     {
         $filter = new IdFilter();
@@ -45,9 +39,6 @@ class IdFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\IdFilter::notEqual
-     */
     public function testNotEqual(): void
     {
         $filter = new IdFilter();
@@ -62,9 +53,6 @@ class IdFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\IdFilter::containsAny
-     */
     public function testContainsAny(): void
     {
         $filter = new IdFilter();
@@ -83,9 +71,6 @@ class IdFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\IdFilter::containsAny
-     */
     public function testContainsAnyWithSingleId(): void
     {
         $filter = new IdFilter();
@@ -101,9 +86,6 @@ class IdFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\IdFilter::containsAny
-     */
     public function testContainsAnyWithEmptyArray(): void
     {
         $filter = new IdFilter();

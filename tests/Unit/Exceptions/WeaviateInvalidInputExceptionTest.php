@@ -26,9 +26,6 @@ use Weaviate\Exceptions\WeaviateBaseException;
 
 class WeaviateInvalidInputExceptionTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::__construct
-     */
     public function testCanCreateInvalidInputException(): void
     {
         $exception = new WeaviateInvalidInputException('Invalid parameter value');
@@ -40,9 +37,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertSame('invalid_input', $context['error_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::__construct
-     */
     public function testCanCreateWithContext(): void
     {
         $context = ['parameter' => 'port', 'value' => 99999];
@@ -54,9 +48,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertSame('invalid_input', $resultContext['error_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forParameter
-     */
     public function testForParameter(): void
     {
         $parameter = 'timeout';
@@ -76,9 +67,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertSame('parameter', $resultContext['input_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forMissingParameter
-     */
     public function testForMissingParameter(): void
     {
         $parameter = 'api_key';
@@ -95,9 +83,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertSame('missing_parameter', $resultContext['input_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forDataStructure
-     */
     public function testForDataStructure(): void
     {
         $structure = 'properties';
@@ -115,9 +100,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertSame('data_structure', $resultContext['input_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forConfiguration
-     */
     public function testForConfiguration(): void
     {
         $configKey = 'timeout';
@@ -137,9 +119,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertSame('configuration', $resultContext['input_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::__construct
-     */
     public function testExceptionChaining(): void
     {
         $previous = new \InvalidArgumentException('Original error');
@@ -148,9 +127,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forParameter
-     */
     public function testForParameterWithPreviousException(): void
     {
         $previous = new \Exception('Validation failed');
@@ -159,9 +135,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forParameter
-     */
     public function testForParameterWithNullValue(): void
     {
         $exception = WeaviateInvalidInputException::forParameter('param', null, 'non-null value');
@@ -172,9 +145,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertNull($context['provided_value']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forParameter
-     */
     public function testForParameterWithArrayValue(): void
     {
         $value = ['key' => 'value'];
@@ -186,9 +156,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertSame($value, $context['provided_value']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forMissingParameter
-     */
     public function testForMissingParameterWithEmptyOperation(): void
     {
         $exception = WeaviateInvalidInputException::forMissingParameter('required_param', '');
@@ -199,9 +166,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertSame('missing_parameter', $context['input_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forCollectionName
-     */
     public function testForCollectionName(): void
     {
         $collectionName = 'invalid-name!';
@@ -219,9 +183,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertIsArray($context['suggestions']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::__construct
-     */
     public function testBasicConstructor(): void
     {
         $exception = new WeaviateInvalidInputException('Invalid input');
@@ -231,9 +192,6 @@ class WeaviateInvalidInputExceptionTest extends TestCase
         $this->assertArrayNotHasKey('suggestions', $context);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateInvalidInputException::forParameter
-     */
     public function testForParameterWithBooleanValue(): void
     {
         $exception = WeaviateInvalidInputException::forParameter('enabled', false, 'true');

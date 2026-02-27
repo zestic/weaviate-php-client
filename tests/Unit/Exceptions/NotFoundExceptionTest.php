@@ -26,9 +26,6 @@ use Weaviate\Exceptions\UnexpectedStatusCodeException;
 
 class NotFoundExceptionTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::__construct
-     */
     public function testCanCreateNotFoundException(): void
     {
         $exception = new NotFoundException();
@@ -38,9 +35,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame(404, $exception->getStatusCode());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::__construct
-     */
     public function testCanCreateWithCustomMessage(): void
     {
         $message = 'Collection not found';
@@ -50,9 +44,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame(404, $exception->getStatusCode());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::__construct
-     */
     public function testCanCreateWithResourceType(): void
     {
         $exception = new NotFoundException('Not found', 'collection');
@@ -62,9 +53,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame(404, $context['status_code']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::__construct
-     */
     public function testCanCreateWithResourceId(): void
     {
         $exception = new NotFoundException('Not found', 'object', 'obj-123');
@@ -74,9 +62,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame('obj-123', $context['resource_id']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::__construct
-     */
     public function testCanCreateWithContext(): void
     {
         $context = ['collection' => 'Article', 'tenant' => 'tenant1'];
@@ -89,9 +74,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame('tenant1', $resultContext['tenant']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forCollection
-     */
     public function testForCollection(): void
     {
         $collectionName = 'Article';
@@ -106,9 +88,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame($collectionName, $context['resource_id']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forObject
-     */
     public function testForObject(): void
     {
         $objectId = 'obj-123';
@@ -122,9 +101,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame($objectId, $context['resource_id']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forObject
-     */
     public function testForObjectWithCollection(): void
     {
         $objectId = 'obj-123';
@@ -143,9 +119,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame($collectionName, $context['collection']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forTenant
-     */
     public function testForTenant(): void
     {
         $tenantName = 'tenant123';
@@ -159,9 +132,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame($tenantName, $context['resource_id']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forTenant
-     */
     public function testForTenantWithCollection(): void
     {
         $tenantName = 'tenant123';
@@ -180,9 +150,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame($collectionName, $context['collection']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::fromResponse
-     */
     public function testFromResponse(): void
     {
         $message = 'Resource not found';
@@ -205,9 +172,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame('get', $resultContext['operation']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::__construct
-     */
     public function testDefaultStatusCodeIs404(): void
     {
         $exception = new NotFoundException('Test message');
@@ -216,9 +180,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame(404, $exception->getCode());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forCollection
-     */
     public function testForCollectionWithEmptyName(): void
     {
         $exception = NotFoundException::forCollection('');
@@ -229,9 +190,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame('', $context['resource_id']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forObject
-     */
     public function testForObjectWithEmptyId(): void
     {
         $exception = NotFoundException::forObject('');
@@ -242,9 +200,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame('', $context['resource_id']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forTenant
-     */
     public function testForTenantWithEmptyName(): void
     {
         $exception = NotFoundException::forTenant('');
@@ -255,9 +210,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame('', $context['resource_id']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forObject
-     */
     public function testForObjectWithSpecialCharacters(): void
     {
         $objectId = 'obj-with-special-chars!@#';
@@ -273,9 +225,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame($collectionName, $context['collection']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::__construct
-     */
     public function testWithNullResourceType(): void
     {
         $exception = new NotFoundException('Not found', null, 'id-123');
@@ -285,9 +234,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertSame('id-123', $context['resource_id']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::__construct
-     */
     public function testWithNullResourceId(): void
     {
         $exception = new NotFoundException('Not found', 'collection', null);
@@ -297,9 +243,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertArrayNotHasKey('resource_id', $context);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forObject
-     */
     public function testForObjectWithNullCollection(): void
     {
         $exception = NotFoundException::forObject('obj-123', null);
@@ -311,9 +254,6 @@ class NotFoundExceptionTest extends TestCase
         $this->assertArrayNotHasKey('collection', $context);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\NotFoundException::forTenant
-     */
     public function testForTenantWithNullCollection(): void
     {
         $exception = NotFoundException::forTenant('tenant123', null);

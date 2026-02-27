@@ -34,8 +34,6 @@ use GuzzleHttp\Psr7\HttpFactory;
  * don't interfere with each other and maintain proper isolation.
  *
  * @group integration
- * @covers \Weaviate\Query\QueryBuilder
- * @covers \Weaviate\Collections\Collection
  */
 class MultipleClientsQueryTest extends TestCase
 {

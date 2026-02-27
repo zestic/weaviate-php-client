@@ -31,7 +31,7 @@ echo "----------------------------\n";
 
 try {
     // Try to connect to a non-existent server
-    $client = WeaviateClient::connectToCustom('non-existent-server.invalid', 8080);
+    $client = WeaviateClientFactory::connectToCustom('non-existent-server.invalid', 8080);
     $client->collections()->exists('TestCollection');
     echo "✓ Connection successful (unexpected)\n";
 } catch (WeaviateConnectionException $e) {
@@ -53,7 +53,7 @@ echo "-----------------------------------\n";
 
 try {
     // Try to create client with invalid port
-    WeaviateClient::connectToCustom('localhost', 99999);
+    WeaviateClientFactory::connectToCustom('localhost', 99999);
     echo "✗ Should have failed with invalid port\n";
 } catch (WeaviateInvalidInputException $e) {
     echo "✓ Caught input validation error: " . $e->getMessage() . "\n";
@@ -72,7 +72,7 @@ echo "----------------------------------------\n";
 
 try {
     // Connect to local Weaviate (adjust URL as needed)
-    $client = WeaviateClient::connectToLocal('localhost:8080');
+    $client = WeaviateClientFactory::connectToLocal('localhost:8080');
     
     // Example 3a: Not Found Error Handling
     echo "3a. Testing Not Found Errors:\n";
@@ -293,7 +293,7 @@ function performWeaviateOperation(WeaviateClient $client, string $collectionName
 
 // Demonstrate the best practices function
 try {
-    $client = WeaviateClient::connectToLocal('localhost:8080');
+    $client = WeaviateClientFactory::connectToLocal('localhost:8080');
     $result = performWeaviateOperation($client, 'NonExistentCollection');
     echo "✓ Operation completed, result: " . ($result ? 'found' : 'not found') . "\n";
 } catch (\RuntimeException $e) {
@@ -310,7 +310,7 @@ echo "\n9. Cleanup\n";
 echo "----------\n";
 
 try {
-    $client = WeaviateClient::connectToLocal('localhost:8080');
+    $client = WeaviateClientFactory::connectToLocal('localhost:8080');
     if ($client->collections()->exists('TestErrorCollection')) {
         $client->collections()->delete('TestErrorCollection');
         echo "✓ Cleaned up test collection\n";

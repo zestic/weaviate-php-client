@@ -18,31 +18,21 @@ declare(strict_types=1);
  * limitations under the License.
  */
 
-namespace Weaviate\Tests\Integration;
+namespace Weaviate\Tests\Integration\Factory;
 
-use PHPUnit\Framework\TestCase;
-use Weaviate\WeaviateClient;
-use Weaviate\Auth\ApiKey;
-use Weaviate\Connection\HttpConnection;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\HttpFactory;
+use PHPUnit\Framework\TestCase;
+use Weaviate\Auth\ApiKey;
+use Weaviate\Connection\HttpConnection;
+use Weaviate\Factory\WeaviateClientFactory;
+use Weaviate\WeaviateClient;
 
-/**
- * Mock integration tests for Weaviate Cloud connectivity
- * These tests use a mock HTTP handler to simulate Weaviate Cloud responses
- */
 class WeaviateCloudMockIntegrationTest extends TestCase
 {
-    /**
-     * Test connectToWeaviateCloud with mocked HTTP responses
-     *
-     * @covers \Weaviate\WeaviateClient::connectToWeaviateCloud
-     * @covers \Weaviate\WeaviateClient::parseWeaviateCloudUrl
-     * @covers \Weaviate\Connection\HttpConnection::get
-     */
     public function testConnectToWeaviateCloudWithMockResponses(): void
     {
         // Create a mock HTTP handler that simulates Weaviate Cloud responses
@@ -95,12 +85,6 @@ class WeaviateCloudMockIntegrationTest extends TestCase
         $this->assertTrue($schema);
     }
 
-    /**
-     * Test URL parsing with various formats
-     *
-     * @covers \Weaviate\WeaviateClient::connectToWeaviateCloud
-     * @covers \Weaviate\WeaviateClient::parseWeaviateCloudUrl
-     */
     public function testConnectToWeaviateCloudUrlParsing(): void
     {
         $auth = new ApiKey('test-key');
@@ -115,17 +99,12 @@ class WeaviateCloudMockIntegrationTest extends TestCase
         ];
 
         foreach ($testUrls as $url) {
-            $client = WeaviateClient::connectToWeaviateCloud($url, $auth);
+            $client = WeaviateClientFactory::connectToWeaviateCloud($url, $auth);
             $this->assertInstanceOf(WeaviateClient::class, $client);
             $this->assertSame($auth, $client->getAuth());
         }
     }
 
-    /**
-     * Test that HTTPS is enforced for Weaviate Cloud connections
-     *
-     * @covers \Weaviate\WeaviateClient::connectToWeaviateCloud
-     */
     public function testConnectToWeaviateCloudEnforcesHttps(): void
     {
         // Create a mock that expects HTTPS requests
@@ -172,12 +151,6 @@ class WeaviateCloudMockIntegrationTest extends TestCase
         $this->assertStringStartsWith('https://', $requestUrl);
     }
 
-    /**
-     * Test authentication header is included in requests
-     *
-     * @covers \Weaviate\WeaviateClient::connectToWeaviateCloud
-     * @covers \Weaviate\Auth\ApiKey::apply
-     */
     public function testConnectToWeaviateCloudIncludesAuthHeader(): void
     {
         $capturedHeaders = [];

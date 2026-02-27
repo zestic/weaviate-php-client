@@ -35,7 +35,7 @@ use Throwable;
  * @example Handling invalid input
  * ```php
  * try {
- *     $client = WeaviateClient::connectToCustom('localhost', 99999); // Invalid port
+ *     $client = WeaviateClientFactory::connectToCustom('localhost', 99999); // Invalid port
  * } catch (WeaviateInvalidInputException $e) {
  *     echo "Invalid input: " . $e->getMessage();
  *

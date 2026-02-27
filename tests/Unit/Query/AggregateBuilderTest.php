@@ -26,9 +26,6 @@ use Weaviate\Connection\ConnectionInterface;
 use Weaviate\Query\AggregateBuilder;
 use Weaviate\Query\Exception\QueryException;
 
-/**
- * @covers \Weaviate\Query\AggregateBuilder
- */
 class AggregateBuilderTest extends TestCase
 {
     private ConnectionInterface&MockObject $connection;
@@ -40,13 +37,6 @@ class AggregateBuilderTest extends TestCase
         $this->aggregateBuilder = new AggregateBuilder($this->connection, 'TestClass');
     }
 
-    /**
-     * @covers \Weaviate\Query\AggregateBuilder::metrics
-     * @covers \Weaviate\Query\AggregateBuilder::execute
-     * @covers \Weaviate\Query\AggregateBuilder::buildGraphQLQuery
-     * @covers \Weaviate\Query\AggregateBuilder::buildMetricsFields
-     * @covers \Weaviate\Query\AggregateBuilder::parseResponse
-     */
     public function testCanExecuteSimpleCountAggregation(): void
     {
         $expectedQuery = [
@@ -76,12 +66,6 @@ class AggregateBuilderTest extends TestCase
         $this->assertEquals([['meta' => ['count' => 42]]], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\AggregateBuilder::groupBy
-     * @covers \Weaviate\Query\AggregateBuilder::metrics
-     * @covers \Weaviate\Query\AggregateBuilder::execute
-     * @covers \Weaviate\Query\AggregateBuilder::buildGraphQLQuery
-     */
     public function testCanExecuteGroupedAggregation(): void
     {
         $expectedQuery = [
@@ -118,10 +102,6 @@ class AggregateBuilderTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\AggregateBuilder::execute
-     * @covers \Weaviate\Query\AggregateBuilder::buildGraphQLQuery
-     */
     public function testCanExecuteAggregationWithTenant(): void
     {
         $aggregateBuilder = new AggregateBuilder($this->connection, 'TestClass', 'tenant-123');
@@ -153,11 +133,6 @@ class AggregateBuilderTest extends TestCase
         $this->assertEquals([['meta' => ['count' => 10]]], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\AggregateBuilder::groupBy
-     * @covers \Weaviate\Query\AggregateBuilder::execute
-     * @covers \Weaviate\Query\AggregateBuilder::buildGraphQLQuery
-     */
     public function testCanExecuteAggregationWithTenantAndGroupBy(): void
     {
         $aggregateBuilder = new AggregateBuilder($this->connection, 'TestClass', 'tenant-123');
@@ -196,10 +171,6 @@ class AggregateBuilderTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\AggregateBuilder::execute
-     * @covers \Weaviate\Query\AggregateBuilder::buildMetricsFields
-     */
     public function testUsesDefaultCountMetricWhenNoMetricsSpecified(): void
     {
         $expectedQuery = [
@@ -227,10 +198,6 @@ class AggregateBuilderTest extends TestCase
         $this->assertEquals([['meta' => ['count' => 5]]], $result);
     }
 
-    /**
-     * @covers \Weaviate\Query\AggregateBuilder::execute
-     * @covers \Weaviate\Query\AggregateBuilder::parseResponse
-     */
     public function testThrowsExceptionOnGraphQLError(): void
     {
         $errorResponse = [
@@ -250,10 +217,6 @@ class AggregateBuilderTest extends TestCase
         $this->aggregateBuilder->execute();
     }
 
-    /**
-     * @covers \Weaviate\Query\AggregateBuilder::execute
-     * @covers \Weaviate\Query\AggregateBuilder::parseResponse
-     */
     public function testThrowsExceptionOnInvalidResponseFormat(): void
     {
         $invalidResponse = [
@@ -273,10 +236,6 @@ class AggregateBuilderTest extends TestCase
         $this->aggregateBuilder->execute();
     }
 
-    /**
-     * @covers \Weaviate\Query\AggregateBuilder::metrics
-     * @covers \Weaviate\Query\AggregateBuilder::buildMetricsFields
-     */
     public function testCanHandleMultipleMetrics(): void
     {
         $expectedQuery = [

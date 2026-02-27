@@ -42,22 +42,22 @@ use Weaviate\WeaviateClient;
 use Weaviate\Auth\ApiKey;
 
 // Connect to local Weaviate instance (default: localhost:8080)
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 
 // Connect to Docker container on custom port
-$client = WeaviateClient::connectToLocal('localhost:18080');
+$client = WeaviateClientFactory::connectToLocal('localhost:18080');
 
 // Connect with authentication
-$client = WeaviateClient::connectToLocal('localhost:8080', new ApiKey('your-api-key'));
+$client = WeaviateClientFactory::connectToLocal('localhost:8080', new ApiKey('your-api-key'));
 
 // Connect to Weaviate Cloud
-$client = WeaviateClient::connectToWeaviateCloud(
+$client = WeaviateClientFactory::connectToWeaviateCloud(
     'my-cluster.weaviate.network',
     new ApiKey('your-wcd-api-key')
 );
 
 // Connect to custom Weaviate instance
-$client = WeaviateClient::connectToCustom(
+$client = WeaviateClientFactory::connectToCustom(
     'my-server.com',        // host
     9200,                   // port
     true,                   // use HTTPS
@@ -78,7 +78,7 @@ The PHP client provides comprehensive schema management capabilities:
 
 use Weaviate\WeaviateClient;
 
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 $schema = $client->schema();
 
 // Check if collection exists
@@ -218,7 +218,7 @@ Weaviate supports multi-tenancy, allowing you to isolate data for different tena
 use Weaviate\WeaviateClient;
 use Weaviate\Connection\HttpConnection;
 
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 
 // Create a collection with multi-tenancy enabled
 $client->collections()->create('Articles', [
@@ -375,7 +375,7 @@ The PHP client provides a powerful query builder with comprehensive filtering ca
 use Weaviate\WeaviateClient;
 use Weaviate\Query\Filter;
 
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 $collection = $client->collections()->get('Article');
 
 // Simple query without filters
@@ -404,7 +404,7 @@ The PHP client now supports full cross-reference management, achieving parity wi
 
 use Weaviate\WeaviateClient;
 
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 $collection = $client->collections()->get('Question');
 
 // Add a single cross-reference

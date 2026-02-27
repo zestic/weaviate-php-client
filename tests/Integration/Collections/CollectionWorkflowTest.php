@@ -50,21 +50,6 @@ class CollectionWorkflowTest extends TestCase
         $this->client = new WeaviateClient($connection);
     }
 
-    /**
-     * @covers \Weaviate\WeaviateClient::__construct
-     * @covers \Weaviate\WeaviateClient::collections
-     * @covers \Weaviate\Collections\Collections::exists
-     * @covers \Weaviate\Collections\Collections::delete
-     * @covers \Weaviate\Collections\Collections::create
-     * @covers \Weaviate\Collections\Collections::get
-     * @covers \Weaviate\Collections\Collection::tenants
-     * @covers \Weaviate\Collections\Collection::withTenant
-     * @covers \Weaviate\Collections\Collection::data
-     * @covers \Weaviate\Data\DataOperations::create
-     * @covers \Weaviate\Data\DataOperations::get
-     * @covers \Weaviate\Data\DataOperations::update
-     * @covers \Weaviate\Data\DataOperations::delete
-     */
     public function testCanCreateAndManageOrganizationCollection(): void
     {
         $collectionName = 'TestOrganization';
@@ -140,19 +125,6 @@ class CollectionWorkflowTest extends TestCase
         $this->assertFalse($this->client->collections()->exists($collectionName));
     }
 
-    /**
-     * @covers \Weaviate\WeaviateClient::__construct
-     * @covers \Weaviate\WeaviateClient::collections
-     * @covers \Weaviate\Collections\Collections::exists
-     * @covers \Weaviate\Collections\Collections::delete
-     * @covers \Weaviate\Collections\Collections::create
-     * @covers \Weaviate\Collections\Collections::get
-     * @covers \Weaviate\Collections\Collection::tenants
-     * @covers \Weaviate\Collections\Collection::withTenant
-     * @covers \Weaviate\Collections\Collection::data
-     * @covers \Weaviate\Data\DataOperations::create
-     * @covers \Weaviate\Data\DataOperations::get
-     */
     public function testCanWorkWithMultipleTenants(): void
     {
         $collectionName = 'TestMultiTenant';

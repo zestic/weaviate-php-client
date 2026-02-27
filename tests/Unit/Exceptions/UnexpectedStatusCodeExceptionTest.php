@@ -26,9 +26,6 @@ use Weaviate\Exceptions\WeaviateBaseException;
 
 class UnexpectedStatusCodeExceptionTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::__construct
-     */
     public function testCanCreateUnexpectedStatusCodeException(): void
     {
         $exception = new UnexpectedStatusCodeException('Server error', 500);
@@ -42,9 +39,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame(500, $context['status_code']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::__construct
-     */
     public function testCanCreateWithResponse(): void
     {
         $response = [
@@ -60,9 +54,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame(500, $context['status_code']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::__construct
-     */
     public function testCanCreateWithContext(): void
     {
         $context = ['operation' => 'create_collection', 'collection' => 'Article'];
@@ -74,9 +65,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame(400, $resultContext['status_code']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::getStatusCode
-     */
     public function testGetStatusCode(): void
     {
         $exception = new UnexpectedStatusCodeException('Error', 422);
@@ -84,9 +72,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame(422, $exception->getStatusCode());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::getResponse
-     */
     public function testGetResponse(): void
     {
         $response = ['body' => 'Error response'];
@@ -95,9 +80,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame($response, $exception->getResponse());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::getResponse
-     */
     public function testGetResponseReturnsNullWhenNotSet(): void
     {
         $exception = new UnexpectedStatusCodeException('Error', 400);
@@ -105,9 +87,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertNull($exception->getResponse());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::fromResponse
-     */
     public function testFromResponse(): void
     {
         $message = 'Conflict error';
@@ -131,9 +110,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame(409, $resultContext['status_code']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::fromResponse
-     */
     public function testFromResponseWithExplanation(): void
     {
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
@@ -150,9 +126,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame(401, $exception->getStatusCode());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::fromResponse
-     */
     public function testFromResponseWithUnknownStatusCode(): void
     {
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
@@ -169,9 +142,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame(999, $exception->getStatusCode());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::__construct
-     */
     public function testExceptionChaining(): void
     {
         $previous = new \RuntimeException('Network error');
@@ -180,9 +150,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::fromResponse
-     */
     public function testFromResponseWithPreviousException(): void
     {
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
@@ -199,9 +166,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::__construct
-     */
     public function testWithZeroStatusCode(): void
     {
         $exception = new UnexpectedStatusCodeException('Error', 0);
@@ -210,9 +174,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame(0, $exception->getCode());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::fromResponse
-     */
     public function testFromResponseWithEmptyBody(): void
     {
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
@@ -229,9 +190,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertStringContainsString('Server error', $exception->getMessage());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::__construct
-     */
     public function testContextIncludesStatusCode(): void
     {
         $exception = new UnexpectedStatusCodeException('Error', 418);
@@ -240,9 +198,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame(418, $context['status_code']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::__construct
-     */
     public function testContextIncludesResponseWhenProvided(): void
     {
         $response = ['body' => 'test', 'headers' => []];
@@ -252,9 +207,6 @@ class UnexpectedStatusCodeExceptionTest extends TestCase
         $this->assertSame($response, $context['response']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\UnexpectedStatusCodeException::__construct
-     */
     public function testContextDoesNotIncludeResponseWhenNull(): void
     {
         $exception = new UnexpectedStatusCodeException('Error', 400, null);

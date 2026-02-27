@@ -24,15 +24,8 @@ use DateTime;
 use PHPUnit\Framework\TestCase;
 use Weaviate\Query\PropertyFilter;
 
-/**
- * @covers \Weaviate\Query\PropertyFilter
- */
 class PropertyFilterTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::__construct
-     * @covers \Weaviate\Query\PropertyFilter::equal
-     */
     public function testEqualWithString(): void
     {
         $filter = new PropertyFilter('name');
@@ -47,9 +40,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::equal
-     */
     public function testEqualWithInteger(): void
     {
         $filter = new PropertyFilter('age');
@@ -64,9 +54,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::equal
-     */
     public function testEqualWithFloat(): void
     {
         $filter = new PropertyFilter('price');
@@ -81,9 +68,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::equal
-     */
     public function testEqualWithBoolean(): void
     {
         $filter = new PropertyFilter('isActive');
@@ -98,9 +82,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::equal
-     */
     public function testEqualWithDateTime(): void
     {
         $filter = new PropertyFilter('createdAt');
@@ -116,9 +97,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::notEqual
-     */
     public function testNotEqual(): void
     {
         $filter = new PropertyFilter('status');
@@ -133,9 +111,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::like
-     */
     public function testLike(): void
     {
         $filter = new PropertyFilter('name');
@@ -150,9 +125,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::isNull
-     */
     public function testIsNullTrue(): void
     {
         $filter = new PropertyFilter('deletedAt');
@@ -167,9 +139,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::isNull
-     */
     public function testIsNullFalse(): void
     {
         $filter = new PropertyFilter('deletedAt');
@@ -184,9 +153,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::isNull
-     */
     public function testIsNullDefaultsToTrue(): void
     {
         $filter = new PropertyFilter('deletedAt');
@@ -201,9 +167,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::greaterThan
-     */
     public function testGreaterThan(): void
     {
         $filter = new PropertyFilter('age');
@@ -218,9 +181,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::lessThan
-     */
     public function testLessThan(): void
     {
         $filter = new PropertyFilter('price');
@@ -235,9 +195,6 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\PropertyFilter::containsAny
-     */
     public function testContainsAny(): void
     {
         $filter = new PropertyFilter('tags');

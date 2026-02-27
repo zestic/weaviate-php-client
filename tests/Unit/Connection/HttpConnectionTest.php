@@ -39,9 +39,6 @@ use Psr\Http\Message\StreamInterface;
 
 class HttpConnectionTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::__construct
-     */
     public function testCanCreateConnection(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -60,10 +57,6 @@ class HttpConnectionTest extends TestCase
         $this->assertInstanceOf(HttpConnection::class, $connection);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::__construct
-     * @covers \Weaviate\Connection\HttpConnection::get
-     */
     public function testCanMakeGetRequest(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -101,9 +94,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['result' => 'success'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::post
-     */
     public function testCanMakePostRequest(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -156,11 +146,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['id' => '123'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::__construct
-     * @covers \Weaviate\Connection\HttpConnection::get
-     * @covers \Weaviate\Connection\HttpConnection::applyAuth
-     */
     public function testCanMakeGetRequestWithAuthentication(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -206,9 +191,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['result' => 'success'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::head
-     */
     public function testCanMakeHeadRequest(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -245,9 +227,6 @@ class HttpConnectionTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::head
-     */
     public function testHeadRequestReturnsFalseForNotFound(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -284,9 +263,6 @@ class HttpConnectionTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::head
-     */
     public function testHeadRequestThrowsExceptionOnNetworkError(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -328,9 +304,6 @@ class HttpConnectionTest extends TestCase
         $connection->head('/v1/objects/Organization/123');
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::head
-     */
     public function testHeadRequestThrowsExceptionForHttpErrors(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -371,9 +344,6 @@ class HttpConnectionTest extends TestCase
         $connection->head('/v1/objects/Organization/123');
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::get
-     */
     public function testGetRequestWithQueryParameters(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -411,9 +381,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['result' => 'success'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::get
-     */
     public function testGetRequestReturnsEmptyArrayForEmptyResponse(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -449,9 +416,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::post
-     */
     public function testPostRequestWithEmptyData(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -492,9 +456,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['id' => '123'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::put
-     */
     public function testCanMakePutRequest(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -547,9 +508,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['updated' => true], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::put
-     */
     public function testPutRequestWithEmptyData(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -590,9 +548,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['updated' => true], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::patch
-     */
     public function testCanMakePatchRequest(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -645,9 +600,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['patched' => true], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::patch
-     */
     public function testPatchRequestWithEmptyData(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -688,9 +640,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['patched' => true], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::delete
-     */
     public function testCanMakeDeleteRequest(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -725,9 +674,6 @@ class HttpConnectionTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::delete
-     */
     public function testDeleteRequestReturnsFalseForErrorStatus(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -762,9 +708,6 @@ class HttpConnectionTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::deleteWithData
-     */
     public function testCanMakeDeleteWithDataRequest(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -815,9 +758,6 @@ class HttpConnectionTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::deleteWithData
-     */
     public function testDeleteWithDataRequestWithEmptyData(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -855,9 +795,6 @@ class HttpConnectionTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::deleteWithData
-     */
     public function testDeleteWithDataReturnsFalseForErrorStatus(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -890,9 +827,6 @@ class HttpConnectionTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::applyHeaders
-     */
     public function testApplyAdditionalHeaders(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -933,10 +867,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['result' => 'success'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::get
-     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
-     */
     public function testGetRequestThrowsNotFoundExceptionFor404(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -972,10 +902,6 @@ class HttpConnectionTest extends TestCase
         $connection->get('/v1/schema/NonExistent');
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::get
-     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
-     */
     public function testGetRequestThrowsInsufficientPermissionsExceptionFor403(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1011,10 +937,6 @@ class HttpConnectionTest extends TestCase
         $connection->get('/v1/schema');
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::get
-     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
-     */
     public function testGetRequestThrowsUnexpectedStatusCodeExceptionForOtherErrors(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1050,9 +972,6 @@ class HttpConnectionTest extends TestCase
         $connection->get('/v1/schema');
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::get
-     */
     public function testGetRequestThrowsWeaviateConnectionExceptionForNetworkError(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1088,9 +1007,6 @@ class HttpConnectionTest extends TestCase
         $connection->get('/v1/schema');
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::get
-     */
     public function testGetRequestThrowsWeaviateConnectionExceptionForRequestError(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1126,9 +1042,6 @@ class HttpConnectionTest extends TestCase
         $connection->get('/v1/schema');
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::post
-     */
     public function testPostRequestThrowsRuntimeExceptionForJsonEncodingFailure(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1162,9 +1075,6 @@ class HttpConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::put
-     */
     public function testPutRequestThrowsRuntimeExceptionForJsonEncodingFailure(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1198,9 +1108,6 @@ class HttpConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::patch
-     */
     public function testPatchRequestThrowsRuntimeExceptionForJsonEncodingFailure(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1234,9 +1141,6 @@ class HttpConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::deleteWithData
-     */
     public function testDeleteWithDataThrowsRuntimeExceptionForJsonEncodingFailure(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1270,9 +1174,6 @@ class HttpConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::get
-     */
     public function testGetRequestWithRetryHandler(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1300,9 +1201,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['result' => 'success'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::post
-     */
     public function testPostRequestWithRetryHandler(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1330,10 +1228,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['id' => '123'], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::post
-     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
-     */
     public function testPostRequestThrowsNotFoundExceptionFor404(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1377,9 +1271,6 @@ class HttpConnectionTest extends TestCase
         $connection->post('/v1/objects', ['name' => 'test']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::post
-     */
     public function testPostRequestThrowsWeaviateConnectionExceptionForNetworkError(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1423,9 +1314,6 @@ class HttpConnectionTest extends TestCase
         $connection->post('/v1/objects', ['name' => 'test']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::__construct
-     */
     public function testCanCreateConnectionWithAllParameters(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1447,9 +1335,6 @@ class HttpConnectionTest extends TestCase
         $this->assertInstanceOf(HttpConnection::class, $connection);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::patch
-     */
     public function testPatchRequestWithRetryHandler(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1477,9 +1362,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['patched' => true], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::put
-     */
     public function testPutRequestWithRetryHandler(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1507,10 +1389,6 @@ class HttpConnectionTest extends TestCase
         $this->assertEquals(['updated' => true], $result);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::patch
-     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
-     */
     public function testPatchRequestThrowsNotFoundExceptionFor404(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1554,10 +1432,6 @@ class HttpConnectionTest extends TestCase
         $connection->patch('/v1/objects/123', ['name' => 'patched']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::patch
-     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
-     */
     public function testPatchRequestThrowsInsufficientPermissionsExceptionFor403(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1601,10 +1475,6 @@ class HttpConnectionTest extends TestCase
         $connection->patch('/v1/objects/123', ['name' => 'patched']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::patch
-     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
-     */
     public function testPatchRequestThrowsUnexpectedStatusCodeExceptionFor500(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1648,9 +1518,6 @@ class HttpConnectionTest extends TestCase
         $connection->patch('/v1/objects/123', ['name' => 'patched']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::patch
-     */
     public function testPatchRequestThrowsWeaviateConnectionExceptionForNetworkError(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1694,9 +1561,6 @@ class HttpConnectionTest extends TestCase
         $connection->patch('/v1/objects/123', ['name' => 'patched']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::patch
-     */
     public function testPatchRequestThrowsWeaviateConnectionExceptionForRequestError(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1740,10 +1604,6 @@ class HttpConnectionTest extends TestCase
         $connection->patch('/v1/objects/123', ['name' => 'patched']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::put
-     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
-     */
     public function testPutRequestThrowsNotFoundExceptionFor404(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1787,10 +1647,6 @@ class HttpConnectionTest extends TestCase
         $connection->put('/v1/objects/123', ['name' => 'updated']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::put
-     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
-     */
     public function testPutRequestThrowsInsufficientPermissionsExceptionFor403(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1834,10 +1690,6 @@ class HttpConnectionTest extends TestCase
         $connection->put('/v1/objects/123', ['name' => 'updated']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::put
-     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
-     */
     public function testPutRequestThrowsUnexpectedStatusCodeExceptionFor500(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1881,9 +1733,6 @@ class HttpConnectionTest extends TestCase
         $connection->put('/v1/objects/123', ['name' => 'updated']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::put
-     */
     public function testPutRequestThrowsWeaviateConnectionExceptionForNetworkError(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1927,9 +1776,6 @@ class HttpConnectionTest extends TestCase
         $connection->put('/v1/objects/123', ['name' => 'updated']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::put
-     */
     public function testPutRequestThrowsWeaviateConnectionExceptionForRequestError(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);
@@ -1973,9 +1819,6 @@ class HttpConnectionTest extends TestCase
         $connection->put('/v1/objects/123', ['name' => 'updated']);
     }
 
-    /**
-     * @covers \Weaviate\Connection\HttpConnection::handleErrorResponse
-     */
     public function testHandleErrorResponseWithCustomUrl(): void
     {
         $httpClient = $this->createMock(ClientInterface::class);

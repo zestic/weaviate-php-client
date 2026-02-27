@@ -23,14 +23,8 @@ namespace Weaviate\Tests\Unit\Query;
 use PHPUnit\Framework\TestCase;
 use Weaviate\Query\ReferenceIdFilter;
 
-/**
- * @covers \Weaviate\Query\ReferenceIdFilter
- */
 class ReferenceIdFilterTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Query\ReferenceIdFilter::__construct
-     */
     public function testCanBeConstructed(): void
     {
         $filter = new ReferenceIdFilter('hasCategory');
@@ -38,10 +32,6 @@ class ReferenceIdFilterTest extends TestCase
         $this->assertInstanceOf(ReferenceIdFilter::class, $filter);
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceIdFilter::equal
-     * @covers \Weaviate\Query\ReferenceIdFilter::toArray
-     */
     public function testEqualFilter(): void
     {
         $uuid = '123e4567-e89b-12d3-a456-426614174000';
@@ -63,10 +53,6 @@ class ReferenceIdFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceIdFilter::notEqual
-     * @covers \Weaviate\Query\ReferenceIdFilter::toArray
-     */
     public function testNotEqualFilter(): void
     {
         $uuid = '123e4567-e89b-12d3-a456-426614174000';
@@ -88,10 +74,6 @@ class ReferenceIdFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceIdFilter::containsAny
-     * @covers \Weaviate\Query\ReferenceIdFilter::toArray
-     */
     public function testContainsAnyFilter(): void
     {
         $uuids = [
@@ -116,9 +98,6 @@ class ReferenceIdFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceIdFilter::containsAny
-     */
     public function testContainsAnyWithEmptyArray(): void
     {
         $filter = new ReferenceIdFilter('hasCategories');
@@ -139,9 +118,6 @@ class ReferenceIdFilterTest extends TestCase
         $this->assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * @covers \Weaviate\Query\ReferenceIdFilter::equal
-     */
     public function testFluentInterface(): void
     {
         $filter = new ReferenceIdFilter('hasCategory');

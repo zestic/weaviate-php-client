@@ -32,7 +32,7 @@ use Weaviate\WeaviateClient;
 use Weaviate\Query\Filter;
 
 // 1. Connect to Weaviate
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 
 // 2. Get a collection
 $collection = $client->collections()->get('Article');

@@ -26,9 +26,6 @@ use Weaviate\Exceptions\WeaviateQueryException;
 
 class WeaviateBatchExceptionTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::__construct
-     */
     public function testCanCreateBatchException(): void
     {
         $exception = new WeaviateBatchException('Batch operation failed');
@@ -41,9 +38,6 @@ class WeaviateBatchExceptionTest extends TestCase
         $this->assertSame('Batch', $context['query_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::__construct
-     */
     public function testCanCreateWithContext(): void
     {
         $context = ['batch_id' => 'test-123', 'operation' => 'insert'];
@@ -55,9 +49,6 @@ class WeaviateBatchExceptionTest extends TestCase
         $this->assertSame('query_failure', $resultContext['error_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::forCompleteFailure
-     */
     public function testForCompleteFailure(): void
     {
         $totalObjects = 100;
@@ -78,9 +69,6 @@ class WeaviateBatchExceptionTest extends TestCase
         $this->assertSame(95, $resultContext['server_load']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::forPartialFailure
-     */
     public function testForPartialFailure(): void
     {
         $totalObjects = 100;
@@ -103,9 +91,6 @@ class WeaviateBatchExceptionTest extends TestCase
         $this->assertSame('partial_failure', $context['batch_type']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::forTimeout
-     */
     public function testForTimeout(): void
     {
         $batchSize = 50;
@@ -126,9 +111,6 @@ class WeaviateBatchExceptionTest extends TestCase
         $this->assertContains('Increase timeout configuration', $resultContext['suggestions']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::forTimeout
-     */
     public function testForTimeoutWithLargeTimeout(): void
     {
         $batchSize = 1000;
@@ -148,9 +130,6 @@ class WeaviateBatchExceptionTest extends TestCase
         $this->assertSame('high', $resultContext['server_load']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::__construct
-     */
     public function testExceptionChaining(): void
     {
         $previous = new \RuntimeException('Network error');
@@ -159,9 +138,6 @@ class WeaviateBatchExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::forCompleteFailure
-     */
     public function testForCompleteFailureWithPreviousException(): void
     {
         $previous = new \Exception('Connection lost');
@@ -170,9 +146,6 @@ class WeaviateBatchExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::forPartialFailure
-     */
     public function testForPartialFailureWithEmptyFailedObjects(): void
     {
         $exception = WeaviateBatchException::forPartialFailure(100, 100, []);
@@ -184,9 +157,6 @@ class WeaviateBatchExceptionTest extends TestCase
         $this->assertSame([], $context['failed_objects']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::forTimeout
-     */
     public function testForTimeoutWithZeroTimeout(): void
     {
         $exception = WeaviateBatchException::forTimeout(10, 0.0);
@@ -197,9 +167,6 @@ class WeaviateBatchExceptionTest extends TestCase
         $this->assertSame(0.0, $context['timeout_seconds']);
     }
 
-    /**
-     * @covers \Weaviate\Exceptions\WeaviateBatchException::forPartialFailure
-     */
     public function testForPartialFailureWithLargeNumbers(): void
     {
         $successfulCount = 9500;

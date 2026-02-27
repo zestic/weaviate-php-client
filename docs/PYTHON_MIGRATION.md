@@ -39,13 +39,13 @@ use Weaviate\WeaviateClient;
 use Weaviate\Auth\ApiKey;
 
 // Default local connection
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 
 // Custom host/port
-$client = WeaviateClient::connectToLocal('localhost:18080');
+$client = WeaviateClientFactory::connectToLocal('localhost:18080');
 
 // With authentication
-$client = WeaviateClient::connectToLocal(
+$client = WeaviateClientFactory::connectToLocal(
     'localhost:8080',
     new ApiKey('your-api-key')
 );
@@ -63,7 +63,7 @@ client = weaviate.connect_to_weaviate_cloud(
 
 **PHP:**
 ```php
-$client = WeaviateClient::connectToWeaviateCloud(
+$client = WeaviateClientFactory::connectToWeaviateCloud(
     'my-cluster.weaviate.network',
     new ApiKey('your-wcd-api-key')
 );
@@ -84,7 +84,7 @@ client = weaviate.connect_to_custom(
 
 **PHP:**
 ```php
-$client = WeaviateClient::connectToCustom(
+$client = WeaviateClientFactory::connectToCustom(
     'my-server.com',
     9200,
     true, // HTTPS
@@ -226,7 +226,7 @@ client = weaviate.connect_to_local(auth_credentials=auth)
 use Weaviate\Auth\ApiKey;
 
 $auth = new ApiKey('your-api-key');
-$client = WeaviateClient::connectToLocal('localhost:8080', $auth);
+$client = WeaviateClientFactory::connectToLocal('localhost:8080', $auth);
 ```
 
 ## Multi-Tenancy
@@ -308,7 +308,7 @@ with weaviate.connect_to_local() as client:
 
 **PHP uses explicit connection management:**
 ```php
-$client = WeaviateClient::connectToLocal();
+$client = WeaviateClientFactory::connectToLocal();
 // Work with client
 // Connection is managed internally
 ```
@@ -375,7 +375,7 @@ print(f"Title: {post.properties['title']}")
 use Weaviate\WeaviateClient;
 
 // Connect
-$client = WeaviateClient::connectToLocal('localhost:18080');
+$client = WeaviateClientFactory::connectToLocal('localhost:18080');
 
 // Create collection
 if (!$client->collections()->exists('Blog')) {

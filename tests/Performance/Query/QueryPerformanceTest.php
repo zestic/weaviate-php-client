@@ -34,8 +34,6 @@ use GuzzleHttp\Psr7\HttpFactory;
  * meets acceptable thresholds for various query scenarios.
  *
  * @group performance
- * @covers \Weaviate\Query\QueryBuilder
- * @covers \Weaviate\Query\Filter
  */
 class QueryPerformanceTest extends TestCase
 {

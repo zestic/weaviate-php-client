@@ -40,18 +40,11 @@ class TenantsTest extends TestCase
         $this->tenants = new Tenants($this->connection, 'TestCollection');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::__construct
-     */
     public function testCanConstruct(): void
     {
         $this->assertInstanceOf(Tenants::class, $this->tenants);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::create
-     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
-     */
     public function testCanCreateSingleTenantFromString(): void
     {
         $this->connection
@@ -65,10 +58,6 @@ class TenantsTest extends TestCase
         $this->tenants->create('tenant1');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::create
-     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
-     */
     public function testCanCreateSingleTenantFromTenantObject(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
@@ -84,10 +73,6 @@ class TenantsTest extends TestCase
         $this->tenants->create($tenant);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::create
-     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
-     */
     public function testCanCreateSingleTenantFromTenantCreateObject(): void
     {
         $tenantCreate = new TenantCreate('tenant1', TenantActivityStatus::INACTIVE);
@@ -103,10 +88,6 @@ class TenantsTest extends TestCase
         $this->tenants->create($tenantCreate);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::create
-     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
-     */
     public function testCanCreateMultipleTenantsFromArray(): void
     {
         $tenants = [
@@ -130,10 +111,6 @@ class TenantsTest extends TestCase
         $this->tenants->create($tenants);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::remove
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanRemoveSingleTenantFromString(): void
     {
         $this->connection
@@ -144,10 +121,6 @@ class TenantsTest extends TestCase
         $this->tenants->remove('tenant1');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::remove
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanRemoveMultipleTenantsFromArray(): void
     {
         $tenants = ['tenant1', new Tenant('tenant2'), 'tenant3'];
@@ -160,9 +133,6 @@ class TenantsTest extends TestCase
         $this->tenants->remove($tenants);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::get
-     */
     public function testCanGetAllTenants(): void
     {
         $responseData = [
@@ -186,9 +156,6 @@ class TenantsTest extends TestCase
         $this->assertEquals(TenantActivityStatus::ACTIVE, $result['tenant1']->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::getByName
-     */
     public function testCanGetTenantByName(): void
     {
         $responseData = ['name' => 'tenant1', 'activityStatus' => 'ACTIVE'];
@@ -206,9 +173,6 @@ class TenantsTest extends TestCase
         $this->assertEquals(TenantActivityStatus::ACTIVE, $result->getActivityStatus());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::getByName
-     */
     public function testGetTenantByNameReturnsNullWhenNotFound(): void
     {
         $this->connection
@@ -222,9 +186,6 @@ class TenantsTest extends TestCase
         $this->assertNull($result);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::getByName
-     */
     public function testCanGetTenantByNameWithTenantObject(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
@@ -242,9 +203,6 @@ class TenantsTest extends TestCase
         $this->assertEquals('tenant1', $result->getName());
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::getByName
-     */
     public function testGetByNameThrowsExceptionOnConnectionError(): void
     {
         $this->connection
@@ -259,9 +217,6 @@ class TenantsTest extends TestCase
         $this->tenants->getByName('tenant1');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::exists
-     */
     public function testCanCheckIfTenantExists(): void
     {
         $this->connection
@@ -275,9 +230,6 @@ class TenantsTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::exists
-     */
     public function testReturnsFalseWhenTenantDoesNotExist(): void
     {
         $this->connection
@@ -291,9 +243,6 @@ class TenantsTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::exists
-     */
     public function testCanCheckIfTenantExistsWithTenantObject(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
@@ -309,9 +258,6 @@ class TenantsTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::exists
-     */
     public function testExistsThrowsExceptionOnConnectionError(): void
     {
         $this->connection
@@ -326,11 +272,6 @@ class TenantsTest extends TestCase
         $this->tenants->exists('tenant1');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::activate
-     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanActivateTenant(): void
     {
         $this->connection
@@ -344,11 +285,6 @@ class TenantsTest extends TestCase
         $this->tenants->activate('tenant1');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::deactivate
-     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanDeactivateTenant(): void
     {
         $this->connection
@@ -362,11 +298,6 @@ class TenantsTest extends TestCase
         $this->tenants->deactivate('tenant1');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::offload
-     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanOffloadTenant(): void
     {
         $this->connection
@@ -380,10 +311,6 @@ class TenantsTest extends TestCase
         $this->tenants->offload('tenant1');
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::getByNames
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanGetTenantsByNames(): void
     {
         $this->connection
@@ -404,10 +331,6 @@ class TenantsTest extends TestCase
         $this->assertArrayNotHasKey('tenant2', $result);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::update
-     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
-     */
     public function testCanUpdateSingleTenant(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
@@ -423,10 +346,6 @@ class TenantsTest extends TestCase
         $this->tenants->update($tenant);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::update
-     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
-     */
     public function testCanUpdateWithTenantUpdateObject(): void
     {
         $tenantUpdate = new TenantUpdate('tenant1', TenantActivityStatus::OFFLOADED);
@@ -442,11 +361,6 @@ class TenantsTest extends TestCase
         $this->tenants->update($tenantUpdate);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::activate
-     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanActivateMultipleTenants(): void
     {
         $this->connection
@@ -463,11 +377,6 @@ class TenantsTest extends TestCase
         $this->tenants->activate(['tenant1', 'tenant2']);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::deactivate
-     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanDeactivateMultipleTenants(): void
     {
         $this->connection
@@ -484,11 +393,6 @@ class TenantsTest extends TestCase
         $this->tenants->deactivate(['tenant1', 'tenant2']);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::offload
-     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanOffloadMultipleTenants(): void
     {
         $this->connection
@@ -507,10 +411,6 @@ class TenantsTest extends TestCase
 
 
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::create
-     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
-     */
     public function testCanCreateMixedTenantTypes(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
@@ -531,10 +431,6 @@ class TenantsTest extends TestCase
         $this->tenants->create(['tenant0', $tenant, $tenantCreate]);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::update
-     * @covers \Weaviate\Tenants\Tenants::normalizeTenantInput
-     */
     public function testCanUpdateMixedTenantTypes(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
@@ -554,10 +450,6 @@ class TenantsTest extends TestCase
         $this->tenants->update([$tenant, $tenantUpdate]);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::remove
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanRemoveSingleTenantObject(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
@@ -570,10 +462,6 @@ class TenantsTest extends TestCase
         $this->tenants->remove($tenant);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::remove
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanRemoveMixedTenantTypes(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
@@ -586,11 +474,6 @@ class TenantsTest extends TestCase
         $this->tenants->remove(['tenant0', $tenant, 'tenant2']);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::activate
-     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanActivateSingleTenantObject(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
@@ -606,11 +489,6 @@ class TenantsTest extends TestCase
         $this->tenants->activate($tenant);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::deactivate
-     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanDeactivateSingleTenantObject(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
@@ -626,11 +504,6 @@ class TenantsTest extends TestCase
         $this->tenants->deactivate($tenant);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::offload
-     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanOffloadSingleTenantObject(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
@@ -646,11 +519,6 @@ class TenantsTest extends TestCase
         $this->tenants->offload($tenant);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::activate
-     * @covers \Weaviate\Tenants\Tenants::updateTenantStatus
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanActivateMixedTenantTypes(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::INACTIVE);
@@ -670,10 +538,6 @@ class TenantsTest extends TestCase
         $this->tenants->activate(['tenant0', $tenant, 'tenant2']);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::getByNames
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanGetTenantsByNamesWithMixedTypes(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
@@ -698,10 +562,6 @@ class TenantsTest extends TestCase
         $this->assertArrayNotHasKey('tenant3', $result);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::getByNames
-     * @covers \Weaviate\Tenants\Tenants::extractTenantNames
-     */
     public function testCanGetTenantsByNamesWithSingleTenant(): void
     {
         $tenant = new Tenant('tenant1', TenantActivityStatus::ACTIVE);
@@ -722,9 +582,6 @@ class TenantsTest extends TestCase
         $this->assertArrayNotHasKey('tenant2', $result);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::existsBatch
-     */
     public function testCanCheckMultipleTenantsExist(): void
     {
         $this->connection
@@ -747,9 +604,6 @@ class TenantsTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::createBatch
-     */
     public function testCanCreateMultipleTenantsInBatch(): void
     {
         $tenantNames = ['tenant1', 'tenant2', 'tenant3'];
@@ -769,9 +623,6 @@ class TenantsTest extends TestCase
         $this->tenants->createBatch($tenantNames);
     }
 
-    /**
-     * @covers \Weaviate\Tenants\Tenants::activateBatch
-     */
     public function testCanActivateMultipleTenantsInBatch(): void
     {
         $tenantNames = ['tenant1', 'tenant2', 'tenant3'];

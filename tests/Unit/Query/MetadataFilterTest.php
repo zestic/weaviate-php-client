@@ -24,17 +24,11 @@ use DateTime;
 use PHPUnit\Framework\TestCase;
 use Weaviate\Query\Filter;
 
-/**
- * @covers \Weaviate\Query\Filter
- * @covers \Weaviate\Query\IdFilter
- * @covers \Weaviate\Query\PropertyFilter
- */
 class MetadataFilterTest extends TestCase
 {
     /**
      * Test ID-based filtering with single ID
      *
-     * @covers \Weaviate\Query\IdFilter::equal
      */
     public function testIdFilterEqual(): void
     {
@@ -53,7 +47,6 @@ class MetadataFilterTest extends TestCase
     /**
      * Test ID-based filtering with exclusion
      *
-     * @covers \Weaviate\Query\IdFilter::notEqual
      */
     public function testIdFilterNotEqual(): void
     {
@@ -72,7 +65,6 @@ class MetadataFilterTest extends TestCase
     /**
      * Test ID-based filtering with multiple IDs
      *
-     * @covers \Weaviate\Query\IdFilter::containsAny
      */
     public function testIdFilterContainsAny(): void
     {
@@ -95,8 +87,6 @@ class MetadataFilterTest extends TestCase
     /**
      * Test timestamp-based filtering for creation dates
      *
-     * @covers \Weaviate\Query\PropertyFilter::greaterThan
-     * @covers \Weaviate\Query\PropertyFilter::lessThan
      */
     public function testTimestampFiltering(): void
     {
@@ -127,7 +117,6 @@ class MetadataFilterTest extends TestCase
     /**
      * Test filtering by last update timestamp
      *
-     * @covers \Weaviate\Query\PropertyFilter::greaterThan
      */
     public function testLastUpdateFiltering(): void
     {
@@ -146,8 +135,6 @@ class MetadataFilterTest extends TestCase
     /**
      * Test filtering by vector certainty/distance
      *
-     * @covers \Weaviate\Query\PropertyFilter::greaterThan
-     * @covers \Weaviate\Query\PropertyFilter::lessThan
      */
     public function testVectorCertaintyFiltering(): void
     {
@@ -175,7 +162,6 @@ class MetadataFilterTest extends TestCase
     /**
      * Test complex metadata combinations
      *
-     * @covers \Weaviate\Query\Filter::allOf
      */
     public function testComplexMetadataFiltering(): void
     {
@@ -220,8 +206,6 @@ class MetadataFilterTest extends TestCase
     /**
      * Test filtering by classification metadata
      *
-     * @covers \Weaviate\Query\PropertyFilter::equal
-     * @covers \Weaviate\Query\PropertyFilter::greaterThan
      */
     public function testClassificationMetadata(): void
     {
@@ -249,7 +233,6 @@ class MetadataFilterTest extends TestCase
     /**
      * Test tenant-aware metadata filtering
      *
-     * @covers \Weaviate\Query\PropertyFilter::equal
      */
     public function testTenantMetadataFiltering(): void
     {
@@ -270,8 +253,6 @@ class MetadataFilterTest extends TestCase
     /**
      * Test filtering by object version/revision metadata
      *
-     * @covers \Weaviate\Query\PropertyFilter::equal
-     * @covers \Weaviate\Query\PropertyFilter::greaterThan
      */
     public function testVersionMetadataFiltering(): void
     {
@@ -299,8 +280,6 @@ class MetadataFilterTest extends TestCase
     /**
      * Test filtering by object size/length metadata
      *
-     * @covers \Weaviate\Query\PropertyFilter::lessThan
-     * @covers \Weaviate\Query\PropertyFilter::greaterThan
      */
     public function testObjectSizeFiltering(): void
     {
@@ -328,8 +307,6 @@ class MetadataFilterTest extends TestCase
     /**
      * Test comprehensive metadata query combining multiple metadata fields
      *
-     * @covers \Weaviate\Query\Filter::allOf
-     * @covers \Weaviate\Query\Filter::anyOf
      */
     public function testComprehensiveMetadataQuery(): void
     {

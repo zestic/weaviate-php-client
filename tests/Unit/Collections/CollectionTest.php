@@ -27,11 +27,6 @@ use Weaviate\Connection\ConnectionInterface;
 
 class CollectionTest extends TestCase
 {
-    /**
-     * @covers \Weaviate\Collections\Collection::__construct
-     * @covers \Weaviate\Collections\Collection::withTenant
-     * @covers \Weaviate\Collections\Collection::getTenant
-     */
     public function testCanSetTenant(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
@@ -44,11 +39,6 @@ class CollectionTest extends TestCase
         $this->assertNull($collection->getTenant()); // Original should be unchanged
     }
 
-    /**
-     * @covers \Weaviate\Collections\Collection::__construct
-     * @covers \Weaviate\Collections\Collection::data
-     * @covers \Weaviate\Data\DataOperations::__construct
-     */
     public function testDataReturnsDataOperations(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
@@ -59,11 +49,6 @@ class CollectionTest extends TestCase
         $this->assertInstanceOf(DataOperations::class, $data);
     }
 
-    /**
-     * @covers \Weaviate\Collections\Collection::__construct
-     * @covers \Weaviate\Collections\Collection::data
-     * @covers \Weaviate\Collections\Collection::withTenant
-     */
     public function testDataOperationsReceiveTenant(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
