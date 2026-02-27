@@ -55,7 +55,10 @@ class WeaviateClientFactoryIntegrationTest extends TestCase
         }
 
         $auth = new ApiKey($apiKey);
-        $client = WeaviateClientFactory::connectToWeaviateCloud('https://example-cluster.weaviate.network/path/', $auth);
+        $client = WeaviateClientFactory::connectToWeaviateCloud(
+            'https://example-cluster.weaviate.network/path/',
+            $auth,
+        );
 
         $this->assertInstanceOf(WeaviateClient::class, $client);
         $this->assertSame($auth, $client->getAuth());
