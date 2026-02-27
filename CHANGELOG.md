@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-02-26
+
+### Changed
+- **HttpConnection API**: added optional `LoggerInterface` parameter and introduced `sendRequest()` helper
+- Centralized error handling/logging, improved exception coverage, and added PSR‑3 logging
+- Public interface methods now delegate to `sendRequest()` for DRY and testability
+- Updated tests to cover logging and broader exception scenarios
+- Added `psr/log` dependency
+- Adjusted phpstan configuration; tests removed from static analysis
+
+### Fixed
+- Enhanced retry and error handling across connection methods
+
+### Dev
+- Added 85 new PHPUnit tests and updated existing suites for logging/refactor
+- Composer scripts updated (phpstan analyze src only)
+- Version bump to 0.6.0 due to interface changes
+
+
 ## [0.5.0] - 2025-01-08
 
 ### Added

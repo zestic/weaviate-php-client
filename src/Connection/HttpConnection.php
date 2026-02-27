@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * Copyright 2025 Zestic
+ * Copyright 2025-2026 Zestic
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
+use Psr\Log\LoggerInterface;
 use Weaviate\Auth\AuthInterface;
 use Weaviate\Exceptions\WeaviateConnectionException;
 use Weaviate\Exceptions\UnexpectedStatusCodeException;
@@ -77,7 +78,8 @@ class HttpConnection implements ConnectionInterface
         private readonly StreamFactoryInterface $streamFactory,
         private readonly ?AuthInterface $auth = null,
         private readonly array $additionalHeaders = [],
-        private readonly ?RetryHandler $retryHandler = null
+        private readonly ?RetryHandler $retryHandler = null,
+        private readonly ?LoggerInterface $logger = null
     ) {
     }
 
@@ -85,9 +87,7 @@ class HttpConnection implements ConnectionInterface
     {
         $url = $this->baseUrl . $path;
         $request = $this->requestFactory->createRequest('DELETE', $url);
-        $request = $this->applyHeaders($request);
-        $request = $this->applyAuth($request);
-        $response = $this->httpClient->sendRequest($request);
+        $response = $this->sendRequest($request, "DELETE {$path}", $url);
 
         return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
     }
@@ -107,9 +107,7 @@ class HttpConnection implements ConnectionInterface
                 ->withHeader('Content-Type', 'application/json');
         }
 
-        $request = $this->applyHeaders($request);
-        $request = $this->applyAuth($request);
-        $response = $this->httpClient->sendRequest($request);
+        $response = $this->sendRequest($request, "DELETE {$path}", $url);
 
         return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
     }
@@ -118,28 +116,19 @@ class HttpConnection implements ConnectionInterface
     {
         $operation = "GET {$path}";
 
-        $executeRequest = function () use ($path, $params): array {
+        $executeRequest = function () use ($path, $params, $operation): array {
             $url = $this->baseUrl . $path;
             if (!empty($params)) {
                 $url .= '?' . http_build_query($params);
             }
 
             $request = $this->requestFactory->createRequest('GET', $url);
-            $request = $this->applyHeaders($request);
-            $request = $this->applyAuth($request);
-
-            try {
-                $response = $this->httpClient->sendRequest($request);
-            } catch (NetworkExceptionInterface $e) {
-                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
-            } catch (RequestExceptionInterface $e) {
-                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
-            }
+            $response = $this->sendRequest($request, $operation, $url);
 
             // Handle HTTP error status codes
             $statusCode = $response->getStatusCode();
             if ($statusCode >= 400) {
-                $this->handleErrorResponse($response, "GET {$path}");
+                $this->handleErrorResponse($response, $operation);
             }
 
             $body = (string) $response->getBody();
@@ -161,16 +150,7 @@ class HttpConnection implements ConnectionInterface
         $executeRequest = function () use ($path, $operation): bool {
             $url = $this->baseUrl . $path;
             $request = $this->requestFactory->createRequest('HEAD', $url);
-            $request = $this->applyHeaders($request);
-            $request = $this->applyAuth($request);
-
-            try {
-                $response = $this->httpClient->sendRequest($request);
-            } catch (NetworkExceptionInterface $e) {
-                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
-            } catch (RequestExceptionInterface $e) {
-                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
-            }
+            $response = $this->sendRequest($request, $operation, $url);
 
             $statusCode = $response->getStatusCode();
 
@@ -203,7 +183,7 @@ class HttpConnection implements ConnectionInterface
     {
         $operation = "PATCH {$path}";
 
-        $executeRequest = function () use ($path, $data): array {
+        $executeRequest = function () use ($path, $data, $operation): array {
             $url = $this->baseUrl . $path;
             $request = $this->requestFactory->createRequest('PATCH', $url);
 
@@ -217,21 +197,12 @@ class HttpConnection implements ConnectionInterface
                     ->withHeader('Content-Type', 'application/json');
             }
 
-            $request = $this->applyHeaders($request);
-            $request = $this->applyAuth($request);
-
-            try {
-                $response = $this->httpClient->sendRequest($request);
-            } catch (NetworkExceptionInterface $e) {
-                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
-            } catch (RequestExceptionInterface $e) {
-                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
-            }
+            $response = $this->sendRequest($request, $operation, $url);
 
             // Handle HTTP error status codes
             $statusCode = $response->getStatusCode();
             if ($statusCode >= 400) {
-                $this->handleErrorResponse($response, "PATCH {$path}");
+                $this->handleErrorResponse($response, $operation);
             }
 
             $body = (string) $response->getBody();
@@ -250,7 +221,7 @@ class HttpConnection implements ConnectionInterface
     {
         $operation = "POST {$path}";
 
-        $executeRequest = function () use ($path, $data): array {
+        $executeRequest = function () use ($path, $data, $operation): array {
             $url = $this->baseUrl . $path;
             $request = $this->requestFactory->createRequest('POST', $url);
 
@@ -264,21 +235,12 @@ class HttpConnection implements ConnectionInterface
                     ->withHeader('Content-Type', 'application/json');
             }
 
-            $request = $this->applyHeaders($request);
-            $request = $this->applyAuth($request);
-
-            try {
-                $response = $this->httpClient->sendRequest($request);
-            } catch (NetworkExceptionInterface $e) {
-                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
-            } catch (RequestExceptionInterface $e) {
-                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
-            }
+            $response = $this->sendRequest($request, $operation, $url);
 
             // Handle HTTP error status codes
             $statusCode = $response->getStatusCode();
             if ($statusCode >= 400) {
-                $this->handleErrorResponse($response, "POST {$path}");
+                $this->handleErrorResponse($response, $operation);
             }
 
             $body = (string) $response->getBody();
@@ -297,7 +259,7 @@ class HttpConnection implements ConnectionInterface
     {
         $operation = "PUT {$path}";
 
-        $executeRequest = function () use ($path, $data): array {
+        $executeRequest = function () use ($path, $data, $operation): array {
             $url = $this->baseUrl . $path;
             $request = $this->requestFactory->createRequest('PUT', $url);
 
@@ -311,21 +273,12 @@ class HttpConnection implements ConnectionInterface
                     ->withHeader('Content-Type', 'application/json');
             }
 
-            $request = $this->applyHeaders($request);
-            $request = $this->applyAuth($request);
-
-            try {
-                $response = $this->httpClient->sendRequest($request);
-            } catch (NetworkExceptionInterface $e) {
-                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
-            } catch (RequestExceptionInterface $e) {
-                throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
-            }
+            $response = $this->sendRequest($request, $operation, $url);
 
             // Handle HTTP error status codes
             $statusCode = $response->getStatusCode();
             if ($statusCode >= 400) {
-                $this->handleErrorResponse($response, "PUT {$path}");
+                $this->handleErrorResponse($response, $operation);
             }
 
             $body = (string) $response->getBody();
@@ -338,6 +291,59 @@ class HttpConnection implements ConnectionInterface
         }
 
         return $executeRequest();
+    }
+
+    /**
+     * Send an HTTP request with logging and exception handling
+     *
+     * Applies headers and authentication, logs the request and response,
+     * and handles all exceptions by converting them to WeaviateConnectionException.
+     *
+     * @param \Psr\Http\Message\RequestInterface $request The prepared HTTP request
+     * @param string $operation Operation description for logging (e.g., "GET /objects")
+     * @param string $url The full URL being requested
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws WeaviateConnectionException If the HTTP request fails
+     */
+    private function sendRequest(
+        \Psr\Http\Message\RequestInterface $request,
+        string $operation,
+        string $url
+    ): \Psr\Http\Message\ResponseInterface {
+        // Apply headers and authentication
+        $request = $this->applyHeaders($request);
+        $request = $this->applyAuth($request);
+
+        // Log the outgoing request
+        $this->logger?->debug('Sending HTTP request', [
+            'method' => $request->getMethod(),
+            'url' => $url,
+            'operation' => $operation,
+        ]);
+
+        try {
+            $response = $this->httpClient->sendRequest($request);
+
+            // Log successful response
+            $this->logger?->debug('HTTP response received', [
+                'status_code' => $response->getStatusCode(),
+                'url' => $url,
+                'operation' => $operation,
+            ]);
+
+            return $response;
+        } catch (\Throwable $e) {
+            // Log the exception with full context
+            $this->logger?->error('HTTP request failed', [
+                'exception' => $e,
+                'url' => $url,
+                'operation' => $operation,
+                'message' => $e->getMessage(),
+            ]);
+
+            // Convert to WeaviateConnectionException
+            throw WeaviateConnectionException::fromNetworkError($url, $e->getMessage(), $e);
+        }
     }
 
     /**
