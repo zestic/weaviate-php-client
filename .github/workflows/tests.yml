@@ -149,12 +149,16 @@ jobs:
       run: composer test-coverage
       env:
         WEAVIATE_URL: http://localhost:18080
+        XDEBUG_MODE: coverage
     
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: zestic/weaviate-php-client
+        files: coverage/clover.xml
+        fail_ci_if_error: true
+        verbose: true
         
     - name: Stop Weaviate
       if: always()
