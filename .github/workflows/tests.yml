@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   unit-tests:
     name: Unit Tests
@@ -109,6 +113,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -150,13 +156,21 @@ jobs:
       env:
         WEAVIATE_URL: http://localhost:18080
         XDEBUG_MODE: coverage
+
+    - name: Verify coverage output exists
+      if: always()
+      run: |
+        ls -la coverage || true
+        test -f coverage/clover.xml
     
     - name: Upload coverage reports to Codecov
+      if: always()
       uses: codecov/codecov-action@v5
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+        use_oidc: true
         slug: zestic/weaviate-php-client
-        files: coverage/clover.xml
+        files: ./coverage/clover.xml
+        disable_search: true
         fail_ci_if_error: true
         verbose: true
         
