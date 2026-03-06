@@ -61,7 +61,7 @@ class TenantTest extends TestCase
 
         $this->assertEquals([
             'name' => 'tenant1',
-            'activityStatus' => 'COLD'
+            'activityStatus' => 'INACTIVE'
         ], $array);
     }
 
@@ -89,9 +89,9 @@ class TenantTest extends TestCase
     public static function statusMappingProvider(): array
     {
         return [
-            'ACTIVE maps to HOT' => [TenantActivityStatus::ACTIVE, 'HOT'],
-            'INACTIVE maps to COLD' => [TenantActivityStatus::INACTIVE, 'COLD'],
-            'OFFLOADED maps to FROZEN' => [TenantActivityStatus::OFFLOADED, 'FROZEN'],
+            'ACTIVE maps to ACTIVE' => [TenantActivityStatus::ACTIVE, 'ACTIVE'],
+            'INACTIVE maps to INACTIVE' => [TenantActivityStatus::INACTIVE, 'INACTIVE'],
+            'OFFLOADED maps to OFFLOADED' => [TenantActivityStatus::OFFLOADED, 'OFFLOADED'],
             'OFFLOADING maps to OFFLOADING' => [TenantActivityStatus::OFFLOADING, 'OFFLOADING'],
             'ONLOADING maps to ONLOADING' => [TenantActivityStatus::ONLOADING, 'ONLOADING'],
         ];

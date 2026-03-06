@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Weaviate\Factory;
 
 use Weaviate\Auth\AuthInterface;
+use Weaviate\Collections\Collections;
+use Weaviate\Connection\ConnectionInterface;
 use Weaviate\Exceptions\WeaviateInvalidInputException;
 use Weaviate\Factory\HttpConnectionFactory;
 use Weaviate\Retry\RetryHandler;
@@ -28,24 +30,21 @@ class WeaviateClientFactory
      *
      * @return WeaviateClient
      */
-    public static function connectToLocal(string $host = 'localhost:8080', ?AuthInterface $auth = null): WeaviateClient
-    {
+    public static function connectToLocal(
+        string $host = 'localhost:8080',
+        ?ConnectionInterface $connection = null,
+        ?AuthInterface $auth = null,
+    ): WeaviateClient {
         if (!str_starts_with($host, 'http://') && !str_starts_with($host, 'https://')) {
             $host = 'http://' . $host;
         }
 
-        $retryHandler = RetryHandler::forConnection();
-
-        $connection = HttpConnectionFactory::create(
-            $host,
-            $auth,
-            [],
-            null,
-            null,
-            null,
-            $retryHandler,
-            null
-        );
+        if (!$connection) {
+            $connection = HttpConnectionFactory::create(
+                $host,
+                $auth,
+            );
+        }
 
         return new WeaviateClient($connection, $auth);
     }
@@ -86,6 +85,7 @@ class WeaviateClientFactory
      * @param bool $secure
      * @param AuthInterface|null $auth
      * @param array<string,string> $headers
+     *
      * @return WeaviateClient
      */
     public static function connectToCustom(
@@ -117,8 +117,13 @@ class WeaviateClientFactory
             $retryHandler,
             null
         );
+        $collection = new Collections($connection);
 
-        return new WeaviateClient($connection, $auth);
+        return new WeaviateClient(
+            $connection,
+            $collection,
+            $auth,
+        );
     }
 
     /**

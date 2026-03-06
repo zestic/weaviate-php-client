@@ -25,12 +25,59 @@ use Weaviate\Collections\Collections;
 use Weaviate\Connection\ConnectionInterface;
 use Weaviate\Schema\Schema;
 
-class WeaviateClient
+class WeaviateClient implements WeaviateClientInterface
 {
+    private readonly Collections $collections;
+    private readonly ?AuthInterface $auth;
+
     public function __construct(
         private readonly ConnectionInterface $connection,
-        private readonly ?AuthInterface $auth = null,
+        Collections|AuthInterface|null $collectionsOrAuth = null,
+        ?AuthInterface $auth = null,
     ) {
+        if ($collectionsOrAuth instanceof Collections) {
+            $this->collections = $collectionsOrAuth;
+            $this->auth = $auth;
+            return;
+        }
+
+        $this->collections = new Collections($connection);
+        $this->auth = $collectionsOrAuth instanceof AuthInterface ? $collectionsOrAuth : $auth;
+    }
+
+    public function connect(): void
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function close(): void
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function isConnected(): bool
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function isLive(): bool
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function isReady(): bool
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function getCollections(): Collections
+    {
+        return $this->collections;
+    }
+
+    public function collections(): Collections
+    {
+        return $this->getCollections();
     }
 
     public function getAuth(): ?AuthInterface
@@ -41,11 +88,6 @@ class WeaviateClient
     public function getConnection(): ConnectionInterface
     {
         return $this->connection;
-    }
-
-    public function collections(): Collections
-    {
-        return new Collections($this->connection);
     }
 
     public function schema(): Schema

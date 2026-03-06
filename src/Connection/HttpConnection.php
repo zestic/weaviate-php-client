@@ -83,6 +83,21 @@ class HttpConnection implements ConnectionInterface
     ) {
     }
 
+    public function connect(bool $force = false): void
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function isConnected(): bool
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function close(): bool
+    {
+        throw new \Exception('Not implemented');
+    }
+
     public function delete(string $path): bool
     {
         $url = $this->baseUrl . $path;

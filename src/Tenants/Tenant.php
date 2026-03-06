@@ -51,7 +51,7 @@ namespace Weaviate\Tenants;
  * $tenant = Tenant::fromArray($array);
  * ```
  */
-class Tenant
+class Tenant implements TenantInterface
 {
     /**
      * Create a new tenant
@@ -104,34 +104,14 @@ class Tenant
     }
 
     /**
-     * Convert the tenant to an array representation
-     *
-     * This is useful for API calls and serialization.
-     *
      * @return array<string, string> Array with 'name' and 'activityStatus' keys
      */
     public function toArray(): array
     {
         return [
             'name' => $this->name,
-            'activityStatus' => $this->getApiStatusValue(),
+            'activityStatus' => $this->activityStatus->value,
         ];
-    }
-
-    /**
-     * Get the API status value (maps modern names to legacy API values)
-     *
-     * @return string The status value expected by the Weaviate API
-     */
-    private function getApiStatusValue(): string
-    {
-        return match ($this->activityStatus) {
-            TenantActivityStatus::ACTIVE => 'HOT',
-            TenantActivityStatus::INACTIVE => 'COLD',
-            TenantActivityStatus::OFFLOADED => 'FROZEN',
-            TenantActivityStatus::OFFLOADING => 'OFFLOADING',
-            TenantActivityStatus::ONLOADING => 'ONLOADING',
-        };
     }
 
     /**

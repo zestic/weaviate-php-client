@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * Copyright 2025 Zestic
+ * Copyright 2025-2026 Zestic
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,30 @@ namespace Weaviate\Connection;
  */
 interface ConnectionInterface
 {
+    public function connect(bool $force = false): void;
+
+    public function isConnected(): bool;
+
+    public function close(): bool;
+
+    /**
+     * Make a DELETE request
+     *
+     * @param string $path The API path
+     * @return bool Success status
+     */
+    public function delete(string $path): bool;
+
+
+    /**
+     * Make a DELETE request with data
+     *
+     * @param string $path The API path
+     * @param array<string, mixed> $data Request body data
+     * @return bool Success status
+     */
+    public function deleteWithData(string $path, array $data = []): bool;
+
     /**
      * Make a GET request
      *
@@ -33,6 +57,27 @@ interface ConnectionInterface
      * @return array<string, mixed> Response data
      */
     public function get(string $path, array $params = []): array;
+
+    /**
+     * Make a HEAD request for existence checks
+     *
+     * @param string $path The API path
+     * @return bool True if resource exists (2xx status), false otherwise
+     */
+    public function head(string $path): bool;
+
+    // public function getMeta(string $path): bool;
+
+    // public function getOpenIdConfiguration();
+
+    /**
+     * Make a PATCH request
+     *
+     * @param string $path The API path
+     * @param array<string, mixed> $data Request body data
+     * @return array<string, mixed> Response data
+     */
+    public function patch(string $path, array $data = []): array;
 
     /**
      * Make a POST request
@@ -51,38 +96,4 @@ interface ConnectionInterface
      * @return array<string, mixed> Response data
      */
     public function put(string $path, array $data = []): array;
-
-    /**
-     * Make a PATCH request
-     *
-     * @param string $path The API path
-     * @param array<string, mixed> $data Request body data
-     * @return array<string, mixed> Response data
-     */
-    public function patch(string $path, array $data = []): array;
-
-    /**
-     * Make a DELETE request
-     *
-     * @param string $path The API path
-     * @return bool Success status
-     */
-    public function delete(string $path): bool;
-
-    /**
-     * Make a DELETE request with data
-     *
-     * @param string $path The API path
-     * @param array<string, mixed> $data Request body data
-     * @return bool Success status
-     */
-    public function deleteWithData(string $path, array $data = []): bool;
-
-    /**
-     * Make a HEAD request for existence checks
-     *
-     * @param string $path The API path
-     * @return bool True if resource exists (2xx status), false otherwise
-     */
-    public function head(string $path): bool;
 }

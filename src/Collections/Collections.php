@@ -22,6 +22,7 @@ namespace Weaviate\Collections;
 
 use Weaviate\Connection\ConnectionInterface;
 use Weaviate\Exceptions\NotFoundException;
+use Weaviate\Tenants\Tenant;
 
 /**
  * Collections management API
@@ -57,19 +58,6 @@ class Collections
     }
 
     /**
-     * Check if a collection exists
-     */
-    public function exists(string $name): bool
-    {
-        try {
-            $this->connection->get("/v1/schema/{$name}");
-            return true;
-        } catch (NotFoundException) {
-            return false;
-        }
-    }
-
-    /**
      * Create a new collection
      *
      * @param string $name Collection name
@@ -85,19 +73,28 @@ class Collections
         return $this->connection->post('/v1/schema', $data);
     }
 
-    /**
-     * Get a collection instance
-     */
+    public function delete(string $name): bool
+    {
+        return $this->connection->delete("/v1/schema/{$name}");
+    }
+
+    public function exists(string $name): bool
+    {
+        try {
+            $this->connection->get("/v1/schema/{$name}");
+            return true;
+        } catch (NotFoundException) {
+            return false;
+        }
+    }
+
     public function get(string $name): Collection
     {
         return new Collection($this->connection, $name);
     }
 
-    /**
-     * Delete a collection
-     */
-    public function delete(string $name): bool
+    public function withTenant(Tenant $tenant): Collection
     {
-        return $this->connection->delete("/v1/schema/{$name}");
+        return $this->get($tenant->getName())->withTenant($tenant->getName());
     }
 }

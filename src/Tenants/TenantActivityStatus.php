@@ -39,39 +39,13 @@ namespace Weaviate\Tenants;
  */
 enum TenantActivityStatus: string
 {
-    /**
-     * The tenant is fully active and can be used for all operations.
-     * Data is stored locally and immediately accessible.
-     */
     case ACTIVE = 'ACTIVE';
-
-    /**
-     * The tenant is not active but files are stored locally.
-     * Data operations are not available but can be quickly reactivated.
-     */
     case INACTIVE = 'INACTIVE';
-
-    /**
-     * The tenant is not active and files are stored on cloud storage.
-     * Data operations are not available and reactivation takes longer.
-     */
     case OFFLOADED = 'OFFLOADED';
-
-    /**
-     * The tenant is in the process of being offloaded to cloud storage.
-     * This is a transitional state and cannot be set directly.
-     */
     case OFFLOADING = 'OFFLOADING';
-
-    /**
-     * The tenant is in the process of being activated from cloud storage.
-     * This is a transitional state and cannot be set directly.
-     */
     case ONLOADING = 'ONLOADING';
 
     /**
-     * Create a TenantActivityStatus from a string value
-     *
      * @param string $value The status string
      * @return TenantActivityStatus
      * @throws \InvalidArgumentException If the status is invalid
@@ -89,9 +63,7 @@ enum TenantActivityStatus: string
     }
 
     /**
-     * Check if this status can be set by users (not transitional)
-     *
-     * @return bool True if the status can be set directly
+     * Returns whether this status can be set directly by tenant update operations.
      */
     public function isWritable(): bool
     {
@@ -102,9 +74,7 @@ enum TenantActivityStatus: string
     }
 
     /**
-     * Check if this is a transitional status
-     *
-     * @return bool True if the status is transitional
+     * Returns whether this status is a transitional state.
      */
     public function isTransitional(): bool
     {
